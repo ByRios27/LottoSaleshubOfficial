@@ -1,0 +1,1108 @@
+[debug] [2025-10-12T23:02:11.134Z] ----------------------------------------------------------------------
+[debug] [2025-10-12T23:02:11.137Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /home/user/.global_modules/bin/firebase init
+[debug] [2025-10-12T23:02:11.138Z] CLI Version:   14.19.1
+[debug] [2025-10-12T23:02:11.138Z] Platform:      linux
+[debug] [2025-10-12T23:02:11.138Z] Node Version:  v20.18.1
+[debug] [2025-10-12T23:02:11.138Z] Time:          Sun Oct 12 2025 23:02:11 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-10-12T23:02:11.139Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-10-12T23:02:11.146Z] Checked if tokens are valid: true, expires at: 1760312861280
+[debug] [2025-10-12T23:02:11.147Z] Checked if tokens are valid: true, expires at: 1760312861280
+[debug] [2025-10-12T23:02:11.150Z] >>> [apiv2][query] GET https://monospace-pa.googleapis.com/v1/workspaces/lottosalesofficial-39865418 [none]
+[debug] [2025-10-12T23:02:11.857Z] <<< [apiv2][status] GET https://monospace-pa.googleapis.com/v1/workspaces/lottosalesofficial-39865418 200
+[debug] [2025-10-12T23:02:11.858Z] <<< [apiv2][body] GET https://monospace-pa.googleapis.com/v1/workspaces/lottosalesofficial-39865418 {"workspaceId":"lottosalesofficial-39865418","name":"LottoSalesOfficial","workspaceRedirectUrl":"firebase-lottosalesofficial-1760061403699.cluster-gizzoza7hzhfyxzo5d76y3flkw.cloudworkstations.dev","status":"WORKSPACE_STATUS_RUNNING","lastAccessDatetime":"2025-10-12T22:47:42.935834Z","workspaceTemplate":"WORKSPACE_TEMPLATE_BLANK_WEB","owner":"SELF","serviceAccountEmail":"msp-7266511594781852210@monospace-362420.iam.gserviceaccount.com","ownerEmail":"jrios5061@gmail.com","workspaceImageUrl":"https://www.gstatic.com/monospace/231115/logo_nextjs.svg","templateArgs":"{\"language\":\"ts\",\"srcDir\":true,\"eslint\":true,\"app\":true,\"tailwind\":true,\"__agentic_workspace\":true}","templateRepoUrl":"file:///usr/local/monospace/templates/public/nextjs","workstationAccessToken":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vd29ya3N0YXRpb25zIiwiYXVkIjoiZmlyZWJhc2UtbG90dG9zYWxlc29mZmljaWFsLTE3NjAwNjE0MDM2OTkuY2x1c3Rlci1naXp6b3phN2h6aGZ5eHpvNWQ3NnkzZmxrdy5jbG91ZHdvcmtzdGF0aW9ucy5kZXYiLCJpYXQiOjE3NjAzMTAxMzEsImV4cCI6MTc2MDM5NjUzMX0.qpVaFTXAgnRgbRmv6WsQoxEfF7pPA4WB6U3PTbJhXTgDnzDQxObjOKWDNYEu9Aqyo0xYC8REZ1WpjMiweb99bws_qF1dflp0ex8zmiNz53oGugYYu-hW3KSQro_xMvDUB6vvRlXRuRlSetjrdVKFL8hD-U3XRX7Y0x6wyhXKquFx_256ZLBfAN_Y4HRhJapq1BM2g9Pw2kKG2e0cpC6HpLXoL2UnRi7XaK76dwZ7X3eUohZfaQvYjuFFT5VvhjVlodT72mZoFQHOIkTIh0SaKTWa5jjJPdxkZ5GJdVJSrhuE58_vLP4X4MZIkAjvd8cbacFMc8fLebZQ5XSQvDB9Ew","firebaseProjectId":"lottosaleshub-official"}
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /home/user/lottosaleshub-v3
+
+[debug] [2025-10-13T03:30:53.667Z] ExitPromptError: User force closed the prompt with SIGINT
+    at Interface.sigint (/home/user/.global_modules/lib/node_modules/firebase-tools/node_modules/@inquirer/core/dist/commonjs/lib/create-prompt.js:101:37)
+    at Interface.emit (node:events:518:28)
+    at Interface.emit (node:domain:489:12)
+    at [_ttyWrite] [as _ttyWrite] (node:internal/readline/interface:1125:18)
+    at ReadStream.onkeypress (node:internal/readline/interface:264:20)
+    at ReadStream.emit (node:events:530:35)
+    at ReadStream.emit (node:domain:489:12)
+    at emitKeys (node:internal/readline/utils:371:14)
+    at emitKeys.next (<anonymous>)
+    at ReadStream.onData (node:internal/readline/emitKeypressEvents:64:36)
+[error] 
+[error] Error: An unexpected error has occurred.
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T14:44:13.599Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:13.599Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:13.605Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T14:44:13.621Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T14:44:13.627Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:13.943Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:13.944Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:13.944Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T14:44:13.945Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T14:44:13.946Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:13.952Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:13.952Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:13.953Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T14:44:13.957Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T14:44:13.957Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:13.965Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:13.965Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:13.966Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T14:44:13.969Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T14:44:13.970Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:13.979Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:13.981Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:13.983Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T14:44:13.989Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T14:44:13.989Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T14:44:14.534Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:14.535Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:14.535Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T14:44:14.535Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T14:44:14.535Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:14.578Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:14.580Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:14.582Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T14:44:14.586Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T14:44:14.590Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:14.601Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:14.601Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:14.602Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T14:44:14.606Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T14:44:14.607Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:14.620Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:14.622Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:14.622Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T14:44:14.626Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T14:44:14.628Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:14.655Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:14.657Z] Checked if tokens are valid: false, expires at: 1760316385476
+[debug] [2025-10-13T14:44:14.657Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T14:44:14.658Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T14:44:14.658Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:15.205Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T14:44:15.205Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:15.308Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T14:44:15.308Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:44:15.541Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T14:44:15.541Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:15.585Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T14:44:15.586Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:44:15.605Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T14:44:15.606Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:15.649Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T14:44:15.650Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:44:15.729Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T14:44:15.729Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:15.753Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-13T14:44:15.753Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:44:15.823Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T14:44:15.824Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T14:44:15.825Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T14:44:15.825Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:15.850Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-13T14:44:15.851Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:44:15.866Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T14:44:15.866Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:15.898Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T14:44:15.898Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:44:15.977Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T14:44:15.977Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:16.009Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-13T14:44:16.012Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:44:16.039Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T14:44:16.040Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:16.065Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-13T14:44:16.066Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:44:16.074Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T14:44:16.074Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T14:44:16.080Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T14:44:16.080Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:16.101Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T14:44:16.102Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:44:16.116Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T14:44:16.116Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T14:44:16.144Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T14:44:16.145Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:44:16.262Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-13T14:44:16.263Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-13T14:44:16.273Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-13T14:44:16.273Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-13T14:44:16.275Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T14:44:16.276Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T14:44:16.281Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T14:44:16.281Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T14:44:16.286Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-13T14:44:16.287Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[debug] [2025-10-13T14:44:16.306Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T14:44:16.306Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T14:44:16.495Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T14:44:16.501Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T14:44:16.577Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-13T14:44:16.579Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T14:44:16.598Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T14:44:16.603Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T14:45:59.606Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.607Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.607Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.608Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.612Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.612Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.612Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.613Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.615Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.615Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.620Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-13T14:45:59.620Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:45:59.732Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T14:45:59.732Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:45:59.735Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T14:45:59.735Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:45:59.737Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T14:45:59.737Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:45:59.739Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-13T14:45:59.739Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T14:45:59.893Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.893Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.898Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.898Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.899Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.901Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.901Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.901Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.902Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.902Z] Checked if tokens are valid: true, expires at: 1760370255116
+[debug] [2025-10-13T14:45:59.902Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-13T14:45:59.902Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:45:59.904Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T14:45:59.904Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:45:59.906Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T14:45:59.906Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:45:59.908Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T14:45:59.908Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:45:59.910Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-13T14:45:59.910Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T14:45:59.982Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-13T14:45:59.988Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-13T14:46:00.025Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T14:46:00.025Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T14:46:00.030Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T14:46:00.030Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T14:46:00.040Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T14:46:00.043Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T14:46:00.051Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-13T14:46:00.051Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-13T14:46:00.168Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T14:46:00.169Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T14:46:00.181Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T14:46:00.181Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T14:46:00.235Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T14:46:00.237Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T14:46:00.423Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-13T14:46:00.429Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[debug] [2025-10-13T14:46:00.474Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-13T14:46:00.475Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T14:46:00.495Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T14:46:00.503Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T14:46:00.567Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T14:46:00.568Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T14:46:00.587Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T14:46:00.587Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T15:54:29.636Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.636Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.637Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T15:54:29.639Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T15:54:29.640Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.679Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.679Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.679Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T15:54:29.680Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T15:54:29.680Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.684Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.684Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.684Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T15:54:29.685Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T15:54:29.685Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.687Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.687Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.687Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T15:54:29.688Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T15:54:29.688Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.690Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.690Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.690Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T15:54:29.691Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T15:54:29.691Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T15:54:29.743Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.743Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.743Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T15:54:29.743Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T15:54:29.743Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.745Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.745Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.745Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T15:54:29.745Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T15:54:29.746Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.752Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.752Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.755Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T15:54:29.756Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T15:54:29.756Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.760Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.762Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.762Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T15:54:29.762Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T15:54:29.762Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.765Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.765Z] Checked if tokens are valid: false, expires at: 1760370255116
+[debug] [2025-10-13T15:54:29.765Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T15:54:29.765Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T15:54:29.766Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.812Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T15:54:29.812Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.831Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-13T15:54:29.832Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T15:54:29.850Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T15:54:29.853Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.870Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T15:54:29.870Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T15:54:29.873Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T15:54:29.873Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.885Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T15:54:29.885Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T15:54:29.888Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T15:54:29.888Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.900Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T15:54:29.900Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T15:54:29.902Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T15:54:29.902Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.914Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T15:54:29.914Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T15:54:29.944Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T15:54:29.944Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.966Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-13T15:54:29.966Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T15:54:29.975Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T15:54:29.975Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:29.989Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-13T15:54:29.989Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T15:54:30.006Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T15:54:30.006Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:30.026Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-13T15:54:30.026Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T15:54:30.033Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-13T15:54:30.033Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-13T15:54:30.040Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T15:54:30.041Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:30.060Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T15:54:30.060Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T15:54:30.081Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T15:54:30.081Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T15:54:30.102Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T15:54:30.102Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T15:54:30.108Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T15:54:30.108Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T15:54:30.109Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T15:54:30.109Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T15:54:30.111Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T15:54:30.111Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T15:54:30.116Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T15:54:30.116Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T15:54:30.117Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-13T15:54:30.117Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-13T15:54:30.148Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T15:54:30.149Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T15:54:30.212Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T15:54:30.212Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T15:54:30.439Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-13T15:54:30.439Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T15:54:30.449Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T15:54:30.449Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T15:54:30.471Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T15:54:30.472Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T15:54:30.485Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T15:54:30.485Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-13T15:54:30.496Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-13T15:54:30.496Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T18:24:12.001Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.001Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.001Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T18:24:12.004Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T18:24:12.004Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.041Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.042Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.042Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T18:24:12.043Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T18:24:12.043Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.046Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.046Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.047Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T18:24:12.048Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T18:24:12.048Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.050Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.050Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.050Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T18:24:12.050Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T18:24:12.050Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.052Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.052Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.052Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T18:24:12.053Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T18:24:12.053Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T18:24:12.126Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.126Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.126Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T18:24:12.127Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T18:24:12.127Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.129Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.129Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.129Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T18:24:12.130Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T18:24:12.130Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.133Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.133Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.133Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T18:24:12.133Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T18:24:12.133Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.135Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.135Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.135Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T18:24:12.135Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T18:24:12.135Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.138Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.138Z] Checked if tokens are valid: false, expires at: 1760374469086
+[debug] [2025-10-13T18:24:12.138Z] > refreshing access token with scopes: []
+[debug] [2025-10-13T18:24:12.139Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-13T18:24:12.139Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.189Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T18:24:12.189Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.219Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T18:24:12.219Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:24:12.245Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T18:24:12.245Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.263Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-13T18:24:12.263Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:24:12.268Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T18:24:12.269Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.290Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-13T18:24:12.290Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:24:12.304Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T18:24:12.304Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.319Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T18:24:12.319Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:24:12.344Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T18:24:12.345Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.361Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T18:24:12.361Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:24:12.364Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T18:24:12.364Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.376Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T18:24:12.377Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:24:12.382Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T18:24:12.382Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.400Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-13T18:24:12.400Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:24:12.414Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T18:24:12.414Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.435Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-13T18:24:12.435Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:24:12.443Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T18:24:12.443Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.458Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T18:24:12.458Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:24:12.478Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-13T18:24:12.482Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-13T18:24:12.499Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T18:24:12.499Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:24:12.519Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-13T18:24:12.519Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-13T18:24:12.525Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T18:24:12.525Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T18:24:12.540Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-13T18:24:12.540Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-13T18:24:12.544Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T18:24:12.544Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T18:24:12.799Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T18:24:12.799Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T18:24:12.806Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T18:24:12.807Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T18:24:12.809Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T18:24:12.809Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T18:24:12.820Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T18:24:12.820Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T18:24:12.824Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-13T18:24:12.824Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[debug] [2025-10-13T18:24:12.926Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-13T18:24:12.927Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T18:24:12.935Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T18:24:12.937Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T18:24:12.965Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T18:24:12.965Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T18:24:12.974Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T18:24:12.974Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T18:43:42.080Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.080Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.080Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.081Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.081Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.081Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.082Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.082Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.082Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.082Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.083Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-13T18:43:42.084Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:43:42.119Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T18:43:42.120Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:43:42.121Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T18:43:42.122Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:43:42.123Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T18:43:42.123Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:43:42.124Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-13T18:43:42.125Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T18:43:42.183Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.183Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.183Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.183Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.184Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.184Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.184Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.184Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.184Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.184Z] Checked if tokens are valid: true, expires at: 1760383451482
+[debug] [2025-10-13T18:43:42.185Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-13T18:43:42.185Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:43:42.186Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-13T18:43:42.186Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:43:42.187Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-13T18:43:42.187Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:43:42.189Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-13T18:43:42.189Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:43:42.190Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-13T18:43:42.190Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-13T18:43:42.240Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-13T18:43:42.240Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-13T18:43:42.266Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T18:43:42.267Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T18:43:42.272Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-13T18:43:42.272Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-13T18:43:42.274Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T18:43:42.274Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T18:43:42.275Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T18:43:42.275Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T18:43:42.291Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-13T18:43:42.292Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-13T18:43:42.312Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-13T18:43:42.314Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-13T18:43:42.327Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-13T18:43:42.329Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-13T18:43:42.635Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-13T18:43:42.636Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[debug] [2025-10-13T18:43:42.651Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-13T18:43:42.651Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T18:43:42.661Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T18:43:42.662Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T18:43:42.684Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T18:43:42.684Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-13T18:43:42.700Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-13T18:43:42.700Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-15T17:17:54.363Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:54.365Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:54.367Z] > refreshing access token with scopes: []
+[debug] [2025-10-15T17:17:54.386Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-15T17:17:54.387Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:54.660Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:54.670Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:54.670Z] > refreshing access token with scopes: []
+[debug] [2025-10-15T17:17:54.675Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-15T17:17:54.676Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:54.718Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:54.719Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:54.731Z] > refreshing access token with scopes: []
+[debug] [2025-10-15T17:17:54.733Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-15T17:17:54.733Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:54.759Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:54.759Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:54.759Z] > refreshing access token with scopes: []
+[debug] [2025-10-15T17:17:54.760Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-15T17:17:54.768Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:54.783Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:54.783Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:54.783Z] > refreshing access token with scopes: []
+[debug] [2025-10-15T17:17:54.791Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-15T17:17:54.791Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-15T17:17:55.565Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:55.569Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:55.569Z] > refreshing access token with scopes: []
+[debug] [2025-10-15T17:17:55.593Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-15T17:17:55.594Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:55.613Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:55.617Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:55.617Z] > refreshing access token with scopes: []
+[debug] [2025-10-15T17:17:55.630Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-15T17:17:55.631Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:55.643Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:55.644Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:55.644Z] > refreshing access token with scopes: []
+[debug] [2025-10-15T17:17:55.652Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-15T17:17:55.654Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:55.670Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:55.670Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:55.670Z] > refreshing access token with scopes: []
+[debug] [2025-10-15T17:17:55.689Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-15T17:17:55.689Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:55.749Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:55.770Z] Checked if tokens are valid: false, expires at: 1760466131662
+[debug] [2025-10-15T17:17:55.770Z] > refreshing access token with scopes: []
+[debug] [2025-10-15T17:17:55.771Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-15T17:17:55.771Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.166Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-15T17:17:56.182Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.265Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-15T17:17:56.276Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:17:56.305Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-15T17:17:56.306Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.352Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-15T17:17:56.353Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:17:56.459Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-15T17:17:56.465Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.491Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-15T17:17:56.491Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:17:56.518Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-15T17:17:56.518Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.542Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-15T17:17:56.542Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:17:56.559Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-15T17:17:56.561Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.600Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-15T17:17:56.600Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:17:56.614Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-15T17:17:56.616Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.647Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-15T17:17:56.647Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:17:56.679Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-15T17:17:56.683Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.718Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-15T17:17:56.718Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:17:56.829Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-15T17:17:56.830Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.851Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-15T17:17:56.851Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:17:56.857Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-15T17:17:56.858Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.894Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-15T17:17:56.894Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:17:56.909Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-15T17:17:56.909Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-15T17:17:56.910Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-15T17:17:56.910Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-15T17:17:56.937Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-15T17:17:56.937Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:17:56.946Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-15T17:17:56.947Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-15T17:17:56.948Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-15T17:17:56.948Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-15T17:17:56.954Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-15T17:17:56.955Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-15T17:17:56.962Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-15T17:17:56.962Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-15T17:17:56.965Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-15T17:17:56.965Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-15T17:17:57.013Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-15T17:17:57.013Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-15T17:17:57.038Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-15T17:17:57.039Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-15T17:17:57.309Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-15T17:17:57.309Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[debug] [2025-10-15T17:17:57.344Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-15T17:17:57.345Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-15T17:17:57.370Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-15T17:17:57.370Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-15T17:18:28.331Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:28.334Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:28.341Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:28.342Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:28.350Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:28.353Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:28.364Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:28.368Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:28.370Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:28.377Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:28.403Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-15T17:18:28.404Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:18:28.928Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-15T17:18:28.929Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:18:28.960Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-15T17:18:28.965Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:18:28.980Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-15T17:18:28.984Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:18:29.004Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-15T17:18:29.013Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-15T17:18:29.511Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:29.512Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:29.516Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:29.519Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:29.523Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:29.523Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:29.524Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:29.525Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:29.527Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:29.528Z] Checked if tokens are valid: true, expires at: 1760552275910
+[debug] [2025-10-15T17:18:29.529Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [none]
+[debug] [2025-10-15T17:18:29.530Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:18:29.534Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-15T17:18:29.534Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:18:29.542Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-15T17:18:29.543Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:18:29.551Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-15T17:18:29.551Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:18:29.561Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [none]
+[debug] [2025-10-15T17:18:29.561Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-official
+[debug] [2025-10-15T17:18:29.709Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-15T17:18:29.716Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-15T17:18:29.733Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-15T17:18:29.734Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-15T17:18:29.745Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-15T17:18:29.745Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-15T17:18:29.751Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-15T17:18:29.752Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-15T17:18:29.830Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com 403
+[debug] [2025-10-15T17:18:29.835Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseio.com [omitted]
+[debug] [2025-10-15T17:18:29.860Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-15T17:18:29.862Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[debug] [2025-10-15T17:18:29.878Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-15T17:18:29.879Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-15T17:18:29.886Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-15T17:18:29.888Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-15T17:18:29.890Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-15T17:18:29.892Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-15T17:18:30.226Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ 200
+[debug] [2025-10-15T17:18:30.226Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-official/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-15T17:18:30.270Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-15T17:18:30.286Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-15T17:18:30.519Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-15T17:18:30.520Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-15T17:18:30.546Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-15T17:18:30.546Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:32:49.676Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.677Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.696Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.697Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.698Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.698Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.700Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.701Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.701Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.701Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.703Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.703Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.704Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.704Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.705Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.706Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.706Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.706Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.708Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.708Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.708Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.709Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.710Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.710Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.711Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.711Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.725Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.726Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.726Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.726Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.733Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.734Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.735Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.735Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.735Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.735Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.738Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.739Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.739Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.739Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.741Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.742Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.742Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.742Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.744Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.746Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.746Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.746Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.748Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.750Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.750Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.750Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.752Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.752Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.753Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.753Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.754Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.755Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.755Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.755Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.761Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.762Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.762Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.762Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.765Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.766Z] No OAuth tokens found
+[debug] [2025-10-24T10:32:49.766Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:49.767Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:49.769Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/storage.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.769Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/storage.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.858Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.859Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.862Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/identitytoolkit.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.862Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/identitytoolkit.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.867Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/fcm.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.867Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/fcm.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.874Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.874Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.881Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseremoteconfig.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.881Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseremoteconfig.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.884Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.884Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.887Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com [none]
+[debug] [2025-10-24T10:32:49.888Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.891Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/storage.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.891Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/storage.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.895Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.895Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.898Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/identitytoolkit.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.899Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/identitytoolkit.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.902Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/fcm.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.902Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/fcm.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.905Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.905Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.908Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseremoteconfig.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.908Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseremoteconfig.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.913Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-24T10:32:49.913Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:49.916Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com [none]
+[debug] [2025-10-24T10:32:49.916Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T10:32:50.156Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-24T10:32:50.158Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.200Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/identitytoolkit.googleapis.com 200
+[debug] [2025-10-24T10:32:50.200Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/identitytoolkit.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.231Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseremoteconfig.googleapis.com 200
+[debug] [2025-10-24T10:32:50.231Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseremoteconfig.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.262Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com 403
+[debug] [2025-10-24T10:32:50.263Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com [omitted]
+[debug] [2025-10-24T10:32:50.270Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com 403
+[debug] [2025-10-24T10:32:50.271Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com [omitted]
+[debug] [2025-10-24T10:32:50.272Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/fcm.googleapis.com 200
+[debug] [2025-10-24T10:32:50.272Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/fcm.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.305Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/fcm.googleapis.com 200
+[debug] [2025-10-24T10:32:50.306Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/fcm.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.338Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-24T10:32:50.338Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.359Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/storage.googleapis.com 200
+[debug] [2025-10-24T10:32:50.359Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/storage.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.381Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com 200
+[debug] [2025-10-24T10:32:50.382Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.399Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com 200
+[debug] [2025-10-24T10:32:50.399Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.433Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/storage.googleapis.com 200
+[debug] [2025-10-24T10:32:50.433Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/storage.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.464Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-24T10:32:50.464Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.476Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/identitytoolkit.googleapis.com 200
+[debug] [2025-10-24T10:32:50.479Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/identitytoolkit.googleapis.com [omitted]
+[debug] [2025-10-24T10:32:50.512Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseremoteconfig.googleapis.com 200
+[debug] [2025-10-24T10:32:50.512Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseremoteconfig.googleapis.com [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:32:50.545Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:50.545Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:32:50.548Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:50.548Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:50.554Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-24T10:32:50.554Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:32:50.603Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:50.603Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:32:50.611Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:50.611Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:32:50.628Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:50.628Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:32:50.635Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:50.635Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:32:51.881Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:51.881Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:32:51.894Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:32:51.894Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:32:51.897Z] >>> [apiv2][query] POST https://auth.firebase.tools/attest [none]
+[debug] [2025-10-24T10:32:51.897Z] >>> [apiv2][body] POST https://auth.firebase.tools/attest {"session_id":"02f56d5e-f975-40ab-9221-5c02597fa7ba"}
+[debug] [2025-10-24T10:32:52.066Z] <<< [apiv2][status] POST https://auth.firebase.tools/attest 200
+[debug] [2025-10-24T10:32:52.071Z] <<< [apiv2][body] POST https://auth.firebase.tools/attest {"token":"nGWDEDf_Jb1KZxUKJtCL7yi1PyUH6CKCf-yzwUZi1zE"}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:34:39.339Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:34:39.339Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:34:39.344Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:34:39.344Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:34:39.353Z] >>> [apiv2][query] POST https://accounts.google.com/o/oauth2/token [none]
+[debug] [2025-10-24T10:34:39.353Z] >>> [apiv2][body] POST https://accounts.google.com/o/oauth2/token [omitted]
+[debug] [2025-10-24T10:34:39.458Z] <<< [apiv2][status] POST https://accounts.google.com/o/oauth2/token 200
+[debug] [2025-10-24T10:34:39.458Z] <<< [apiv2][body] POST https://accounts.google.com/o/oauth2/token [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:34:54.270Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:34:54.270Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:34:54.281Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:34:54.281Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:35:12.751Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:35:12.751Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:35:12.760Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:35:12.761Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:35:12.825Z] >>> [apiv2][query] GET https://accounts.google.com/o/oauth2/revoke token=1%2F%2F04ZUpaQA1n86ICgYIARAAGAQSNwF-L9IrOr2EVZb8KDgD3jAcDIXEkHNb9lZVAILeArMBtyQXB6986Bvd7md2rtF6YFV0kpjGw4A
+[debug] [2025-10-24T10:35:12.895Z] <<< [apiv2][status] GET https://accounts.google.com/o/oauth2/revoke 200
+[debug] [2025-10-24T10:35:12.898Z] <<< [apiv2][body] GET https://accounts.google.com/o/oauth2/revoke {}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:35:24.709Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:35:24.769Z] Running auto auth
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:35:24.824Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:35:24.827Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:35:24.832Z] >>> [apiv2][query] POST https://auth.firebase.tools/attest [none]
+[debug] [2025-10-24T10:35:24.833Z] >>> [apiv2][body] POST https://auth.firebase.tools/attest {"session_id":"225d12d9-82b6-42ad-845e-d337c681c4b2"}
+[debug] [2025-10-24T10:35:25.075Z] <<< [apiv2][status] POST https://auth.firebase.tools/attest 200
+[debug] [2025-10-24T10:35:25.077Z] <<< [apiv2][body] POST https://auth.firebase.tools/attest {"token":"pppTbhIcNS7xQ0QtZ9RfOHATy4I5lvEsn5bza7l1JxM"}
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:36:57.093Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:36:57.093Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:36:57.099Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:36:57.099Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T10:36:57.104Z] >>> [apiv2][query] POST https://accounts.google.com/o/oauth2/token [none]
+[debug] [2025-10-24T10:36:57.107Z] >>> [apiv2][body] POST https://accounts.google.com/o/oauth2/token [omitted]
+[debug] [2025-10-24T10:36:57.205Z] <<< [apiv2][status] POST https://accounts.google.com/o/oauth2/token 200
+[debug] [2025-10-24T10:36:57.205Z] <<< [apiv2][body] POST https://accounts.google.com/o/oauth2/token [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:37:10.468Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:37:10.468Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T10:37:10.473Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T10:37:10.473Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T11:37:14.475Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T11:37:14.476Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T11:37:14.485Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.486Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.487Z] > refreshing access token with scopes: []
+[debug] [2025-10-24T11:37:14.490Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-24T11:37:14.490Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.542Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.542Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.543Z] > refreshing access token with scopes: []
+[debug] [2025-10-24T11:37:14.544Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-24T11:37:14.544Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.557Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.558Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.558Z] > refreshing access token with scopes: []
+[debug] [2025-10-24T11:37:14.559Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-24T11:37:14.559Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.562Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.563Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.563Z] > refreshing access token with scopes: []
+[debug] [2025-10-24T11:37:14.563Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-24T11:37:14.564Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.566Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T11:37:14.566Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2025-10-24T11:37:14.568Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.568Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.568Z] > refreshing access token with scopes: []
+[debug] [2025-10-24T11:37:14.569Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-24T11:37:14.569Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.571Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.571Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.571Z] > refreshing access token with scopes: []
+[debug] [2025-10-24T11:37:14.571Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-24T11:37:14.572Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.575Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.575Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.575Z] > refreshing access token with scopes: []
+[debug] [2025-10-24T11:37:14.576Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-24T11:37:14.576Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.578Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.578Z] Checked if tokens are valid: false, expires at: 1761305816208
+[debug] [2025-10-24T11:37:14.578Z] > refreshing access token with scopes: []
+[debug] [2025-10-24T11:37:14.579Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-24T11:37:14.579Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.692Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-24T11:37:14.692Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.715Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-24T11:37:14.715Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T11:37:14.753Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-24T11:37:14.753Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.768Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-24T11:37:14.768Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T11:37:14.780Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-24T11:37:14.785Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.797Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-24T11:37:14.798Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T11:37:14.843Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-24T11:37:14.843Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.860Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com [none]
+[debug] [2025-10-24T11:37:14.860Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T11:37:14.865Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-24T11:37:14.865Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.878Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com [none]
+[debug] [2025-10-24T11:37:14.878Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T11:37:14.890Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-24T11:37:14.890Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.907Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-24T11:37:14.907Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T11:37:14.937Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-24T11:37:14.937Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.952Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com [none]
+[debug] [2025-10-24T11:37:14.952Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T11:37:14.956Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-24T11:37:14.957Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-24T11:37:14.975Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com [none]
+[debug] [2025-10-24T11:37:14.975Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com x-goog-quota-user=projects/lottosaleshub-stable-app
+[debug] [2025-10-24T11:37:15.086Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com 403
+[debug] [2025-10-24T11:37:15.086Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com [omitted]
+[debug] [2025-10-24T11:37:15.107Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com 200
+[debug] [2025-10-24T11:37:15.109Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com [omitted]
+[debug] [2025-10-24T11:37:15.114Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-24T11:37:15.114Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-24T11:37:15.119Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-24T11:37:15.119Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-24T11:37:15.120Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-24T11:37:15.122Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-24T11:37:15.129Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-24T11:37:15.130Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-24T11:37:15.140Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com 403
+[debug] [2025-10-24T11:37:15.141Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/firebaseio.com [omitted]
+[debug] [2025-10-24T11:37:15.146Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com 200
+[debug] [2025-10-24T11:37:15.146Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/lottosaleshub-stable-app/services/cloudfunctions.googleapis.com [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T11:37:15.156Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T11:37:15.156Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T11:37:15.159Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T11:37:15.160Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T11:37:15.187Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T11:37:15.187Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T11:37:15.191Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T11:37:15.191Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T11:37:15.203Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T11:37:15.203Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-24T11:37:15.208Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T11:37:15.209Z] > authorizing via signed-in user (jrios5061@gmail.com)
