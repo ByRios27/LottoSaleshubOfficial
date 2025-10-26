@@ -1,16 +1,15 @@
 'use client';
 
-import { ChartBarIcon, TicketIcon, UserGroupIcon, BuildingStorefrontIcon, ArrowLeftOnRectangleIcon, TrophyIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
+import { ChartBarIcon, TicketIcon, BuildingStorefrontIcon, ArrowLeftOnRectangleIcon, TrophyIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 import { useBusiness } from '@/contexts/BusinessContext';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import React from 'react';
-import { themes } from '@/lib/themes';
 import { toast } from 'sonner';
-import { auth } from '@/lib/firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { app } from '@/lib/firebase';
+import { getAuth, onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 // --- COMPONENTES INTERNOS DE LA PÁGINA ---
 
@@ -20,41 +19,14 @@ const LotteryIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-const LoginView = ({ onLogin, theme }: { onLogin: (email:string, pass:string) => Promise<void>, theme: any }) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!email || !password) {
-            toast.error('Por favor, ingresa tu correo y contraseña.');
-            return;
-        }
-        onLogin(email, password);
-    };
-
-    return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4">
-            <div className={`w-full max-w-md p-8 rounded-2xl shadow-2xl ${theme.styles.glassClasses}`}>
-                <div className="flex flex-col items-center mb-8">
-                    <div className={`p-3 bg-gradient-to-br ${theme.styles.primaryGradient} rounded-full mb-4 shadow-lg`}><ChartBarIcon className="w-10 h-10 text-white" /></div>
-                    <h1 className={`text-3xl font-bold ${theme.styles.textPrimary}`}>LottoSalesHub</h1>
-                </div>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label htmlFor="email" className={`block text-sm font-medium ${theme.styles.textSecondary} mb-2`}>Correo Electrónico</label>
-                        <input id="email" name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className={`w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:ring-2 ${theme.styles.focusRing} focus:outline-none transition text-white`} placeholder="tu@email.com" />
-                    </div>
-                    <div>
-                        <label htmlFor="password" className={`block text-sm font-medium ${theme.styles.textSecondary} mb-2`}>Contraseña</label>
-                        <input id="password" name="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className={`w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:ring-2 ${theme.styles.focusRing} focus:outline-none transition text-white`} placeholder="········" />
-                    </div>
-                    <button type="submit" className={`w-full py-3 px-4 text-lg font-semibold text-white rounded-lg bg-gradient-to-r ${theme.styles.primaryGradient} hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme.styles.focusRing} transition-all duration-300 transform hover:scale-105`}>Iniciar Sesión</button>
-                </form>
-            </div>
+const LoadingView = () => (
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-900">
+        <div className="flex justify-center items-center h-screen bg-gray-900">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+            <p className="text-white mt-4">Cargando...</p>
         </div>
-    );
-};
+    </div>
+);
 
 const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName: string, businessLogo: string, onLogout: () => void }) => {
     const menuItems = [
@@ -73,7 +45,7 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
 
     return (
         <div className="relative flex flex-col items-center justify-center min-h-screen pt-12">
-             <button onClick={onLogout} className="absolute top-6 right-6 flex items-center gap-2 py-2 px-4 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors"><ArrowLeftOnRectangleIcon className='h-5 w-5' /><span>Cerrar Sesión</span></button>
+            <button onClick={onLogout} className="absolute top-6 right-6 flex items-center gap-2 py-2 px-4 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors"><ArrowLeftOnRectangleIcon className='h-5 w-5' /><span>Cerrar Sesión</span></button>
             <header className="flex flex-col items-center justify-center mb-10 text-center">
                 {renderLogo()}
                 <h1 className="mt-6 text-4xl font-bold text-white">{businessName}</h1>
@@ -92,46 +64,56 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
     );
 };
 
+// --- COMPONENTE PRINCIPAL CON LÓGICA DE AUTENTICACIÓN ---
+
 export default function Home() {
-    const [user, loading, error] = useAuthState(auth);
-    const { businessName, businessLogo, theme, isLoading: isBusinessLoading } = useBusiness();
-    const selectedTheme = themes.find(t => t.name === theme) || themes[0];
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+    const { businessName, businessLogo, isLoading: isBusinessLoading } = useBusiness();
+    const router = useRouter();
+    const auth = getAuth(app);
 
+    // Efecto para manejar el estado de autenticación
     useEffect(() => {
-        if (error) {
-            toast.error(error.message);
-        }
-    }, [error]);
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                // Usuario autenticado: permite el acceso
+                setUser(currentUser);
+            } else {
+                // Usuario no autenticado: redirige a la página de login
+                router.push('/login');
+            }
+            setLoading(false);
+        });
 
-    const handleLogin = async (email: string, pass: string) => {
-        try {
-            await signInWithEmailAndPassword(auth, email, pass);
-            toast.success('¡Bienvenido!');
-        } catch (e: any) {
-            toast.error(e.message);
-        }
-    };
+        // Limpia el listener al desmontar el componente
+        return () => unsubscribe();
+    }, [auth, router]);
 
     const handleLogout = async () => {
         try {
             await signOut(auth);
-            toast.info('Has cerrado sesión.');
+            toast.info('Has cerrado la sesión.');
+            // onAuthStateChanged se encargará de la redirección automáticamente
         } catch (e: any) {
-            toast.error(e.message);
+            toast.error('Error al cerrar sesión: ' + e.message);
         }
     };
 
+    // Muestra una pantalla de carga mientras se verifica el estado de autenticación
     if (loading || isBusinessLoading) {
-        return <div className="flex justify-center items-center h-screen bg-gray-900"><div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div></div>;
+        return <LoadingView />;
+    }
+
+    // Si hay un usuario, muestra el dashboard. Si no, `useEffect` ya habrá iniciado la redirección.
+    // Devolvemos `null` para prevenir un renderizado momentáneo del dashboard antes de redirigir.
+    if (!user) {
+        return null;
     }
 
     return (
         <div>
-            {user ? (
-                <DashboardView businessName={businessName} businessLogo={businessLogo} onLogout={handleLogout} />
-            ) : (
-                <LoginView onLogin={handleLogin} theme={selectedTheme} />
-            )}
+           <DashboardView businessName={businessName} businessLogo={businessLogo} onLogout={handleLogout} />
         </div>
     );
 }

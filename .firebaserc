@@ -1,5 +1,7 @@
 {
-  "projects": {},
+  "projects": {
+    "default": "lottosaleshub-stable-app"
+  },
   "targets": {},
   "etags": {}
 }

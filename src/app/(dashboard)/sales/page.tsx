@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { useDraws, type Draw } from '@/contexts/DrawsContext';
 import { useBusiness } from '@/contexts/BusinessContext';
 import Link from 'next/link';
-import Image from 'next/image'; // Import Image
+import Image from 'next/image';
 import { TicketIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import SalesModal from '@/components/sales/SalesModal';
+import { SalesProvider } from '@/contexts/SalesContext'; // 1. Importar el proveedor
 
-export default function SalesPage() {
+// 2. El contenido de la página se convierte en un componente interno
+function SalesPageContent() {
   const { draws } = useDraws();
   const { businessName, businessLogo } = useBusiness();
   const [selectedDraw, setSelectedDraw] = useState<Draw | null>(null);
@@ -59,5 +61,14 @@ export default function SalesPage() {
         />
       )}
     </>
+  );
+}
+
+// 3. El componente exportado ahora es un "wrapper" que provee el contexto
+export default function SalesPage() {
+  return (
+    <SalesProvider>
+      <SalesPageContent />
+    </SalesProvider>
   );
 }

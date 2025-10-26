@@ -1,398 +1,252 @@
 'use client';
 import { useState, useMemo } from 'react';
+import { ResultsProvider, useResults, Result, Winner, Sale } from '@/contexts/ResultsContext'; // Importa el Provider
 import { useDraws } from '@/contexts/DrawsContext';
-import { useResults, Result, Winner, Sale } from '@/contexts/ResultsContext';
-import { themes } from '@/lib/themes';
-import { FiUpload, FiTrash2, FiChevronDown, FiCheckCircle, FiAlertTriangle, FiEdit } from 'react-icons/fi';
-import { EyeIcon } from '@heroicons/react/24/outline';
 import { useBusiness } from '@/contexts/BusinessContext';
-import { toast } from 'sonner';
-import Receipt from '@/components/sales/Receipt';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react';
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
 
-export default function Resultados() {
-  const { theme, businessName, businessLogo } = useBusiness();
+// --- Tipos para las props de los componentes ---
+type ResultCardProps = { result: Result; onDelete: (id: string) => void; onUpdate: (id: string) => void; };
+type WinnerCardProps = { winner: Winner; };
+type SaleCardProps = { sale: Sale; drawName: string; onReceiptClick: () => void; };
+type ReceiptProps = { 
+    sale: (Sale & { sellerId: string; costPerFraction: number; }) | null; 
+    drawName: string; 
+    onClose: () => void; 
+    businessName: string; 
+};
+
+// --- Componentes Hijos (Sin cambios) ---
+
+const ResultCard: React.FC<ResultCardProps> = ({ result, onDelete, onUpdate }) => (
+  <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700 hover:border-green-500 transition-all duration-300">
+    <div className="flex justify-between items-start mb-4">
+      <div>
+        <h3 className="text-xl font-bold text-white">{result.drawName}</h3>
+        <p className="text-sm text-gray-400">Horario: {result.schedule}</p>
+        <p className="text-xs text-gray-500">ID: {result.id}</p>
+      </div>
+    </div>
+    <div className="grid grid-cols-3 gap-4 text-center">
+      <div>
+        <p className="text-sm text-gray-400">1ro</p>
+        <p className="text-2xl font-bold text-green-400">{result.winningNumbers['1ro']}</p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-400">2do</p>
+        <p className="text-2xl font-bold text-yellow-400">{result.winningNumbers['2do']}</p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-400">3ro</p>
+        <p className="text-2xl font-bold text-blue-400">{result.winningNumbers['3ro']}</p>
+      </div>
+    </div>
+    <p className="text-xs text-gray-600 text-right mt-4">Registrado: {new Date(result.timestamp).toLocaleString()}</p>
+  </div>
+);
+
+const WinnerCard: React.FC<WinnerCardProps> = ({ winner }) => (
+  <div className="bg-gray-800 rounded-lg shadow-md p-5 border border-gray-700">
+    <div className="flex justify-between items-center mb-3">
+      <h3 className="text-lg font-semibold text-white">{winner.clientName}</h3>
+      <span className="px-2 py-1 text-xs font-bold text-green-800 bg-green-400 rounded-full">{winner.prize} Premio</span>
+    </div>
+    <div className="space-y-2 text-sm text-gray-400">
+      <p><span className="font-semibold text-gray-300">Sorteo:</span> {winner.drawName} ({winner.schedule})</p>
+      <p><span className="font-semibold text-gray-300">Jugada:</span> Número {winner.play.number} - Monto: ${winner.play.amount.toFixed(2)}</p>
+      <p><span className="font-semibold text-gray-300">Ticket ID:</span> {winner.ticketId}</p>
+      <p className="text-xs text-gray-500">Vendido: {new Date(winner.timestamp).toLocaleString()}</p>
+    </div>
+  </div>
+);
+
+const SaleCard: React.FC<SaleCardProps> = ({ sale, drawName, onReceiptClick }) => (
+  <div className="bg-gray-800 rounded-lg shadow-md p-5 border border-gray-700">
+    <div className="flex justify-between items-start mb-3">
+      <div>
+        <h3 className="text-lg font-semibold text-white">Ticket: {sale.ticketId}</h3>
+        {sale.clientName && <p className="text-sm text-gray-400">Cliente: {sale.clientName}</p>}
+      </div>
+      <button onClick={onReceiptClick} className="text-green-400 hover:text-green-300 transition-colors">
+          <DocumentTextIcon className="h-6 w-6" />
+      </button>
+    </div>
+    <div className="space-y-3">
+        <p className="text-sm text-gray-400"><span className="font-semibold text-gray-300">Sorteo:</span> {drawName}</p>
+        <div className="border-t border-gray-700 pt-2">
+            <p className="font-semibold text-gray-300 mb-1">Números Jugados:</p>
+            <div className="grid grid-cols-3 gap-1 text-xs">
+                {sale.numbers.map((n, index) => (
+                    <div key={index} className="bg-gray-700/50 rounded px-2 py-1">
+                        <span className="font-bold text-white">{n.number}: </span>
+                        <span className="text-green-400">${n.quantity.toFixed(2)}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+        <div className="flex justify-between items-center border-t border-gray-700 pt-3 mt-3">
+            <p className="text-sm font-bold text-white">Total: <span className="text-green-400">${sale.totalCost.toFixed(2)}</span></p>
+            <p className="text-xs text-gray-500">{new Date(sale.timestamp).toLocaleString()}</p>
+        </div>
+    </div>
+  </div>
+);
+
+const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName }) => {
+    if (!sale) return null;
+    const totalCost = sale.numbers.reduce((acc, curr) => acc + curr.quantity, 0);
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4">
+            <div className="bg-white text-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-sm font-sans">
+                <div className="text-center border-b-2 border-dashed border-gray-300 pb-4 mb-4">
+                    <h2 className="text-2xl font-bold uppercase tracking-wider">{businessName}</h2>
+                    <p className="text-sm">Recibo de Venta</p>
+                </div>
+                <div className="mb-4 space-y-2 text-sm">
+                    <div className="flex justify-between"><span className="font-semibold">Ticket ID:</span><span className="font-mono">{sale.ticketId}</span></div>
+                    <div className="flex justify-between"><span className="font-semibold">Fecha:</span><span>{new Date(sale.timestamp).toLocaleDateString()}</span></div>
+                    <div className="flex justify-between"><span className="font-semibold">Hora:</span><span>{new Date(sale.timestamp).toLocaleTimeString()}</span></div>
+                    {sale.clientName && <div className="flex justify-between"><span className="font-semibold">Cliente:</span><span>{sale.clientName}</span></div>}
+                    <div className="flex justify-between"><span className="font-semibold">Sorteo:</span><span>{drawName}</span></div>
+                </div>
+                <div className="border-t border-b border-dashed border-gray-300 py-2 mb-4">
+                    <div className="flex justify-between font-bold text-xs mb-1"><span>Número</span><span>Costo</span></div>
+                    <div className="space-y-1 text-sm">{sale.numbers.map((play, index) => <div key={index} className="flex justify-between font-mono"><span>{play.number}</span><span>${play.quantity.toFixed(2)}</span></div>)}</div>
+                </div>
+                <div className="text-right font-bold text-lg mb-6"><span className="mr-2">TOTAL:</span><span>${totalCost.toFixed(2)}</span></div>
+                <button onClick={onClose} className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">Cerrar</button>
+            </div>
+        </div>
+    );
+};
+
+// --- Componente de la Página de Resultados (ahora como un componente interno) ---
+function ResultsPageContent() {
+  const { results, winners, allSales, isLoading } = useResults();
   const { draws } = useDraws();
-  const { results, addResult, deleteResult, updateResult, isLoading: isLoadingResults, winners, allSales } = useResults();
+  const { businessName } = useBusiness();
 
+  const [selectedDraw, setSelectedDraw] = useState('all');
+  const [selectedSchedule, setSelectedSchedule] = useState('all');
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [saleForReceipt, setSaleForReceipt] = useState<Sale | null>(null);
-  
-  const selectedTheme = themes.find(t => t.name === theme) || themes[0];
-  const themeStyles = selectedTheme.styles;
 
-  const [selectedDrawId, setSelectedDrawId] = useState<string>('');
-  const [selectedSchedule, setSelectedSchedule] = useState<string>('');
-  const [prizeNumbers, setPrizeNumbers] = useState({ '1ro': '', '2do': '', '3ro': '' });
+  const filteredResults = useMemo(() => {
+    if (isLoading) return [];
+    return results.filter(r => (selectedDraw === 'all' || r.drawId === selectedDraw) && (selectedSchedule === 'all' || r.schedule === selectedSchedule));
+  }, [results, selectedDraw, selectedSchedule, isLoading]);
 
-  const [resultToDelete, setResultToDelete] = useState<Result | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isPayModalOpen, setIsPayModalOpen] = useState(false);
-  const [selectedWinner, setSelectedWinner] = useState<Winner | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [resultToEdit, setResultToEdit] = useState<Result | null>(null);
-  const [editNumbers, setEditNumbers] = useState({ '1ro': '', '2do': '', '3ro': '' });
+  const filteredWinners = useMemo(() => {
+    if (isLoading) return [];
+    const resultSchedules = new Set(filteredResults.map(r => `${r.drawId}-${r.schedule}`));
+    return winners.filter(w => resultSchedules.has(`${draws.find(d => d.name === w.drawName)?.id}-${w.schedule}`));
+  }, [winners, filteredResults, draws, isLoading]);
 
-  const [paidWinners, setPaidWinners] = useState<Record<string, boolean>>(() => {
-    if (typeof window === 'undefined') return {};
-    const saved = localStorage.getItem('paid-winners');
-    return saved ? JSON.parse(saved) : {};
-  });
+  const filteredSales = useMemo(() => {
+    if (isLoading) return [];
+    return allSales.filter(s => (selectedDraw === 'all' || s.drawId === selectedDraw) && (selectedSchedule === 'all' || s.schedules.includes(selectedSchedule)));
+  }, [allSales, selectedDraw, selectedSchedule, isLoading]);
 
-  const handleShowReceipt = (ticketId: string) => {
-    const saleDetail = allSales.find(s => s.ticketId === ticketId);
-    if (saleDetail) {
-      setSaleForReceipt(saleDetail);
-      setIsReceiptModalOpen(true);
-    } else {
-      toast.error('No se encontraron los detalles de la venta para este ticket.');
-    }
+  const handleOpenReceipt = (sale: Sale) => {
+    setSaleForReceipt(sale);
+    setIsReceiptModalOpen(true);
   };
 
-  const handleDrawChange = (drawId: string) => {
-    setSelectedDrawId(drawId);
-    setSelectedSchedule('');
-    setPrizeNumbers({ '1ro': '', '2do': '', '3ro': '' });
-  };
+  const drawOptions = useMemo(() => [{ id: 'all', name: 'Todos los Sorteos' }, ...draws.map(d => ({ id: d.id, name: d.name }))], [draws]);
 
-  const selectedDraw = useMemo(() => draws.find(d => d.id === selectedDrawId), [selectedDrawId, draws]);
-  const availableSchedules = useMemo(() => selectedDraw ? selectedDraw.sch : [], [selectedDraw]);
+  const scheduleOptions = useMemo(() => {
+    if (selectedDraw === 'all') return [{ id: 'all', name: 'Todos los Horarios' }, ...Array.from(new Set(draws.flatMap(d => d.schedules))).map(s => ({id: s, name: s}))];
+    const draw = draws.find(d => d.id === selectedDraw);
+    return [{ id: 'all', name: 'Todos los Horarios' }, ...(draw?.schedules.map(s => ({ id: s, name: s })) || [])];
+  }, [draws, selectedDraw]);
 
-  const handlePrizeNumberChange = (prize: '1ro' | '2do' | '3ro', value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, '');
-    if (selectedDraw && numericValue.length <= selectedDraw.cif) {
-      setPrizeNumbers(prev => ({ ...prev, [prize]: numericValue }));
-    }
-  };
-
-  const handleRegister = () => {
-    if (!isFormValid || !selectedDraw) return;
-    const newResult = { drawId: selectedDraw.id, drawName: selectedDraw.name, schedule: selectedSchedule, winningNumbers: prizeNumbers };
-    addResult(newResult);
-    toast.success(`Resultados para ${selectedDraw.name} registrados.`);
-    setSelectedDrawId('');
-    setSelectedSchedule('');
-    setPrizeNumbers({ '1ro': '', '2do': '', '3ro': '' });
-  };
-
-  const handleOpenPayModal = (winner: Winner) => {
-    setSelectedWinner(winner);
-    setIsPayModalOpen(true);
-  };
-
-  const handleConfirmPayment = () => {
-    if (selectedWinner) {
-      const winnerId = `${selectedWinner.ticketId}-${selectedWinner.play.number}-${selectedWinner.prize}`;
-      const updatedPaidWinners = { ...paidWinners, [winnerId]: true };
-      setPaidWinners(updatedPaidWinners);
-      localStorage.setItem('paid-winners', JSON.stringify(updatedPaidWinners));
-      toast.success(`Ganador del ticket ${selectedWinner.ticketId} marcado como pagado.`);
-      setIsPayModalOpen(false);
-      setSelectedWinner(null);
-    }
-  };
-
-  const handleRequestDelete = (result: Result) => {
-    setResultToDelete(result);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (resultToDelete) {
-      deleteResult(resultToDelete.id);
-      toast.success(`Resultado para ${resultToDelete.drawName} eliminado.`);
-      setIsDeleteModalOpen(false);
-      setResultToDelete(null);
-    }
-  };
-  
-  const handleRequestEdit = (result: Result) => {
-    setResultToEdit(result);
-    setEditNumbers(result.winningNumbers);
-    setIsEditModalOpen(true);
-  };
-
-  const handleEditNumberChange = (prize: '1ro' | '2do' | '3ro', value: string) => {
-    const drawForEditedResult = draws.find(d => d.id === resultToEdit?.drawId);
-    const numericValue = value.replace(/[^0-9]/g, '');
-    if (drawForEditedResult && numericValue.length <= drawForEditedResult.cif) {
-        setEditNumbers(prev => ({ ...prev, [prize]: numericValue }));
-    }
-  };
-
-  const handleConfirmUpdate = () => {
-    if (resultToEdit) {
-      updateResult(resultToEdit.id, { winningNumbers: editNumbers });
-      toast.success(`Resultados para ${resultToEdit.drawName} actualizados.`);
-      setIsEditModalOpen(false);
-      setResultToEdit(null);
-    }
-  };
-
-  const isFormValid = useMemo(() => {
-    if (!selectedDraw || !selectedSchedule) return false;
-    const requiredDigits = selectedDraw.cif;
-    const hasAllNumbers = prizeNumbers['1ro'] && prizeNumbers['2do'] && prizeNumbers['3ro'];
-    if (!hasAllNumbers) return false;
-    return Object.values(prizeNumbers).every(num => num.length === requiredDigits);
-  }, [selectedDraw, selectedSchedule, prizeNumbers]);
-
-  const groupedResults = useMemo(() => {
-    return results.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .reduce((acc, result) => {
-        const date = new Date(result.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(result);
-        return acc;
-    }, {} as Record<string, Result[]>);
-  }, [results]);
-
-  const processedWinners = useMemo(() => {
-      return winners.map(winner => ({
-          ...winner,
-          id: `${winner.ticketId}-${winner.play.number}-${winner.prize}`,
-          paid: !!paidWinners[`${winner.ticketId}-${winner.play.number}-${winner.prize}`]
-      })).sort((a, b) => (a.paid === b.paid) ? 0 : a.paid ? 1 : -1);
-  }, [winners, paidWinners]);
+  if (isLoading) return <div className="text-center p-10">Cargando datos...</div>;
 
   return (
-    <div className={`min-h-screen p-6 ${themeStyles.backgroundImage}`}>
-      <div className={`max-w-6xl mx-auto rounded-2xl shadow-lg p-6 space-y-10 ${themeStyles.glassClasses}`}>
+    <div className="p-4 md:p-6">
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold text-white">Resultados y Ganadores</h1>
+        <p className="text-gray-400">Filtra y revisa los resultados, ganadores y ventas.</p>
+      </header>
 
-        <section className="space-y-6">
-          <h2 className={`text-2xl font-semibold border-b pb-2 ${themeStyles.textPrimary} border-white/10`}>
-            Registrar Nuevo Resultado
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-            <div className="md:col-span-1">
-              <label className={`block text-sm font-medium mb-1 ${themeStyles.textSecondary}`}>Sorteo</label>
-              <div className="relative">
-                <select className={`w-full border rounded-lg p-2 pr-8 outline-none appearance-none font-medium bg-white/10 text-white border-white/20`} value={selectedDrawId} onChange={(e) => handleDrawChange(e.target.value)}>
-                  <option value="">Seleccionar sorteo</option>
-                  {draws.map(draw => <option key={draw.id} value={draw.id}>{draw.name}</option>)}
-                </select>
-                <FiChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none text-gray-500`} />
-              </div>
-            </div>
-            <div className="md:col-span-1">
-              <label className={`block text-sm font-medium mb-1 ${themeStyles.textSecondary}`}>Horario</label>
-              <div className="relative">
-                <select className={`w-full border rounded-lg p-2 pr-8 outline-none appearance-none font-medium bg-white/10 text-white border-white/20`} value={selectedSchedule} onChange={(e) => setSelectedSchedule(e.target.value)} disabled={!selectedDrawId}>
-                  <option value="">Seleccionar horario</option>
-                  {availableSchedules.map(schedule => <option key={schedule} value={schedule}>{schedule}</option>)}
-                </select>
-                <FiChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none text-gray-500`} />
-              </div>
-            </div>
-            <div className="md:col-span-1">
-              <label className={`block text-sm font-medium mb-1 ${themeStyles.textSecondary}`}>
-                Números Ganadores ({selectedDraw?.cif || 'N/A'} cifras)
-              </label>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 text-center">
-                    <span className="text-xs text-white">1ro</span>
-                    <input type="text" inputMode="numeric" className={`w-full border rounded-lg p-2 text-center outline-none bg-white/10 text-white border-white/20 font-medium`} value={prizeNumbers['1ro']} onChange={(e) => handlePrizeNumberChange('1ro', e.target.value)} maxLength={selectedDraw?.cif} disabled={!selectedDrawId} />
-                </div>
-                <div className="flex-1 text-center">
-                    <span className="text-xs text-white">2do</span>
-                    <input type="text" inputMode="numeric" className={`w-full border rounded-lg p-2 text-center outline-none bg-white/10 text-white border-white/20 font-medium`} value={prizeNumbers['2do']} onChange={(e) => handlePrizeNumberChange('2do', e.target.value)} maxLength={selectedDraw?.cif} disabled={!selectedDrawId} />
-                </div>
-                <div className="flex-1 text-center">
-                    <span className="text-xs text-white">3ro</span>
-                    <input type="text" inputMode="numeric" className={`w-full border rounded-lg p-2 text-center outline-none bg-white/10 text-white border-white/20 font-medium`} value={prizeNumbers['3ro']} onChange={(e) => handlePrizeNumberChange('3ro', e.target.value)} maxLength={selectedDraw?.cif} disabled={!selectedDrawId} />
-                </div>
-              </div>
-            </div>
-            <div className="md:col-span-1">
-                <button onClick={handleRegister} disabled={!isFormValid} className={`w-full px-4 py-2 rounded-md font-semibold text-white flex items-center justify-center gap-2 transition-all duration-300 ease-in-out bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed`}>
-                    <FiUpload />
-                    Registrar
-                </button>
-            </div>
+      <div className="flex flex-col md:flex-row gap-4 mb-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
+          <div className="flex-1">
+              <label htmlFor="drawFilter" className="block text-sm font-medium text-gray-300 mb-1">Sorteo</label>
+              <select id="drawFilter" value={selectedDraw} onChange={e => setSelectedDraw(e.target.value)} className="w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-green-500 focus:border-green-500">
+                  {drawOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}
+              </select>
           </div>
-        </section>
-
-        <section className="space-y-4">
-            <h2 className={`text-2xl font-semibold border-b pb-2 ${themeStyles.textPrimary} border-white/10`}>
-                Últimos Resultados Registrados
-            </h2>
-            {isLoadingResults ? (
-                 <p className={themeStyles.textSecondary}>Cargando resultados...</p>
-            ) : Object.keys(groupedResults).length > 0 ? (
-                <div className="space-y-6">
-                    {Object.entries(groupedResults).map(([date, resultsForDate]) => (
-                        <div key={date}>
-                            <h3 className={`font-semibold text-lg mb-2 ${themeStyles.textPrimary}`}>{date}</h3>
-                            <div className="overflow-x-auto rounded-lg border border-white/10">
-                                <table className={`w-full text-left ${themeStyles.textSecondary}`}>
-                                    <thead className={`bg-white/5`}>
-                                        <tr className={`border-b border-white/10`}>
-                                            <th className="py-2 px-3 text-sm">Sorteo</th>
-                                            <th className="py-2 px-3 text-sm">Horario</th>
-                                            <th className="py-2 px-3 text-sm text-center">1ro</th>
-                                            <th className="py-2 px-3 text-sm text-center">2do</th>
-                                            <th className="py-2 px-3 text-sm text-center">3ro</th>
-                                            <th className="py-2 px-3 text-sm text-center">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {resultsForDate.map(result => (
-                                            <tr key={result.id} className={`border-t hover:bg-white/5 border-white/10`}>
-                                                <td className={`py-2 px-3 text-sm font-semibold ${themeStyles.textPrimary}`}>{result.drawName}</td>
-                                                <td className="py-2 px-3 text-sm">{result.schedule}</td>
-                                                <td className={`py-2 px-3 text-sm text-center font-bold text-green-400`}>{result.winningNumbers['1ro']}</td>
-                                                <td className={`py-2 px-3 text-sm text-center font-bold text-green-400`}>{result.winningNumbers['2do']}</td>
-                                                <td className={`py-2 px-3 text-sm text-center font-bold text-green-400`}>{result.winningNumbers['3ro']}</td>
-                                                <td className="py-2 px-3 text-sm text-center">
-                                                    <button onClick={() => handleRequestEdit(result)} className={`p-1.5 rounded-full hover:bg-blue-500/20 text-blue-500 transition-colors mr-2`}>
-                                                        <FiEdit size={16}/>
-                                                    </button>
-                                                    <button onClick={() => handleRequestDelete(result)} className={`p-1.5 rounded-full hover:bg-red-500/20 text-red-500 transition-colors`}>
-                                                        <FiTrash2 size={16}/>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <p className={themeStyles.textSecondary}>No hay resultados registrados todavía.</p>
-            )}
-        </section>
-
-        <section className="space-y-4">
-            <h2 className={`text-2xl font-semibold border-b pb-2 ${themeStyles.textPrimary} border-white/10`}>
-                🏆 Ganadores
-            </h2>
-            <div className="overflow-x-auto">
-                <table className={`w-full text-left ${themeStyles.textSecondary}`}>
-                    <thead>
-                        <tr className={`border-b border-white/10`}>
-                            <th className="py-2 px-3 text-sm">Ticket ID</th>
-                            <th className="py-2 px-3 text-sm">Nombre</th>
-                            <th className="py-2 px-3 text-sm">Sorteo</th>
-                            <th className="py-2 px-3 text-sm">Número</th>
-                            <th className="py-2 px-3 text-sm">Lugar del premio</th>
-                            <th className="py-2 px-3 text-sm text-center">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {processedWinners.length > 0 ? processedWinners.map((winner) => (
-                            <tr key={winner.id} className={`hover:bg-white/5 ${winner.paid ? 'opacity-50' : ''}`}>
-                                <td className={`py-2 px-3 text-sm font-mono ${themeStyles.textSecondary}`}>{winner.ticketId}</td>
-                                <td className={`py-2 px-3 text-sm font-semibold ${themeStyles.textPrimary}`}>{winner.clientName}</td>
-                                <td className="py-2 px-3 text-sm">{winner.drawName} ({winner.schedule})</td>
-                                <td className={`py-2 px-3 text-sm font-bold text-green-400`}>{winner.play.number}</td>
-                                <td className="py-2 px-3 text-sm font-semibold">{winner.prize}</td>
-                                <td className="py-2 px-3 text-sm text-center">
-                                    <div className="flex items-center justify-center gap-2">
-                                        <button
-                                            onClick={() => !winner.paid && handleOpenPayModal(winner)}
-                                            disabled={winner.paid}
-                                            className={`px-3 py-1 rounded-md font-semibold text-xs transition-transform duration-200 ease-in-out transform hover:scale-105 
-                                                ${winner.paid
-                                                ? 'bg-gray-600 text-white/70 cursor-not-allowed inline-flex items-center gap-1.5' 
-                                                : 'bg-green-500 text-white'}`}>
-                                            {winner.paid ? <><FiCheckCircle /> Pagado</> : 'Pagar'}
-                                        </button>
-                                        <button onClick={() => handleShowReceipt(winner.ticketId)} className="p-1.5 rounded-full hover:bg-blue-500/20 text-blue-500 transition-colors">
-                                            <EyeIcon className="h-5 w-5" />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        )) : (
-                            <tr><td colSpan={6} className={`py-4 text-center ${themeStyles.textSecondary}`}>No se han encontrado ganadores. Registra resultados para verificar.</td></tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
+          <div className="flex-1">
+              <label htmlFor="scheduleFilter" className="block text-sm font-medium text-gray-300 mb-1">Horario</label>
+              <select id="scheduleFilter" value={selectedSchedule} onChange={e => setSelectedSchedule(e.target.value)} className="w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-green-500 focus:border-green-500">
+                  {scheduleOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}
+              </select>
+          </div>
       </div>
 
-      {isPayModalOpen && selectedWinner && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-800 rounded-2xl p-8 space-y-6 w-full max-w-md border border-gray-700 shadow-xl">
-            <h3 className="text-xl font-bold text-white">Confirmar Pago a Ganador</h3>
-            <div className="p-4 rounded-lg bg-gray-900/50 border border-gray-700 space-y-2">
-                <p className="text-gray-300">¿Estás seguro de que quieres marcar este premio como pagado?</p>
-                <div className="border-t border-white/10 pt-3 mt-3 text-sm">
-                  <p className="text-gray-400"><span className="font-semibold text-white">Ticket:</span> {selectedWinner.ticketId}</p>
-                  <p className="text-gray-400"><span className="font-semibold text-white">Cliente:</span> {selectedWinner.clientName}</p>
-                  <p className="text-gray-400"><span className="font-semibold text-white">Número Ganador:</span> {selectedWinner.play.number} ({selectedWinner.prize})</p>
-                </div>
+      <TabGroup>
+        <TabList variant="solid" className="w-full">
+          <Tab>Resultados ({filteredResults.length})</Tab>
+          <Tab>Ganadores ({filteredWinners.length})</Tab>
+          <Tab>Ventas ({filteredSales.length})</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+              {filteredResults.length > 0 ? (
+                filteredResults.map(result => <ResultCard key={result.id} result={result} onDelete={() => {}} onUpdate={() => {}} />)
+              ) : (
+                <p className="text-gray-500 col-span-full text-center">No hay resultados para mostrar con los filtros seleccionados.</p>
+              )}
             </div>
-            <div className="flex justify-end gap-4">
-              <button onClick={() => setIsPayModalOpen(false)} className="px-6 py-2 rounded-md font-semibold bg-gray-600 hover:bg-gray-500 text-white transition-colors">Cancelar</button>
-              <button onClick={handleConfirmPayment} className="px-6 py-2 rounded-md font-semibold bg-green-600 hover:bg-green-500 text-white transition-colors">Sí, Marcar como Pagado</button>
+          </TabPanel>
+          <TabPanel>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+              {filteredWinners.length > 0 ? (
+                filteredWinners.map(winner => <WinnerCard key={winner.ticketId + winner.play.number} winner={winner} />)
+              ) : (
+                <p className="text-gray-500 col-span-full text-center">No hay ganadores para mostrar con los filtros seleccionados.</p>
+              )}
             </div>
-          </div>
-        </div>
-      )}
-
-      {isDeleteModalOpen && resultToDelete && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className={`rounded-2xl p-8 space-y-6 w-full max-w-md ${themeStyles.glassClasses} border border-white/10`}>
-            <div className="text-center">
-                <FiAlertTriangle className="mx-auto text-red-500 h-12 w-12 mb-4"/>
-                <h3 className={`text-xl font-bold ${themeStyles.textPrimary}`}>¿Estás seguro?</h3>
-                <p className={`mt-2 text-sm ${themeStyles.textSecondary}`}>
-                    Vas a eliminar permanentemente los resultados para <span className="font-bold">{resultToDelete.drawName}</span> del horario <span className="font-bold">{resultToDelete.schedule}</span>. Esta acción no se puede deshacer.
-                </p>
+          </TabPanel>
+           <TabPanel>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+              {filteredSales.length > 0 ? (
+                filteredSales.map(sale => (
+                  <SaleCard 
+                    key={sale.ticketId}
+                    sale={sale}
+                    drawName={draws.find(d => d.id === sale.drawId)?.name || 'N/A'}
+                    onReceiptClick={() => handleOpenReceipt(sale)}
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500 col-span-full text-center">No hay ventas para mostrar con los filtros seleccionados.</p>
+              )}
             </div>
-            <div className="flex justify-center gap-4">
-              <button onClick={() => setIsDeleteModalOpen(false)} className={`px-6 py-2 rounded-md font-semibold bg-gray-500 text-white`}>Cancelar</button>
-              <button onClick={handleConfirmDelete} className="px-6 py-2 rounded-md font-semibold bg-red-600 text-white">Sí, eliminar</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isEditModalOpen && resultToEdit && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className={`rounded-2xl p-8 space-y-6 w-full max-w-md ${themeStyles.glassClasses} border border-white/10`}>
-            <div>
-                <h3 className={`text-xl font-bold ${themeStyles.textPrimary}`}>Editar Resultado</h3>
-                <p className={`mt-1 text-sm ${themeStyles.textSecondary}`}>
-                    Sorteo: <span className="font-semibold">{resultToEdit.drawName}</span> - Horario: <span className="font-semibold">{resultToEdit.schedule}</span>
-                </p>
-            </div>
-            <div className="flex items-end gap-4">
-                <div className="flex-1 text-center">
-                    <span className="text-xs text-white">1ro</span>
-                    <input type="text" inputMode="numeric" className={`w-full border rounded-lg p-2 text-center outline-none bg-white/10 text-white border-white/20 font-medium`} value={editNumbers['1ro']} onChange={(e) => handleEditNumberChange('1ro', e.target.value)} maxLength={draws.find(d => d.id === resultToEdit.drawId)?.cif} />
-                </div>
-                <div className="flex-1 text-center">
-                    <span className="text-xs text-white">2do</span>
-                    <input type="text" inputMode="numeric" className={`w-full border rounded-lg p-2 text-center outline-none bg-white/10 text-white border-white/20 font-medium`} value={editNumbers['2do']} onChange={(e) => handleEditNumberChange('2do', e.target.value)} maxLength={draws.find(d => d.id === resultToEdit.drawId)?.cif} />
-                </div>
-                <div className="flex-1 text-center">
-                    <span className="text-xs text-white">3ro</span>
-                    <input type="text" inputMode="numeric" className={`w-full border rounded-lg p-2 text-center outline-none bg-white/10 text-white border-white/20 font-medium`} value={editNumbers['3ro']} onChange={(e) => handleEditNumberChange('3ro', e.target.value)} maxLength={draws.find(d => d.id === resultToEdit.drawId)?.cif} />
-                </div>
-            </div>
-            <div className="flex justify-end gap-4">
-              <button onClick={() => setIsEditModalOpen(false)} className={`px-6 py-2 rounded-md font-semibold bg-gray-500 text-white`}>Cancelar</button>
-              <button onClick={handleConfirmUpdate} className="px-6 py-2 rounded-md font-semibold bg-blue-600 text-white">Actualizar</button>
-            </div>
-          </div>
-        </div>
-      )}
-
+          </TabPanel>
+        </TabPanels>
+      </TabGroup>
+      
       {isReceiptModalOpen && (
         <Receipt 
-          sale={saleForReceipt}
+          sale={saleForReceipt ? { ...saleForReceipt, sellerId: '', costPerFraction: 0 } : null}
           drawName={saleForReceipt ? (draws.find(d => d.id === saleForReceipt.drawId)?.name || 'N/A') : ''}
           onClose={() => setIsReceiptModalOpen(false)}
           businessName={businessName}
-          logoUrl={businessLogo}
         />
       )}
-
     </div>
+  );
+}
+
+// --- Componente Principal (Wrapper) ---
+export default function ResultsPage() {
+  return (
+    <ResultsProvider>
+      <ResultsPageContent />
+    </ResultsProvider>
   );
 }

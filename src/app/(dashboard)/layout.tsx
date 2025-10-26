@@ -6,8 +6,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useBusiness } from '@/contexts/BusinessContext';
 import { DrawsProvider } from '@/contexts/DrawsContext';
-import { ResultsProvider } from '@/contexts/ResultsContext';
-import { SalesProvider } from '@/contexts/SalesContext'; // Importa el SalesProvider
 import { themes } from '@/lib/themes';
 import Image from 'next/image';
 
@@ -54,34 +52,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <DrawsProvider>
-      <SalesProvider>
-        <ResultsProvider> {/* Envuelve el contenido con ResultsProvider */}
-          <section>
-            {themeStyles && (
-                <header 
-                  className={`sticky top-0 z-50 flex items-center justify-center py-4 ${themeStyles.glassClasses}`}
-                >
-                  <div className="absolute left-6">
-                    <button 
-                      onClick={() => router.back()}
-                      className={`p-2 rounded-full hover:bg-white/20 transition-colors ${themeStyles.textSecondary}`}
-                      aria-label="Volver a la página anterior"
-                    >
-                      <ArrowLeftIcon className="w-6 h-6 stroke-[2.5]" />
-                    </button>
-                  </div>
-                  <Link href="/" className="flex items-center gap-4 group">
-                      {renderLogo()}
-                      <h1 className={`text-2xl font-bold ${themeStyles.textPrimary}`}>{businessName}</h1>
-                  </Link>
-                </header>
-            )}
-            <main>
-              {children}
-            </main>
-          </section>
-        </ResultsProvider>
-      </SalesProvider>
+        <section>
+          {themeStyles && (
+              <header 
+                className={`sticky top-0 z-50 flex items-center justify-center py-4 ${themeStyles.glassClasses}`}
+              >
+                <div className="absolute left-6">
+                  <button 
+                    onClick={() => router.back()}
+                    className={`p-2 rounded-full hover:bg-white/20 transition-colors ${themeStyles.textSecondary}`}
+                    aria-label="Volver a la página anterior"
+                  >
+                    <ArrowLeftIcon className="w-6 h-6 stroke-[2.5]" />
+                  </button>
+                </div>
+                <Link href="/" className="flex items-center gap-4 group">
+                    {renderLogo()}
+                    <h1 className={`text-2xl font-bold ${themeStyles.textPrimary}`}>{businessName}</h1>
+                </Link>
+              </header>
+          )}
+          <main>
+            {children}
+          </main>
+        </section>
     </DrawsProvider>
   );
 }
