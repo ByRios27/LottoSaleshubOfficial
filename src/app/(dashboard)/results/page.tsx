@@ -175,13 +175,13 @@ function ResultsPageContent() {
           <div className="flex-1">
               <label htmlFor="drawFilter" className="block text-sm font-medium text-gray-300 mb-1">Sorteo</label>
               <select id="drawFilter" value={selectedDraw} onChange={e => setSelectedDraw(e.target.value)} className="w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-green-500 focus:border-green-500">
-                  {drawOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}
+                  {drawOptions.map((opt, index) => <option key={`${opt.id}-${index}`} value={opt.id}>{opt.name}</option>)}
               </select>
           </div>
           <div className="flex-1">
               <label htmlFor="scheduleFilter" className="block text-sm font-medium text-gray-300 mb-1">Horario</label>
               <select id="scheduleFilter" value={selectedSchedule} onChange={e => setSelectedSchedule(e.target.value)} className="w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-green-500 focus:border-green-500">
-                  {scheduleOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}
+                  {scheduleOptions.map((opt, index) => <option key={`${opt.id}-${index}`} value={opt.id}>{opt.name}</option>)}
               </select>
           </div>
       </div>
