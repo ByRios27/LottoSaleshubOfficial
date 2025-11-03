@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
 import { app } from "@/lib/firebase";
-import { ArrowRightIcon, AtSymbolIcon, LockClosedIcon } from "@heroicons/react/24/solid";
+import { ArrowRightIcon, AtSymbolIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 // Componente del Logo con un estilo más prominente y moderno
 const AppLogo = () => (
@@ -24,6 +24,7 @@ export default function LoginPage() {
     const [pass, setPass] = useState("");
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -43,7 +44,7 @@ export default function LoginPage() {
     return (
         <main className="relative min-h-screen w-full flex flex-col items-center justify-center bg-gray-900 text-white overflow-hidden">
             {/* Textura de ruido de fondo */}
-            <div className="absolute inset-0 bg-repeat bg-center" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
+            <div className="absolute inset-0 bg-repeat bg-center" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.04\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
             
             <div className="relative z-10 w-full max-w-md px-6 sm:px-8">
                 <div className="flex flex-col items-center mb-8">
@@ -58,30 +59,41 @@ export default function LoginPage() {
                 >
                     {/* Campo de Correo Electrónico con Flexbox */}
                     <div className="flex items-center w-full bg-white/5 border border-white/10 rounded-xl focus-within:ring-2 focus-within:ring-green-500/50 transition-all duration-300">
-                        <AtSymbolIcon className="h-5 w-5 text-gray-400 mx-4 flex-shrink-0" />
+                        <AtSymbolIcon className="h-5 w-5 text-gray-400 ml-4 mr-4 flex-shrink-0" />
                         <input
                             type="email"
                             autoComplete="email"
                             placeholder="Correo Electrónico"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-transparent py-3 text-white outline-none placeholder-gray-500"
+                            className="w-full bg-transparent py-3 pr-4 text-white outline-none placeholder-gray-500"
                             required
                         />
                     </div>
 
                     {/* Campo de Contraseña con Flexbox */}
-                    <div className="flex items-center w-full bg-white/5 border border-white/10 rounded-xl focus-within:ring-2 focus-within:ring-green-500/50 transition-all duration-300">
-                        <LockClosedIcon className="h-5 w-5 text-gray-400 mx-4 flex-shrink-0" />
+                    <div className="relative flex items-center w-full bg-white/5 border border-white/10 rounded-xl focus-within:ring-2 focus-within:ring-green-500/50 transition-all duration-300">
+                        <LockClosedIcon className="h-5 w-5 text-gray-400 ml-4 mr-4 flex-shrink-0" />
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             autoComplete="current-password"
                             placeholder="Contraseña"
                             value={pass}
                             onChange={(e) => setPass(e.target.value)}
-                            className="w-full bg-transparent py-3 text-white outline-none placeholder-gray-500"
+                            className="w-full bg-transparent py-3 pr-16 text-white outline-none placeholder-gray-500"
                             required
                         />
+                        <button
+                            type="button"
+                            className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-400 hover:text-white cursor-pointer"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? (
+                                <EyeSlashIcon className="h-5 w-5" />
+                            ) : (
+                                <EyeIcon className="h-5 w-5" />
+                            )}
+                        </button>
                     </div>
 
                     {err && <p className="text-red-400 text-sm text-center bg-red-500/10 p-3 rounded-lg">{err}</p>}

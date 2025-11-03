@@ -1,43 +1,32 @@
-# Blueprint: Lotto Sales Hub
+# Blueprint: LottoSalesHub
 
-## Visión General
+## Overview
 
-Esta aplicación es un centro de ventas de lotería, diseñado para permitir a los usuarios interactuar con datos de lotería en tiempo real. La base de la aplicación está construida con Next.js y aprovecha Firebase para la autenticación, la base de datos en tiempo real y la administración del servidor.
+This document outlines the architecture, design, and features of the LottoSalesHub application. It serves as a single source of truth to ensure consistency and guide future development.
 
-## Diseño y Estilo
+## Project Architecture
 
-*   **Framework:** Next.js con App Router
-*   **Estilo:** (Aún por definir, se centrará en un diseño moderno y responsivo)
-*   **Componentes:** (Se definirán a medida que se construya la interfaz de usuario)
+The project follows a hybrid Next.js setup, leveraging both the `pages` and `app` routers for specific functionalities.
 
-## Características Implementadas
+*   **Authentication (`pages` router):**
+    *   The login functionality is handled by `pages/login.tsx`. This component is responsible for user authentication via Firebase.
+    *   Upon successful login, the user is redirected to the root path (`/`).
 
-### **Configuración del Backend y Firebase**
+*   **Main Application (`app` router):**
+    *   The core application, including the main dashboard and subsequent views, is built using the App Router within the `src/app` directory.
+    *   The root page (`src/app/page.tsx`) acts as a protected route. It checks for an authenticated user. If the user is not logged in, it automatically redirects them to the `/login` page. If the user is authenticated, it displays the main application dashboard.
+    *   All dashboard-related routes (e.g., `/sales`, `/draws`, `/business`) are organized as subdirectories within `src/app/(dashboard)`.
 
-*   **SDK de Firebase (Cliente):** Se ha configurado el SDK de Firebase para el lado del cliente, permitiendo la interacción desde el navegador.
-*   **SDK de Firebase Admin (Servidor):**
-    *   Se ha instalado y configurado el paquete `firebase-admin`.
-    *   Se ha creado un archivo de configuración (`src/lib/firebase-admin.ts`) que utiliza una cuenta de servicio para inicializar el SDK de Admin de forma segura.
-    *   La aplicación ahora puede realizar operaciones de backend autenticadas con Firebase, como leer y escribir en la Realtime Database con privilegios de administrador.
-*   **Manejo de Credenciales:** Se ha establecido un sistema seguro para manejar las credenciales del servidor, asegurando que las claves privadas no queden expuestas en el código del cliente.
+## Design & Features
 
-### **Autenticación de Usuarios**
-
-*   **Flujo de Autenticación Completo:** Se ha implementado un sistema de inicio y cierre de sesión robusto utilizando Firebase Authentication.
-*   **Inicio de Sesión con Correo/Contraseña:** Los usuarios pueden autenticarse de forma segura utilizando su correo electrónico y contraseña.
-*   **Gestión de Estado en Tiempo Real:** La aplicación utiliza el hook `useAuthState` de `react-firebase-hooks` para escuchar los cambios de estado de autenticación en tiempo real. La interfaz de usuario reacciona instantáneamente al iniciar o cerrar sesión.
-*   **Notificaciones y Manejo de Errores:** Se muestran notificaciones claras al usuario para confirmar un inicio de sesión exitoso, un cierre de sesión o para informar de errores durante el proceso (por ejemplo, credenciales incorrectas).
-
-### **Página de Resultados y Ganadores**
-
-*   **Cálculo Automático de Ganadores:** El sistema cruza automáticamente los resultados de los sorteos registrados con las ventas de tickets para identificar a los ganadores.
-*   **Visualización de Recibos para Ganadores:** Se ha implementado la funcionalidad para que al hacer clic en el ícono de "visualizar" en la lista de ganadores, se muestre el comprobante de venta correspondiente, de forma similar a la sección de "Ventas Realizadas".
-
-## Plan Actual
-
-*   **[COMPLETADO]** Configurar la integración de Firebase, tanto para el cliente como para el servidor.
-*   **[COMPLETADO]** Implementar el flujo de autenticación de usuarios con correo y contraseña.
-*   **[COMPLETADO]** Activar la visualización de recibos en la sección de ganadores.
-*   **[PRÓXIMO]** Diseñar y construir la interfaz de usuario principal para mostrar los datos de la lotería.
-*   **[PRÓXIMO]** Implementar la lógica para leer y mostrar datos desde la Firebase Realtime Database.
-*   **[PRÓXIMO]** Añadir funcionalidades de interacción para el usuario (por ejemplo, comprar billetes, ver resultados).
+*   **Styling:** The application uses Tailwind CSS for a modern, utility-first design approach.
+*   **UI:** The user interface is designed to be clean, intuitive, and responsive, with a dark theme (`bg-gray-900`). Interactive elements feature hover effects and transitions for a better user experience.
+*   **Iconography:** The app utilizes `@heroicons/react` for clear and consistent iconography. A custom SVG logo is used for branding.
+*   **Authentication Flow:**
+    1.  User visits the root URL.
+    2.  `src/app/page.tsx` checks auth status.
+    3.  If not logged in, user is redirected to `pages/login.tsx`.
+    4.  User submits credentials on the login page.
+    5.  `signInWithEmailAndPassword` from Firebase authenticates the user.
+    6.  On success, `router.push("/")` sends the user back to the root.
+    7.  `src/app/page.tsx` now detects the authenticated user and renders the `DashboardView`.
