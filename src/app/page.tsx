@@ -4,14 +4,10 @@ import { ChartBarIcon, TicketIcon, BuildingStorefrontIcon, ArrowLeftOnRectangleI
 import Link from 'next/link';
 import { useBusiness } from '@/contexts/BusinessContext';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { app } from '@/lib/firebase';
-import { getAuth, onAuthStateChanged, signOut, User } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
 
-// --- COMPONENTES INTERNOS DE LA PÁGINA ---
+// --- COMPONENTES INTERNOS DE LA PÁGINA (sin cambios) ---
 
 const LotteryIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
@@ -64,51 +60,46 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
     );
 };
 
-// --- COMPONENTE PRINCIPAL CON LÓGICA DE AUTENTICACIÓN ---
+// --- COMPONENTE PRINCIPAL CON LÓGICA DE AUTENTICACIÓN SIMULADA ---
+
+// Objeto para simular la interfaz User de Firebase
+const mockUser = {
+  uid: 'test-uid-12345',
+  email: 'jrios5061@gmail.com',
+  displayName: 'J Rios',
+  photoURL: null,
+  emailVerified: true,
+  // ...puedes añadir más propiedades si algún componente las necesita
+};
 
 export default function Home() {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    // Simulamos un usuario logueado estáticamente.
+    const [user, setUser] = useState<any>(mockUser); 
     const { businessName, businessLogo, isLoading: isBusinessLoading } = useBusiness();
-    const router = useRouter();
-    const auth = getAuth(app);
+    
+    // La carga es más simple ahora, solo depende de los datos del negocio.
+    const loading = isBusinessLoading;
 
-    // Efecto para manejar el estado de autenticación
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            if (currentUser) {
-                // Usuario autenticado: permite el acceso
-                setUser(currentUser);
-            } else {
-                // Usuario no autenticado: redirige a la página de login
-                router.push('/login');
-            }
-            setLoading(false);
-        });
-
-        // Limpia el listener al desmontar el componente
-        return () => unsubscribe();
-    }, [auth, router]);
-
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-            toast.info('Has cerrado la sesión.');
-            // onAuthStateChanged se encargará de la redirección automáticamente
-        } catch (e: any) {
-            toast.error('Error al cerrar sesión: ' + e.message);
-        }
+    const handleLogout = () => {
+        // Simula el cierre de sesión borrando el usuario del estado.
+        setUser(null);
+        toast.info('Has cerrado la sesión (simulado).');
+        // En un futuro, aquí podrías redirigir a una página de login simulada.
     };
 
-    // Muestra una pantalla de carga mientras se verifica el estado de autenticación
-    if (loading || isBusinessLoading) {
+    if (loading) {
         return <LoadingView />;
     }
 
-    // Si hay un usuario, muestra el dashboard. Si no, `useEffect` ya habrá iniciado la redirección.
-    // Devolvemos `null` para prevenir un renderizado momentáneo del dashboard antes de redirigir.
     if (!user) {
-        return null;
+        // Mostramos un mensaje simple en lugar de redirigir.
+        // Esto previene errores si la página de login no existe.
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-900">
+                <h1 className="text-white text-2xl">Sesión cerrada.</h1>
+                <p className="text-gray-400">Por favor, recarga para volver a iniciar sesión (simulado).</p>
+            </div>
+        );
     }
 
     return (
