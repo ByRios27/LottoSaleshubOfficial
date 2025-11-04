@@ -28,7 +28,6 @@ const LoadingView = () => (
 const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName: string, businessLogo: string, onLogout: () => void }) => {
     const menuItems = [
         { name: 'Ventas', href: '/sales', icon: LotteryIcon },
-        { name: 'Resultados', href: '/results', icon: TrophyIcon },
         { name: 'Sorteos', href: '/draws', icon: TicketIcon },
         { name: 'Verificación', href: '/verificacion', icon: ShieldCheckIcon },
         { name: 'Negocio', href: '/business', icon: BuildingStorefrontIcon },
