@@ -4,10 +4,11 @@ import { ChartBarIcon, TicketIcon, BuildingStorefrontIcon, ArrowLeftOnRectangleI
 import Link from 'next/link';
 import { useBusiness } from '@/contexts/BusinessContext';
 import Image from 'next/image';
-import React, { useState } from 'react';
-import { toast } from 'sonner';
+import React from 'react';
+import { useAuth } from '@/contexts/AuthContext'; // Importar el hook de autenticación
+import { useRouter } from 'next/navigation';
 
-// --- COMPONENTES INTERNOS DE LA PÁGINA (sin cambios) ---
+// --- COMPONENTES VISUALES (sin cambios) ---
 
 const LotteryIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
@@ -60,51 +61,35 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
     );
 };
 
-// --- COMPONENTE PRINCIPAL CON LÓGICA DE AUTENTICACIÓN SIMULADA ---
-
-// Objeto para simular la interfaz User de Firebase
-const mockUser = {
-  uid: 'test-uid-12345',
-  email: 'jrios5061@gmail.com',
-  displayName: 'J Rios',
-  photoURL: null,
-  emailVerified: true,
-  // ...puedes añadir más propiedades si algún componente las necesita
-};
+// --- COMPONENTE PRINCIPAL CON LÓGICA DE AUTENTICACIÓN REAL ---
 
 export default function Home() {
-    // Simulamos un usuario logueado estáticamente.
-    const [user, setUser] = useState<any>(mockUser); 
-    const { businessName, businessLogo, isLoading: isBusinessLoading } = useBusiness();
-    
-    // La carga es más simple ahora, solo depende de los datos del negocio.
-    const loading = isBusinessLoading;
+    const { user, loading: authLoading, logout } = useAuth();
+    const { businessName, businessLogo, isLoading: businessLoading } = useBusiness();
+    const router = useRouter();
 
-    const handleLogout = () => {
-        // Simula el cierre de sesión borrando el usuario del estado.
-        setUser(null);
-        toast.info('Has cerrado la sesión (simulado).');
-        // En un futuro, aquí podrías redirigir a una página de login simulada.
-    };
+    const isLoading = authLoading || businessLoading;
 
-    if (loading) {
+    // Si no hay usuario y la carga ha terminado, redirigir al login
+    React.useEffect(() => {
+        if (!isLoading && !user) {
+            router.push('/login');
+        }
+    }, [isLoading, user, router]);
+
+    if (isLoading) {
         return <LoadingView />;
     }
 
+    // Si el usuario no está autenticado, no mostrar nada mientras redirige
     if (!user) {
-        // Mostramos un mensaje simple en lugar de redirigir.
-        // Esto previene errores si la página de login no existe.
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-900">
-                <h1 className="text-white text-2xl">Sesión cerrada.</h1>
-                <p className="text-gray-400">Por favor, recarga para volver a iniciar sesión (simulado).</p>
-            </div>
-        );
+        return <LoadingView/>;
     }
 
+    // Si el usuario está autenticado, mostrar el dashboard
     return (
         <div>
-           <DashboardView businessName={businessName} businessLogo={businessLogo} onLogout={handleLogout} />
+            <DashboardView businessName={businessName} businessLogo={businessLogo} onLogout={logout} />
         </div>
     );
 }
