@@ -1,9 +1,22 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { initialDraws } from '@/lib/placeholder-data';
+import { useAuth } from '@/contexts/AuthContext'; // Para la autenticación
+import { db } from '@/lib/firebase'; // Acceso a la BD de Firestore
+import {
+  collection,
+  doc,
+  getDocs,
+  writeBatch,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy
+} from 'firebase/firestore';
+import { initialDraws } from '@/lib/placeholder-data'; // Datos iniciales
 
-// --- Definición de Tipos ---
+// --- Definición de Tipos (sin cambios) ---
 export type Draw = {
   id: string;
   name: string;
@@ -15,15 +28,16 @@ export type Draw = {
 
 type DrawsContextType = {
   draws: Draw[];
-  addDraw: (newDraw: Omit<Draw, 'id'>) => void;
-  updateDraw: (updatedDraw: Draw) => void;
-  deleteDraw: (id: string) => void;
+  addDraw: (newDraw: Omit<Draw, 'id'>) => Promise<void>;
+  updateDraw: (updatedDraw: Draw) => Promise<void>;
+  deleteDraw: (id: string) => Promise<void>;
+  isLoading: boolean; // Para que la UI sepa que estamos cargando datos
 };
 
-// --- Creación del Contexto ---
+// --- Creación del Contexto (sin cambios) ---
 const DrawsContext = createContext<DrawsContextType | undefined>(undefined);
 
-// --- Hook Personalizado ---
+// --- Hook Personalizado (sin cambios) ---
 export function useDraws() {
   const context = useContext(DrawsContext);
   if (context === undefined) {
@@ -32,74 +46,90 @@ export function useDraws() {
   return context;
 }
 
-// --- Proveedor del Contexto con Carga Prioritaria de LocalStorage ---
+// --- Proveedor del Contexto (Lógica de Firestore) ---
 interface DrawsProviderProps {
   children: ReactNode;
 }
 
 export function DrawsProvider({ children }: DrawsProviderProps) {
-  // 1. Iniciar siempre con los datos de ejemplo para consistencia SSR/cliente.
-  const [draws, setDraws] = useState<Draw[]>(initialDraws);
+  const { user } = useAuth(); // Obtener el usuario actual
+  const [draws, setDraws] = useState<Draw[]>([]); // Iniciar con array vacío
+  const [isLoading, setIsLoading] = useState(true); // Empezar en estado de carga
 
-  // 2. En el primer render del cliente, cargar desde localStorage si existe.
+  // Efecto para cargar los sorteos desde Firestore cuando el usuario está disponible
   useEffect(() => {
-    try {
-      const savedDraws = window.localStorage.getItem('drawsData');
-      if (savedDraws) {
-        setDraws(JSON.parse(savedDraws));
-      }
-    } catch (error) {
-      console.error("Error loading draws from localStorage on mount", error);
-    }
-  }, []); // El array vacío asegura que esto se ejecute solo una vez en el cliente.
+    if (user) {
+      const fetchDraws = async () => {
+        setIsLoading(true);
+        const drawsCollectionRef = collection(db, 'users', user.uid, 'draws');
+        const q = query(drawsCollectionRef, orderBy('name', 'asc')); // Ordenar por nombre
+        const querySnapshot = await getDocs(q);
 
-  // 3. Guardar en localStorage cada vez que los sorteos cambien.
-  useEffect(() => {
-    // Evitar sobreescribir los datos guardados con los datos iniciales durante la carga.
-    if (draws !== initialDraws) {
-        try {
-            window.localStorage.setItem('drawsData', JSON.stringify(draws));
-        } catch (error) {
-            console.error("Error saving draws to localStorage", error);
+        if (querySnapshot.empty) {
+          // Si el usuario no tiene sorteos, creamos los de por defecto
+          console.log('No draws found, seeding initial data...');
+          const batch = writeBatch(db);
+          const seededDraws: Draw[] = [];
+          initialDraws.forEach((draw) => {
+            const newDrawRef = doc(drawsCollectionRef, draw.id); // Usamos el ID predefinido
+            batch.set(newDrawRef, draw);
+            seededDraws.push(draw);
+          });
+          await batch.commit();
+          setDraws(seededDraws.sort((a,b) => a.name.localeCompare(b.name)));
+        } else {
+          // Si hay sorteos, los cargamos
+          const userDraws = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Draw[];
+          setDraws(userDraws);
         }
+        setIsLoading(false);
+      };
+
+      fetchDraws().catch(console.error);
     }
-  }, [draws]);
+  }, [user]); // Se ejecuta cada vez que el usuario cambia
 
-  // 4. Sincronización entre pestañas (sin cambios, esto es para otras pestañas).
-  const handleStorageChange = useCallback((event: StorageEvent) => {
-    if (event.key === 'drawsData' && event.newValue && event.oldValue !== event.newValue) {
-      try {
-        setDraws(JSON.parse(event.newValue));
-      } catch (error) {
-        console.error("Error parsing draws from storage event", error);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [handleStorageChange]);
-
-  // --- Funciones de Modificación (sin cambios) ---
-  const addDraw = (newDrawData: Omit<Draw, 'id'>) => {
-    const newDraw: Draw = { id: Date.now().toString(), ...newDrawData };
-    setDraws(prevDraws => [newDraw, ...prevDraws]);
+  // --- Funciones de Modificación con Firestore ---
+  const addDraw = async (newDrawData: Omit<Draw, 'id'>) => {
+    if (!user) throw new Error('User not authenticated');
+    const drawsCollectionRef = collection(db, 'users', user.uid, 'draws');
+    
+    // Añadir el nuevo sorteo a Firestore
+    const newDocRef = await addDoc(drawsCollectionRef, newDrawData);
+    
+    // Actualizar el estado local (actualización optimista)
+    const newDraw: Draw = { id: newDocRef.id, ...newDrawData };
+    setDraws(prevDraws => [newDraw, ...prevDraws].sort((a,b) => a.name.localeCompare(b.name)));
   };
 
-  const updateDraw = (updatedDraw: Draw) => {
-    setDraws(prevDraws => 
+  const updateDraw = async (updatedDraw: Draw) => {
+    if (!user) throw new Error('User not authenticated');
+    const drawDocRef = doc(db, 'users', user.uid, 'draws', updatedDraw.id);
+
+    // Actualizar el documento en Firestore
+    await updateDoc(drawDocRef, { ...updatedDraw });
+
+    // Actualizar el estado local
+    setDraws(prevDraws =>
       prevDraws.map(d => (d.id === updatedDraw.id ? updatedDraw : d))
     );
   };
 
-  const deleteDraw = (id: string) => {
+  const deleteDraw = async (id: string) => {
+    if (!user) throw new Error('User not authenticated');
+    const drawDocRef = doc(db, 'users', user.uid, 'draws', id);
+
+    // Borrar el documento de Firestore
+    await deleteDoc(drawDocRef);
+
+    // Actualizar el estado local
     setDraws(prevDraws => prevDraws.filter(d => d.id !== id));
   };
 
-  const value = { draws, addDraw, updateDraw, deleteDraw };
+  const value = { draws, addDraw, updateDraw, deleteDraw, isLoading };
 
   return (
     <DrawsContext.Provider value={value}>

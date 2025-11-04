@@ -10,11 +10,17 @@ import {
   ExclamationTriangleIcon,
   ShieldExclamationIcon,
   XCircleIcon,
+  ArrowUpTrayIcon, // Icono para el estado de carga
 } from '@heroicons/react/24/outline';
 import { ChartBarIcon } from '@heroicons/react/24/solid';
 import { themes } from '@/lib/themes';
+import { useAuth } from '@/contexts/AuthContext'; // Para obtener el ID de usuario
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // Firebase Storage
+import { app } from '@/lib/firebase'; // Config de Firebase
 
 export default function BusinessPage() {
+  const { user } = useAuth();
+  const storage = getStorage(app);
   const {
     businessName,
     businessLogo,
@@ -32,6 +38,7 @@ export default function BusinessPage() {
 
   const [nameLogoSaveStatus, setNameLogoSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [themeSaveStatus, setThemeSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [logoUploadStatus, setLogoUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -48,21 +55,38 @@ export default function BusinessPage() {
     }
   }, [businessName, businessLogo, theme, isLoading]);
 
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setTempLogo(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file || !user) {
+      return;
+    }
+
+    setLogoUploadStatus('uploading');
+    try {
+      // Crear una referencia en Firebase Storage
+      const storageRef = ref(storage, `business_logos/${user.uid}/${file.name}`);
+
+      // Subir el archivo
+      const snapshot = await uploadBytes(storageRef, file);
+
+      // Obtener la URL de descarga
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      // Actualizar el estado temporal con la nueva URL de Firebase
+      setTempLogo(downloadURL);
+      setLogoUploadStatus('success');
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      setLogoUploadStatus('error');
+    } finally {
+      setTimeout(() => setLogoUploadStatus('idle'), 3000); // Resetear estado visual
     }
   };
 
   const handleNameLogoSave = () => {
     try {
       setBusinessName(tempName);
-      setBusinessLogo(tempLogo);
+      setBusinessLogo(tempLogo); // Esto ahora guarda la URL de Firebase
       setNameLogoSaveStatus('success');
     } catch (e) {
       console.error("Error saving name and logo:", e);
@@ -89,6 +113,15 @@ export default function BusinessPage() {
   };
 
   const renderLogoPreview = () => {
+    // Mostrar spinner de carga mientras se sube el logo
+    if (logoUploadStatus === 'uploading') {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-primary/50">
+                <ArrowUpTrayIcon className="w-16 h-16 text-white animate-pulse" />
+            </div>
+        );
+    }
+
     if (tempLogo && tempLogo !== 'default') {
       return <Image src={tempLogo} alt="Previsualización del logo" layout="fill" objectFit="cover" />;
     } else {
@@ -99,7 +132,8 @@ export default function BusinessPage() {
       );
     }
   };
-
+  
+  // ... (El resto del código permanece igual)
   const renderSaveMessage = (status: 'idle' | 'success' | 'error') => {
     if (status === 'success') {
       return (
@@ -143,9 +177,10 @@ export default function BusinessPage() {
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className={`flex items-center gap-2 px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors ${themeStyles.textPrimary}`}>
+              disabled={logoUploadStatus === 'uploading'}
+              className={`flex items-center gap-2 px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors ${themeStyles.textPrimary} disabled:opacity-50 disabled:cursor-not-allowed`}>
               <PhotoIcon className="w-5 h-5" />
-              Subir Logo
+              {logoUploadStatus === 'uploading' ? 'Subiendo...' : 'Subir Logo'}
             </button>
           </div>
           <div>

@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { app } from "@/lib/firebase";
 import { ArrowRightIcon, AtSymbolIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
@@ -25,6 +26,30 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
+    const [appName, setAppName] = useState("LottoSalesHub");
+    const [appSubtitle, setAppSubtitle] = useState("Inicia sesión para gestionar tus ventas");
+
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const db = getFirestore(app);
+                const configRef = doc(db, 'public', 'config');
+                const configSnap = await getDoc(configRef);
+
+                if (configSnap.exists()) {
+                    const configData = configSnap.data();
+                    setAppName(configData.appName || "LottoSalesHub");
+                    setAppSubtitle(configData.appSubtitle || "Inicia sesión para gestionar tus ventas");
+                } else {
+                    console.warn("Public config not found, using default values.");
+                }
+            } catch (error) {
+                console.error("Error fetching public config:", error);
+            }
+        };
+
+        fetchConfig();
+    }, []);
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -49,8 +74,8 @@ export default function LoginPage() {
             <div className="relative z-10 w-full max-w-md px-6 sm:px-8">
                 <div className="flex flex-col items-center mb-8">
                     <AppLogo />
-                    <h1 className="text-4xl font-bold text-white tracking-tight">LottoSalesHub</h1>
-                    <p className="text-lg text-gray-400 mt-2">Inicia sesión para gestionar tus ventas</p>
+                    <h1 className="text-4xl font-bold text-white tracking-tight">{appName}</h1>
+                    <p className="text-lg text-gray-400 mt-2">{appSubtitle}</p>
                 </div>
 
                 <form

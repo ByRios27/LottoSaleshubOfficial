@@ -3,7 +3,10 @@
 import { useState, useEffect, FormEvent, useRef } from 'react';
 import Image from 'next/image';
 import { useDraws, type Draw } from '@/contexts/DrawsContext';
-import { Plus, Edit, Trash2, Image as ImageIcon, X, XCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Image as ImageIcon, X, XCircle, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext'; // Para obtener el ID de usuario
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // Firebase Storage
+import { app } from '@/lib/firebase'; // Config de Firebase
 
 // --- Componente Modal de Edición ---
 interface EditDrawModalProps {
@@ -22,7 +25,9 @@ function EditDrawModal({ draw, isOpen, onClose, onSave }: EditDrawModalProps) {
     const [newHour, setNewHour] = useState('01');
     const [newMinute, setNewMinute] = useState('00');
     const [newPeriod, setNewPeriod] = useState('PM');
+    const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const storage = getStorage(app);
 
     useEffect(() => {
         if (draw) {
@@ -36,14 +41,19 @@ function EditDrawModal({ draw, isOpen, onClose, onSave }: EditDrawModalProps) {
 
     if (!isOpen || !draw) return null;
 
-    const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleLogoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setLogo(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+        if (!file || !draw.id) return;
+        setIsUploading(true);
+        try {
+            const storageRef = ref(storage, `draw_logos/${draw.id}/${file.name}`);
+            await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(storageRef);
+            setLogo(downloadURL);
+        } catch (error) {
+            console.error("Error uploading logo:", error);
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -77,14 +87,18 @@ function EditDrawModal({ draw, isOpen, onClose, onSave }: EditDrawModalProps) {
                     <div className="flex flex-col gap-6">
                         <div className="flex flex-col items-center gap-2">
                             <div className="relative w-32 h-32 rounded-full bg-black/5 border-2 border-dashed border-black/20 flex items-center justify-center overflow-hidden">
-                                {logo ? (
+                                {isUploading ? (
+                                    <Loader2 className="w-12 h-12 text-black/40 animate-spin" />
+                                ) : logo ? (
                                     <Image src={logo} alt="Logo del sorteo" layout="fill" objectFit="cover" />
                                 ) : (
                                     <ImageIcon className="w-16 h-16 text-black/40"/>
                                 )}
                             </div>
-                            <input type="file" accept="image/*" ref={fileInputRef} onChange={handleLogoChange} className="hidden" />
-                            <button type="button" onClick={() => fileInputRef.current?.click()} className="text-sm text-green-600 hover:text-green-500 font-semibold">Cambiar Logo</button>
+                            <input type="file" accept="image/*" ref={fileInputRef} onChange={handleLogoChange} className="hidden" disabled={isUploading} />
+                            <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="text-sm text-green-600 hover:text-green-500 font-semibold disabled:opacity-50">
+                                {isUploading ? 'Subiendo...' : 'Cambiar Logo'}
+                            </button>
                         </div>
                         <div className="flex flex-col"><label htmlFor="edit-draw-name" className="mb-2 font-semibold text-gray-700">Nombre</label><input id="edit-draw-name" type="text" value={name} onChange={(e) => setName(e.target.value)} className="bg-white border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" /></div>
                         <div className="flex flex-col"><label className="mb-2 font-semibold text-gray-700">Horarios</label><div className="flex items-center gap-2"><select value={newHour} onChange={e => setNewHour(e.target.value)} className="bg-white border border-gray-300 px-3 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 w-auto">{Array.from({length: 12}, (_, i) => i + 1).map(h => <option key={h} value={h.toString().padStart(2, '0')}>{h.toString().padStart(2, '0')}</option>)}</select><span className="font-bold">:</span><select value={newMinute} onChange={e => setNewMinute(e.target.value)} className="bg-white border border-gray-300 px-3 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 w-auto">{Array.from({length: 12}, (_, i) => i * 5).map(m => <option key={m} value={m.toString().padStart(2, '0')}>{m.toString().padStart(2, '0')}</option>)}</select><select value={newPeriod} onChange={e => setNewPeriod(e.target.value)} className="bg-white border border-gray-300 px-3 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 w-auto"><option value="AM">AM</option><option value="PM">PM</option></select><button type="button" onClick={handleAddHorario} disabled={horarios.length >= 5} className="flex items-center justify-center p-3 bg-gray-200 hover:bg-gray-300 transition-colors rounded-lg font-semibold disabled:opacity-50 ml-auto"><Plus className="w-6 h-6"/></button></div><div className="flex flex-wrap gap-2 mt-3">{horarios.map(h => (<div key={h} className="flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium"><span>{h}</span><button type="button" onClick={() => handleRemoveHorario(h)}><XCircle className="w-5 h-5 text-red-500 hover:text-red-700"/></button></div>))}</div></div>
@@ -99,11 +113,11 @@ function EditDrawModal({ draw, isOpen, onClose, onSave }: EditDrawModalProps) {
 
 // --- Componente Principal de la Página ---
 export default function DrawsPage() {
-  const { draws, addDraw, updateDraw, deleteDraw } = useDraws();
+  const { user } = useAuth();
+  const { draws, addDraw, updateDraw, deleteDraw, isLoading } = useDraws();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingDraw, setEditingDraw] = useState<Draw | null>(null);
   
-  // Estado para el formulario de AÑADIR
   const [newDrawName, setNewDrawName] = useState('');
   const [newDrawLogo, setNewDrawLogo] = useState<string | undefined>(undefined);
   const [newDrawCifras, setNewDrawCifras] = useState(2);
@@ -112,16 +126,25 @@ export default function DrawsPage() {
   const [newHour, setNewHour] = useState('01');
   const [newMinute, setNewMinute] = useState('00');
   const [newPeriod, setNewPeriod] = useState('PM');
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const storage = getStorage(app);
 
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setNewDrawLogo(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+    if (!file) return;
+    setIsUploading(true);
+    try {
+        // Usamos un ID temporal para la carpeta del logo hasta que se cree el sorteo
+        const tempId = Date.now().toString();
+        const storageRef = ref(storage, `draw_logos/${user?.uid}/${tempId}/${file.name}`);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+        setNewDrawLogo(downloadURL);
+    } catch (error) {
+        console.error("Error uploading new draw logo:", error);
+    } finally {
+        setIsUploading(false);
     }
   };
 
@@ -138,13 +161,13 @@ export default function DrawsPage() {
     setHorarios(horarios.filter((h) => h !== horarioToRemove));
   };
 
-  const handleAddDrawSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleAddDrawSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newDrawName.trim() === '' || horarios.length === 0) {
         alert("El nombre y al menos un horario son obligatorios.");
         return;
     }
-    addDraw({ name: newDrawName, logo: newDrawLogo, cif: newDrawCifras, cost: newDrawCosto, sch: horarios });
+    await addDraw({ name: newDrawName, logo: newDrawLogo, cif: newDrawCifras, cost: newDrawCosto, sch: horarios });
     setNewDrawName('');
     setNewDrawLogo(undefined);
     setNewDrawCifras(2);
@@ -157,11 +180,19 @@ export default function DrawsPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleSaveDraw = (updatedDraw: Draw) => {
-    updateDraw(updatedDraw);
+  const handleSaveDraw = async (updatedDraw: Draw) => {
+    await updateDraw(updatedDraw);
     setIsEditModalOpen(false);
     setEditingDraw(null);
   };
+
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-center min-h-screen">
+            <Loader2 className="w-16 h-16 text-white animate-spin" />
+        </div>
+    );
+  }
 
   return (
     <>
@@ -174,14 +205,18 @@ export default function DrawsPage() {
                     <h2 className="text-2xl font-bold text-center text-white mb-2">Añadir Nuevo Sorteo</h2>
                     <div className="flex flex-col items-center gap-2">
                         <div className="relative w-32 h-32 rounded-full bg-white/10 border-2 border-dashed border-white/40 flex items-center justify-center overflow-hidden">
-                           {newDrawLogo ? (
+                           {isUploading ? (
+                               <Loader2 className="w-12 h-12 text-white/50 animate-spin" />
+                           ) : newDrawLogo ? (
                                 <Image src={newDrawLogo} alt="Logo del nuevo sorteo" layout="fill" objectFit="cover" />
                             ) : (
                                 <ImageIcon className="w-16 h-16 text-white/50"/>
                             )}
                         </div>
-                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleLogoChange} className="hidden" />
-                        <button type="button" onClick={() => fileInputRef.current?.click()} className="text-sm text-green-400 hover:text-green-300 font-semibold">Subir Logo</button>
+                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleLogoChange} className="hidden" disabled={isUploading}/>
+                        <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="text-sm text-green-400 hover:text-green-300 font-semibold disabled:opacity-50">
+                            {isUploading ? 'Subiendo...' : 'Subir Logo'}
+                        </button>
                     </div>
                     <div className="flex flex-col"><label htmlFor="draw-name" className="mb-2 font-semibold text-white/80">Nombre del Sorteo</label><input id="draw-name" type="text" value={newDrawName} onChange={(e) => setNewDrawName(e.target.value)} placeholder="Ej: Lotería del Jueves" className="bg-white/20 placeholder-white/60 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" /></div>
                     <div className="flex flex-col"><label className="mb-2 font-semibold text-white/80">Horarios (hasta 5)</label><div className="flex items-center gap-2"><select value={newHour} onChange={e => setNewHour(e.target.value)} className="bg-white/20 text-white px-3 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 w-auto">{Array.from({length: 12}, (_, i) => i + 1).map(h => <option key={h} value={h.toString().padStart(2, '0')}>{h.toString().padStart(2, '0')}</option>)}</select><span className="font-bold">:</span><select value={newMinute} onChange={e => setNewMinute(e.target.value)} className="bg-white/20 text-white px-3 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 w-auto">{Array.from({length: 12}, (_, i) => i * 5).map(m => <option key={m} value={m.toString().padStart(2, '0')}>{m.toString().padStart(2, '0')}</option>)}</select><select value={newPeriod} onChange={e => setNewPeriod(e.target.value)} className="bg-white/20 text-white px-3 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 w-auto"><option value="AM">AM</option><option value="PM">PM</option></select><button type="button" onClick={handleAddHorario} disabled={horarios.length >= 5} className="flex items-center justify-center p-3 bg-gray-500/50 hover:bg-gray-500/70 transition-colors rounded-lg font-semibold disabled:opacity-50 ml-auto"><Plus className="w-6 h-6"/></button></div><div className="flex flex-wrap gap-2 mt-3">{horarios.map(h => (<div key={h} className="flex items-center gap-2 bg-green-500/30 text-green-200 px-3 py-1 rounded-full text-sm"><span>{h}</span><button type="button" onClick={() => handleRemoveHorario(h)}><XCircle className="w-5 h-5 text-red-400 hover:text-red-300"/></button></div>))}</div></div>
