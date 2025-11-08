@@ -1,43 +1,37 @@
 'use client';
 
 import { useMemo, Fragment, useEffect, useState } from 'react';
-import { useForm, useFieldArray, useWatch } from 'react-hook-form';
+import { useForm, useFieldArray, useWatch, SubmitHandler } from 'react-hook-form';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { X, PlusCircle, Trash2, Eye, Pencil, Share2, MoreVertical, Clock, ChevronDown, Ticket as TicketIcon } from 'lucide-react';
+import { X, PlusCircle, Trash2, Eye, Share2, MoreVertical } from 'lucide-react';
 import { Menu, Transition } from '@headlessui/react';
 import Receipt from './Receipt';
-import { usePersistentSales } from '@/hooks/usePersistentSales';
+import { useSales, Sale } from '@/contexts/SalesContext';
 import type { Draw } from '@/contexts/DrawsContext';
 import { toast } from 'sonner';
 import React from 'react';
+import { Ticket as TicketIcon } from 'lucide-react';
 
-const saleFormSchema = (digits: number) => z.object({
+/* ====== BLOQUE ÚNICO — ALINEA Zod + RHF + TS SIN CAMBIAR UI ====== */
+
+/** 1) Schema único (clave: quantity con coerce a number) */
+const formSchema = z.object({
+  schedules: z.array(z.string()).nonempty("Debes seleccionar al menos un sorteo."),
+  numbers: z.array(
+    z.object({
+      number: z.string().min(1, "El número es requerido."),
+      quantity: z.coerce.number().int().min(1, "Mínimo 1"),
+    })
+  ).nonempty("Añade al menos un número."),
   clientName: z.string().optional(),
   clientPhone: z.string().optional(),
-  schedules: z.array(z.string()).min(1, 'Debes seleccionar al menos un sorteo.'),
-  numbers: z.array(z.object({
-    number: z.string().min(1, 'El número es requerido.'),
-    quantity: z.preprocess(
-      (val) => (val === '' || val === null ? undefined : val),
-      z.coerce.number().min(1, 'Mínimo 1')
-    ),
-  })).min(1, 'Añade al menos un número.').refine(
-    (numbers) => numbers.every(n => n.number.length === digits),
-    { message: `Todos los números deben tener ${digits} dígitos.` }
-  ),
 });
 
-type SaleFormValues = z.input<ReturnType<typeof saleFormSchema>>;
-type SaleOutputData = z.output<ReturnType<typeof saleFormSchema>>;
+/** 2) Tipo del formulario derivado del schema (no declares otro distinto) */
+type FormValues = z.infer<typeof formSchema>;
 
-interface Sale extends SaleOutputData {
-  ticketId: string;
-  timestamp: string;
-  sellerId: string;
-  costPerFraction: number;
-  totalCost: number;
-}
+/* ====== FIN DEL BLOQUE ====== */
 
 interface SalesModalProps {
   draw: Draw | null;
@@ -54,109 +48,94 @@ const generateTicketId = () => {
 
 const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, logoUrl }) => {
   const [activeTab, setActiveTab] = useState('sell');
-  const { sales: completedSales, addSale, deleteSale, isLoading, cleanUpExpiredSales } = usePersistentSales<Sale>(draw?.id?.toString());
+  const { sales, addSale, deleteSale, isLoading } = useSales(); 
   const [viewingReceipt, setViewingReceipt] = useState<Sale | null>(null);
 
-  const formSchema = saleFormSchema(draw?.cif || 0);
+  const completedSales = useMemo(() => 
+    sales.filter(s => s.drawId === draw?.id?.toString()), 
+  [sales, draw]);
 
-  const form = useForm<SaleFormValues>({
-    resolver: zodResolver(formSchema),
-    mode: 'all',
-    defaultValues: {
-      clientName: '',
-      clientPhone: '',
-      schedules: [],
-      numbers: [{ number: '', quantity: undefined }],
-    },
+  /** 3) useForm SIN genérico — deja que el resolver marque el tipo de entrada/salida */
+  const form = useForm({
+      resolver: zodResolver(formSchema),
+      mode: "all",
+      defaultValues: {
+        schedules: [],
+        numbers: [{ number: "", quantity: 1 }],
+        clientName: "",
+        clientPhone: "",
+      } as FormValues, // asegura compatibilidad de defaultValues
   });
 
+  /** 4) FieldArray tipado por name (no cambia tu render) */
   const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "numbers",
+      control: form.control,
+      name: "numbers",
   });
 
   const schedules = useMemo(() => draw?.sch || [], [draw]);
-
   const costPerFraction = draw?.cost || 0.20;
-  
-  // 🔹 useWatch escucha los cambios en tiempo real
-  const watchedNumbers = useWatch({
-    control: form.control,
-    name: 'numbers',
-  });
 
-  const watchedSchedules = useWatch({
-    control: form.control,
-    name: 'schedules',
-  });
+  const watchedNumbers = useWatch({ control: form.control, name: 'numbers' });
+  const watchedSchedules = useWatch({ control: form.control, name: 'schedules' });
 
   const totalCost = useMemo(() => {
-    const totalQuantity = (watchedNumbers || []).reduce((acc, curr) => {
-      return acc + (Number(curr?.quantity) || 0);
-    }, 0);
-
-    const schedulesCount = (watchedSchedules?.length || 0) > 0 ? watchedSchedules.length : 1;
-
+    const totalQuantity = (watchedNumbers || []).reduce((acc, curr) => acc + (Number(curr?.quantity) || 0), 0);
+    const schedulesCount = (watchedSchedules?.length || 0);
     return totalQuantity * costPerFraction * schedulesCount;
   }, [watchedNumbers, watchedSchedules, costPerFraction]);
 
-  useEffect(() => {
-    if (activeTab === 'history') {
-        cleanUpExpiredSales();
-    }
-  }, [activeTab, cleanUpExpiredSales]);
-
   if (!draw) return null;
 
-  const onSubmit = (values: SaleOutputData) => {
-    const totalQuantity = values.numbers.reduce((acc, curr) => acc + curr.quantity, 0);
-    const finalTotalCost = totalQuantity * costPerFraction * values.schedules.length;
+  /** 5) onSubmit tipado con el tipo inferido del schema */
+  const onSubmit: SubmitHandler<FormValues> = (values) => {
+    if (!draw) return;
 
-    const newSale: Sale = {
-      ...values,
+    const newSale: Omit<Sale, 'id' | 'timestamp'> = {
       ticketId: generateTicketId(),
-      timestamp: new Date().toISOString(),
-      sellerId: 'ventas01',
+      drawId: draw.id.toString(),
+      drawName: draw.name,
+      drawLogo: draw.logo,
+      sellerId: 'ventas01', 
       costPerFraction,
-      totalCost: finalTotalCost,
+      totalCost,
+      receiptUrl: '', 
+      ...values,
     };
 
     addSale(newSale);
     toast.success('Venta realizada con éxito');
-    form.reset({
-      clientName: '',
-      clientPhone: '',
-      schedules: [],
-      numbers: [{ number: '', quantity: undefined }],
-    });
+    form.reset();
     setActiveTab('history');
   };
   
-  const handleEditSale = (saleToEdit: Sale) => {
-    form.reset({
-      clientName: saleToEdit.clientName || '',
-      clientPhone: saleToEdit.clientPhone || '',
-      schedules: saleToEdit.schedules,
-      numbers: saleToEdit.numbers.map(n => ({...n, quantity: Number(n.quantity)}))
-    });
-    deleteSale(saleToEdit.ticketId);
-    setActiveTab('sell');
-  };
-
-  const handleDeleteSale = (ticketId: string) => {
-    deleteSale(ticketId);
-    toast.info('Venta eliminada');
-  };
-
   const handleShareSale = async (saleToShare: Sale) => {
+    const verificationUrl = new URL(
+      `/verificacion/${encodeURIComponent(saleToShare.ticketId)}`,
+      window.location.origin
+    ).href;
+
     const shareData = {
       title: `Comprobante de Venta - ${businessName || 'Lotto Hub'}`,
-      text: `¡Gracias por tu compra! Aquí está tu comprobante para el sorteo ${draw.name}.\n\nTicket ID: ${saleToShare.ticketId}\nCliente: ${saleToShare.clientName || 'General'}\nTotal: $${saleToShare.totalCost.toFixed(2)}\n\n¡Mucha suerte!`,
+      text: `¡Gracias por tu compra! Aquí está tu comprobante para el sorteo ${draw.name}.\n\nTicket ID: ${saleToShare.ticketId}\nCliente: ${saleToShare.clientName || 'General'}\nTotal: $${saleToShare.totalCost.toFixed(2)}\n\nVerifica tu ticket aquí:`,
+      url: verificationUrl,
     };
+
     try {
-      await navigator.share(shareData);
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(verificationUrl);
+        toast.success("Enlace de verificación copiado al portapapeles.");
+      }
     } catch (err) {
-      toast.error("Error al compartir la venta.");
+      console.error("Error al compartir:", err);
+      try {
+        await navigator.clipboard.writeText(verificationUrl);
+        toast.success("Error al compartir, enlace copiado al portapapeles.");
+      } catch (copyErr) {
+        toast.error("No se pudo compartir ni copiar el enlace.");
+      }
     }
   };
 
@@ -174,17 +153,17 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
 
           <div className="p-3 border-b border-white/10 flex-shrink-0">
             <div className="flex space-x-1 bg-black/20 p-1 rounded-lg">
-              <button onClick={() => setActiveTab('sell')} className={`w-full py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'sell' ? 'bg-green-600 text-white shadow' : 'text-white/70 hover:bg-white/10'}`}>{form.formState.isDirty ? 'Venta' : 'Vender'}</button>
-              <button onClick={() => setActiveTab('history')} className={`w-full py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'history' ? 'bg-green-600 text-white shadow' : 'text-white/70 hover:bg-white/10'}`}>Ventas Realizadas</button>
+              <button onClick={() => setActiveTab('sell')} className={`w-full py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'sell' ? 'bg-green-600 text-white shadow' : 'text-white/70 hover:bg-white/10'}`}>{form.formState.isDirty ? 'Venta en Progreso' : 'Nueva Venta'}</button>
+              <button onClick={() => setActiveTab('history')} className={`w-full py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'history' ? 'bg-green-600 text-white shadow' : 'text-white/70 hover:bg-white/10'}`}>Historial (${completedSales.length})</button>
             </div>
           </div>
 
           <main className="flex-grow overflow-y-auto p-5">
             {activeTab === 'sell' && (
-              <form onSubmit={form.handleSubmit(onSubmit as any)} className="flex flex-col h-full">
-                <div className="flex-grow space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+                 <div className="flex-grow space-y-6">
                   <div>
-                    <h4 className="font-medium text-white/90 mb-3">Seleccione Horario</h4>
+                    <h4 className="font-medium text-white/90 mb-3">Seleccione Horario(s)</h4>
                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {schedules.map(schedule => (
                         <label key={schedule} className={`flex items-center space-x-2 p-2.5 rounded-md cursor-pointer transition-colors ${form.watch('schedules').includes(schedule) ? 'bg-green-500/15 border-green-500' : 'bg-black/20 border-transparent'} border`}>
@@ -209,18 +188,18 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                   </div>
 
                   <div>
-                    <h4 className="font-medium text-white/90 mb-3">Añade Numero</h4>
+                    <h4 className="font-medium text-white/90 mb-3">Añadir Números</h4>
                     <div className="space-y-3">
                       {fields.map((field, index) => (
                         <div key={field.id} className="flex items-center gap-3">
                           <input type="text" placeholder="Número" {...form.register(`numbers.${index}.number`)} maxLength={draw.cif} className={`w-full bg-black/20 border rounded-lg py-1.5 px-3 text-white focus:ring-1 focus:ring-green-500 transition-all ${form.formState.errors.numbers?.[index]?.number ? 'border-red-500' : 'border-white/20'}`} />
-                          <input type="number" placeholder="Cantidad" {...form.register(`numbers.${index}.quantity`)} className="w-36 bg-black/20 border-white/20 border rounded-lg py-1.5 px-3 text-white focus:ring-1 focus:ring-green-500 transition-all" />
+                          <input type="number" placeholder="Cantidad" {...form.register(`numbers.${index}.quantity`, { valueAsNumber: true })} className="w-36 bg-black/20 border-white/20 border rounded-lg py-1.5 px-3 text-white focus:ring-1 focus:ring-green-500 transition-all" />
                           <button type="button" onClick={() => remove(index)} className="p-2 text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-colors disabled:opacity-50" disabled={fields.length <= 1}><Trash2 className="w-4 h-4" /></button>
                         </div>
                       ))}
                     </div>
-                     {form.formState.errors.numbers && <p className="text-red-500 text-xs mt-2">{form.formState.errors.numbers.message || form.formState.errors.numbers.root?.message}</p>}
-                    <button type="button" onClick={() => append({ number: '', quantity: undefined })} className="mt-4 flex items-center gap-2 text-green-400 hover:text-green-300 text-sm font-medium transition-colors"><PlusCircle className="w-5 h-5" />Añadir Número</button>
+                     {form.formState.errors.numbers && <p className="text-red-500 text-xs mt-2">{form.formState.errors.numbers.root?.message}</p>}
+                    <button type="button" onClick={() => append({ number: '', quantity: 1 })} className="mt-4 flex items-center gap-2 text-green-400 hover:text-green-300 text-sm font-medium transition-colors"><PlusCircle className="w-5 h-5" />Añadir Número</button>
                   </div>
                 </div>
                 <div className="mt-6 pt-6 border-t border-white/10 flex justify-between items-center">
@@ -228,9 +207,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                         <span className="text-sm text-white/70">Total Venta:</span>
                         <p className="text-2xl font-bold text-green-400">${totalCost.toFixed(2)}</p>
                     </div>
-                    <button type="submit" disabled={!form.formState.isValid} className="bg-green-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-lg transition-all duration-300 disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-700">
-                      {form.formState.isDirty ? 'Actualizar Venta' : 'Completar Venta'}
-                    </button>
+                    <button type="submit" disabled={!form.formState.isValid} className="bg-green-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-lg transition-all duration-300 disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-700">Completar Venta</button>
                 </div>
               </form>
             )}
@@ -244,7 +221,6 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                 completedSales.length > 0 ? (
                   <div className="overflow-x-auto">
                     <div className="min-w-full">
-                      {/* Table Header */}
                       <div className="grid grid-cols-12 gap-4 px-4 py-2 text-xs font-medium text-white/60 border-b border-t border-white/10">
                         <div className="col-span-2">Números</div>
                         <div className="col-span-3">Sorteos</div>
@@ -252,10 +228,9 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                         <div className="col-span-2 text-right">Total</div>
                         <div className="col-span-2 text-center">Acciones</div>
                       </div>
-                      {/* Table Body */}
                       <div className="divide-y divide-white/10">
                         {completedSales.map((sale) => (
-                          <div key={sale.ticketId} className="grid grid-cols-12 gap-4 px-4 py-3 items-center text-sm text-white/90">
+                           <div key={sale.id} className="grid grid-cols-12 gap-4 px-4 py-3 items-center text-sm text-white/90">
                             <div className="col-span-2 font-semibold">
                               {sale.numbers.map(n => n.number).join(', ')}
                             </div>
@@ -264,19 +239,13 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                             </div>
                             <div className="col-span-3">
                               <div>{sale.clientName || 'Cliente General'}</div>
-                              <div className="text-xs text-white/50">{new Date(sale.timestamp).toLocaleString()}</div>
+                              <div className="text-xs text-white/50">{typeof sale.timestamp === 'string' ? new Date(sale.timestamp).toLocaleString() : sale.timestamp?.toDate?.().toLocaleString()}</div>
                             </div>
                             <div className="col-span-2 text-right font-mono text-green-400">
                               ${sale.totalCost.toFixed(2)}
                             </div>
                             <div className="col-span-2 flex justify-center">
-                              <ActionMenu 
-                                sale={sale} 
-                                onVisualize={() => setViewingReceipt(sale)} 
-                                onDelete={() => handleDeleteSale(sale.ticketId)} 
-                                onShare={() => handleShareSale(sale)} 
-                                onEdit={() => handleEditSale(sale)} 
-                              />
+                              <ActionMenu sale={sale} onVisualize={() => setViewingReceipt(sale)} onShare={() => handleShareSale(sale)} onDelete={() => sale.id && deleteSale(sale.id)} />
                             </div>
                           </div>
                         ))}
@@ -295,8 +264,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
   );
 };
 
-
-const ActionMenu: React.FC<{sale: Sale; onVisualize: () => void; onDelete: () => void; onShare: () => void; onEdit: () => void;}> = ({ onVisualize, onDelete, onShare, onEdit }) => {
+const ActionMenu: React.FC<{sale: Sale; onVisualize: () => void; onShare: () => void; onDelete: () => void;}> = ({ onVisualize, onShare, onDelete }) => {
     return (
         <Menu as="div" className="relative inline-block text-left">
             <Menu.Button className="p-1.5 rounded-full text-white/70 hover:bg-white/20 hover:text-white"><MoreVertical className="w-5 h-5" /></Menu.Button>
@@ -304,7 +272,6 @@ const ActionMenu: React.FC<{sale: Sale; onVisualize: () => void; onDelete: () =>
                 <Menu.Items className="absolute right-0 w-48 mt-2 origin-top-right bg-gray-800 border border-white/20 divide-y divide-white/10 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20">
                     <div className="px-1 py-1">
                         <Menu.Item>{({ active }) => <button onClick={onVisualize} className={`${active ? 'bg-green-600 text-white' : 'text-white/90'} group flex rounded-md items-center w-full px-2 py-2 text-sm`}><Eye className="w-5 h-5 mr-2"/>Visualizar</button>}</Menu.Item>
-                        <Menu.Item>{({ active }) => <button onClick={onEdit} className={`${active ? 'bg-green-600 text-white' : 'text-white/90'} group flex rounded-md items-center w-full px-2 py-2 text-sm`}><Pencil className="w-5 h-5 mr-2"/>Editar</button>}</Menu.Item>
                         <Menu.Item>{({ active }) => <button onClick={onShare} className={`${active ? 'bg-green-600 text-white' : 'text-white/90'} group flex rounded-md items-center w-full px-2 py-2 text-sm`}><Share2 className="w-5 h-5 mr-2"/>Compartir</button>}</Menu.Item>
                     </div>
                     <div className="px-1 py-1">

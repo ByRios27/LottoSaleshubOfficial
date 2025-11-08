@@ -4,19 +4,14 @@ import { ShareIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import QRCode from 'react-qr-code';
 import Image from 'next/image';
 import React from 'react';
+import { Sale } from '@/contexts/SalesContext'; // <- IMPORTAR TIPO UNIFICADO
 
-// Define the shape of the sale object
-interface Sale {
-  ticketId: string;
-  timestamp: string;
-  sellerId: string;
-  clientName?: string;
-  clientPhone?: string;
-  schedules: string[];
-  numbers: { number: string; quantity: number }[];
-  costPerFraction: number;
-  totalCost: number;
-}
+// // Define the shape of the sale object - ELIMINADO
+// interface Sale {
+//   ticketId: string;
+//   timestamp: string; 
+//   ...
+// }
 
 // Define the props for the Receipt component
 interface ReceiptProps {
@@ -41,6 +36,11 @@ const DefaultLogo = () => (
 const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName, logoUrl }) => {
 
   if (!sale) return null;
+
+  // Convertir timestamp a string para asegurar consistencia
+  const displayTimestamp = typeof sale.timestamp === 'string' 
+    ? sale.timestamp 
+    : sale.timestamp.toDate().toISOString();
 
   const handleShare = async () => {
     const shareData = {
@@ -91,7 +91,7 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
             {/* Meta Info */}
             <div className="my-4 border-t border-b border-dashed border-gray-300 py-3 text-xs space-y-1.5 text-gray-800">
                 <p><strong>Ticket ID:</strong> <span className="font-mono ml-1">{sale.ticketId}</span></p>
-                <p><strong>Fecha:</strong> <span className="font-mono ml-1">{new Date(sale.timestamp).toLocaleString()}</span></p>
+                <p><strong>Fecha:</strong> <span className="font-mono ml-1">{new Date(displayTimestamp).toLocaleString()}</span></p>
                 <p><strong>Vendedor:</strong> <span className="font-mono ml-1">{sale.sellerId || 'N/A'}</span></p>
                 <p><strong>Cliente:</strong> <span className="ml-1">{sale.clientName || 'N/A'}</span></p>
                  {sale.clientPhone && <p><strong>Teléfono:</strong> <span className="font-mono ml-1">{sale.clientPhone}</span></p>}
