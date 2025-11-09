@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useBusiness } from '@/contexts/BusinessContext';
 import Image from 'next/image';
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext'; // Importar el hook de autenticación
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 // --- COMPONENTES VISUALES (sin cambios) ---
@@ -60,30 +60,33 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
     );
 };
 
-// --- COMPONENTE PRINCIPAL CON LÓGICA DE AUTENTICACIÓN REAL ---
-
-export default function Home() {
-    const { user, loading: authLoading, logout } = useAuth();
+// --- COMPONENTE NUEVO Y SEGURO PARA EL DASHBOARD ---
+function UserDashboard() {
+    const { logout } = useAuth();
     const { businessName, businessLogo, isLoading: businessLoading } = useBusiness();
-    const router = useRouter();
 
-    const isLoading = authLoading || businessLoading;
-
-    // Si no hay usuario y la carga ha terminado, redirigir al login
-    React.useEffect(() => {
-        if (!isLoading && !user) {
-            router.push('/login');
-        }
-    }, [isLoading, user, router]);
-
-    if (isLoading) {
+    if (businessLoading) {
         return <LoadingView />;
     }
 
-    // Si el usuario está autenticado, mostrar el dashboard
-    return (
-        <div>
-            <DashboardView businessName={businessName} businessLogo={businessLogo} onLogout={logout} />
-        </div>
-    );
+    return <DashboardView businessName={businessName} businessLogo={businessLogo} onLogout={logout} />;
+}
+
+// --- COMPONENTE PRINCIPAL CON LÓGICA DE AUTENTICACIÓN CORREGIDA ---
+export default function Home() {
+    const { user, loading: authLoading } = useAuth();
+    const router = useRouter();
+
+    React.useEffect(() => {
+        if (!authLoading && !user) {
+            router.push('/login');
+        }
+    }, [authLoading, user, router]);
+
+    if (authLoading || !user) {
+        return <LoadingView />;
+    }
+
+    // Si llegamos aquí, el usuario está autenticado y la carga inicial ha terminado.
+    return <UserDashboard />;
 }
