@@ -80,11 +80,6 @@ export default function Home() {
         return <LoadingView />;
     }
 
-    // Si el usuario no está autenticado, no mostrar nada mientras redirige
-    if (!user) {
-        return <LoadingView/>;
-    }
-
     // Si el usuario está autenticado, mostrar el dashboard
     return (
         <div>

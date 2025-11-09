@@ -52,10 +52,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (loading) {
     return <LoadingSpinner />;
   }
-  
-  if (!user && pathname !== '/login') {
-      return <LoadingSpinner />;
-  }
 
   return (
     <AuthContext.Provider value={{ user, loading, logout }}>
