@@ -1,9 +1,9 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/lib/firebase';
-import { createSaleWithIndex } from '@/app/(dashboard)/sales/actions'; // <- IMPORTAR SERVER ACTION
+import { createSaleWithIndex } from '@/app/(dashboard)/sales/actions';
 import {
   collection,
   deleteDoc,
@@ -11,15 +11,14 @@ import {
   getDocs,
   query,
   orderBy,
-  Timestamp, // Mantener Timestamp para el tipo Sale
+  Timestamp,
 } from 'firebase/firestore';
 
 // --- Definición de Tipos ---
-// El tipo Sale ahora puede tener un timestamp que es un string (desde el servidor)
 export type Sale = {
   id?: string;
   ticketId: string;
-  timestamp: Timestamp | string; // Acepta Timestamp del cliente o string del servidor
+  timestamp: Timestamp | string;
   drawId: string;
   drawName: string;
   drawLogo?: string;
@@ -35,7 +34,7 @@ export type Sale = {
 
 type SalesContextType = {
   sales: Sale[];
-  addSale: (newSale: Omit<Sale, 'id' | 'timestamp'>) => Promise<void>; // Ajustado para no requerir timestamp
+  addSale: (newSale: Omit<Sale, 'id' | 'timestamp'>) => Promise<void>;
   deleteSale: (id: string) => Promise<void>;
   isLoading: boolean;
 };
@@ -59,57 +58,60 @@ export function SalesProvider({ children }: SalesProviderProps) {
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 1. Extraer la lógica de fetching a una función `useCallback` para estabilidad
+  const fetchSales = useCallback(async () => {
+    if (!user) return;
+    setIsLoading(true);
+    const salesCollectionRef = collection(db, 'users', user.uid, 'sales');
+    const q = query(salesCollectionRef, orderBy('timestamp', 'desc'));
+    try {
+      const querySnapshot = await getDocs(q);
+      const userSales = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          timestamp: (data.timestamp as Timestamp)?.toDate?.().toISOString() ?? data.timestamp,
+        } as Sale;
+      });
+      setSales(userSales);
+    } catch (error) {
+      console.error("Error fetching sales from Firestore:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
+
+  // 2. El useEffect ahora solo llama a fetchSales cuando el usuario cambia.
   useEffect(() => {
     if (user) {
-      const fetchSales = async () => {
-        setIsLoading(true);
-        const salesCollectionRef = collection(db, 'users', user.uid, 'sales');
-        const q = query(salesCollectionRef, orderBy('timestamp', 'desc'));
-        try {
-          const querySnapshot = await getDocs(q);
-          const userSales = querySnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              // Convertir Timestamp a string para consistencia
-              timestamp: (data.timestamp as Timestamp)?.toDate?.().toISOString() ?? data.timestamp,
-            } as Sale;
-          });
-          setSales(userSales);
-        } catch (error) {
-          console.error("Error fetching sales from Firestore:", error);
-        }
-        setIsLoading(false);
-      };
       fetchSales();
     } else {
       setSales([]);
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, fetchSales]);
 
   const addSale = async (newSale: Omit<Sale, 'id' | 'timestamp'>) => {
     if (!user) throw new Error('User not authenticated to add sale');
-
-    // Actualización optimista: Añadir la venta al estado local inmediatamente
+    
     const optimisticSale: Sale = {
-      ...newSale,
-      id: `temp-${Date.now()}`,
-      timestamp: new Date().toISOString(), // Usar un timestamp local temporal
-    };
+        ...newSale,
+        id: `temp-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+      };
+  
+    // Actualización optimista para la UI inmediata
     setSales(prevSales => [optimisticSale, ...prevSales]);
 
     try {
-      // Llamar a la Server Action para la persistencia real
-      const { saleId } = await createSaleWithIndex(user.uid, newSale as any);
+      // Llamada a la server action para la persistencia real
+      await createSaleWithIndex(user.uid, newSale as any);
+      
+      // 3. Después de que la venta se guarda con éxito, se vuelven a cargar todas las ventas.
+      // Esto asegura que el estado local es un reflejo exacto de la base de datos.
+      await fetchSales(); 
 
-      // Actualizar el estado con el ID real devuelto por el servidor
-      setSales(prevSales =>
-        prevSales.map(sale =>
-          sale.id === optimisticSale.id ? { ...sale, id: saleId } : sale
-        )
-      );
     } catch (error) {
       console.error('Error creating sale with index:', error);
       // Revertir la actualización optimista en caso de error
@@ -124,8 +126,7 @@ export function SalesProvider({ children }: SalesProviderProps) {
     try {
       const saleDocRef = doc(db, 'users', user.uid, 'sales', id);
       await deleteDoc(saleDocRef);
-      // Aquí también deberíamos eliminar del índice, pero es más complejo (requiere otra Server Action).
-      // Por ahora, se deja como está según las instrucciones.
+      // Opcional: podrías llamar a fetchSales() aquí también si fuera necesario.
     } catch (error) {
       console.error('Error deleting sale:', error);
       setSales(originalSales); // Revertir en caso de error
