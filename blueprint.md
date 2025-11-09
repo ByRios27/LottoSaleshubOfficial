@@ -1,8 +1,13 @@
+
 # Proyecto LottoSaleshubOfficial - Blueprint
 
 ## Visión General del Proyecto
 
 LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la venta de loterías, sorteos y resultados. Incluye funcionalidades para la gestión de negocios, vendedores, ventas y resultados de sorteos, con autenticación de usuarios y una interfaz de usuario moderna y adaptable.
+
+## Punto de Recuperación Estable (Checkpoint)
+
+**Esta versión del proyecto se considera estable y funcional.** Todos los cambios han sido probados, compilados y subidos a la rama `main` de GitHub. Este estado representa un punto de recuperación seguro antes de implementar nuevas funcionalidades.
 
 ## Características Implementadas
 
@@ -19,6 +24,9 @@ LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la ven
 *   **Gestión de Sorteos (Página `/draws`):**
     *   Creación, edición y eliminación de sorteos.
     *   Subida de imágenes para los sorteos con almacenamiento en Firebase Storage.
+*   **Capacidades de Progressive Web App (PWA):**
+    *   Configuración de `manifest.json` para permitir la instalación en dispositivos móviles.
+    *   Definición de iconos personalizados para la pantalla de inicio.
 *   **Configuración de Next.js:**
     *   Configurado para permitir imágenes desde `firebasestorage.googleapis.com`.
 *   **Diseño y Estilo:**
@@ -29,16 +37,4 @@ LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la ven
 
 ## Plan y Pasos para el Cambio Actual
 
-1.  **Restaurar y Corregir `business/page.tsx`:**
-    *   **Acción:** Reintegrar el código JSX para las secciones de "Temas" y "Zona de Peligro (Restablecer)" que fueron eliminadas por error.
-    *   **Verificación:** Asegurarse de que la lógica de subida de logo (ruta `logos/`, guardado inmediato) y la sintaxis del componente `<Image>` (uso de `fill` y `style`) se mantengan correctas.
-
-2.  **Corregir Problema de Subida en `draws/page.tsx`:**
-    *   **Análisis:** Investigar el archivo `src/app/(dashboard)/draws/page.tsx` para encontrar la causa del bucle "subiendo". La hipótesis principal es que la ruta de subida a Firebase Storage es incorrecta (no coincide con las reglas de seguridad).
-    *   **Acción:** Modificar la función que sube la imagen del sorteo para que utilice la ruta correcta (`logos/` en lugar de cualquier otra).
-    *   **Verificación:** Asegurar que el manejo del estado de la subida (por ejemplo, `setUploadStatus`) se reinicie correctamente tanto en caso de éxito como de error, utilizando un bloque `finally`.
-
-3.  **Verificación Final y Despliegue:**
-    *   **Acción:** Ejecutar el comando `npm run build` en el entorno de desarrollo para simular el proceso de compilación de producción y detectar cualquier error de sintaxis o de tipo.
-    *   **Acción:** Una vez la compilación sea exitosa, hacer `commit` de todos los archivos modificados (`blueprint.md`, `business/page.tsx`, `draws/page.tsx`) a GitHub.
-    *   **Resultado Esperado:** El `push` a la rama `main` activará el flujo de CI/CD, que esta vez debería completarse sin errores de compilación, desplegando la versión completamente funcional de la aplicación.
+*No hay cambios en curso. La aplicación está en un estado estable.*
