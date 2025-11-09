@@ -31,10 +31,8 @@ function SalesPageContent() {
                                         src={draw.logo}
                                         alt={draw.name}
                                         fill
-                                        sizes="100vw"
-                                        style={{
-                                          objectFit: "cover"
-                                        }} />
+                                        sizes="96px"
+                                        className="object-cover" />
                                   ) : (
                                       <PhotoIcon className="w-12 h-12 text-white/50 group-hover:text-green-400 transition-colors duration-300"/>
                                   )}
