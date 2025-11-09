@@ -39,10 +39,8 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
             alt={`${businessName} logo`}
             priority
             fill
-            sizes="100vw"
-            style={{
-                objectFit: "cover"
-            }} /></div>
+            sizes="128px"
+            className="object-cover" /></div>
     ) : (
         <div className="p-8 bg-green-500 rounded-full shadow-lg"><ChartBarIcon className="w-16 h-16 text-white" /></div>
     );
