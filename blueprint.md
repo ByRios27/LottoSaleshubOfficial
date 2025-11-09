@@ -6,55 +6,39 @@ LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la ven
 
 ## Características Implementadas
 
-### Estructura de Proyecto
-*   **Next.js App Router:** Utiliza la estructura de enrutamiento basada en archivos en el directorio `/app`.
-*   **Componentes de Servidor (RSC):** Predominantemente usa React Server Components para un rendimiento óptimo.
-*   **Client Components:** Uso selectivo de `"use client"` para componentes interactivos y estados específicos del navegador.
-*   **Gestión de Rutas:**
-    *   `/app/(dashboard)/`: Rutas protegidas para el panel de control.
-    *   `/app/login`: Página de inicio de sesión.
-    *   `/app/verificacion`: Ruta para la verificación de tickets con subrutas dinámicas (`/[ticketId]`).
-*   **Directorios Comunes:**
-    *   `/components`: Componentes UI reutilizables.
-    *   `/contexts`: Contextos de React para la gestión de estados globales (Autenticación, Negocios, Sorteos, Resultados, Ventas).
-    *   `/hooks`: Hooks personalizados (ej. `usePersistentSales`).
-    *   `/lib`: Funciones de utilidad y configuración de Firebase.
-
-### Autenticación y Autorización
-*   **AuthContext:** Contexto para la gestión del estado de autenticación del usuario.
-*   **Firebase Admin SDK:** Utilizado en el backend (ej. `src/lib/firebase/admin.ts`) para operaciones de administrador y seguridad.
-
-### Gestión de Datos
-*   **Firebase:** Integración con Firebase para la base de datos (Firestore), autenticación y otras funcionalidades.
-*   **Server Actions:** Utilizado para mutaciones de datos seguras desde el lado del cliente al servidor (ej. `src/app/verificacion/actions.ts`, `src/app/(dashboard)/sales/actions.ts`).
-*   **Contextos:**
-    *   `BusinessContext`: Para la gestión de datos relacionados con negocios.
-    *   `DrawsContext`: Para la gestión de datos de sorteos.
-    *   `ResultsContext`: Para la gestión de resultados de sorteos.
-    *   `SalesContext`: Para la gestión de datos de ventas.
-
-### Interfaz de Usuario (UI) y Diseño
-*   **Componentes UI:** Utiliza componentes UI modernos y estilizados (ej. `src/components/ui/alert-dialog.tsx`, `button.tsx`, `card.tsx`, `input.tsx`, `select.tsx`, `table.tsx`).
-*   **Tematización:** Integración de temas (ej. `src/lib/themes.ts`, `public/theme-*.png`).
-*   **Diseño Responsivo:** Adaptabilidad a diferentes tamaños de pantalla (web y móvil).
-*   **Elementos Visuales:** Incorporación de iconos (`public/*.svg`), imágenes de fondo (`public/background-main.jpg.png`) y componentes interactivos como `AppLogo.tsx` y `ThemeManager.tsx`.
-*   **Accesibilidad (A11Y):** Consideración de estándares de accesibilidad en el diseño.
-
-### Funcionalidades Específicas
-*   **Módulo de Verificación de Tickets:**
-    *   Ruta `/app/verificacion` para la entrada y verificación de tickets.
-    *   Ruta dinámica `/app/verificacion/[ticketId]` para la visualización de detalles de un ticket específico.
-    *   Server Actions (`actions.ts`) para procesar la verificación.
-*   **Panel de Control (Dashboard):**
-    *   Rutas dedicadas para `business`, `draws`, `sales` y `sellers`.
-    *   Componentes específicos de ventas (ej. `Receipt.tsx`, `SalesModal.tsx`).
-
-### Herramientas y Configuración
-*   **ESLint:** Configuración (`eslint.config.mjs`) para asegurar la calidad del código.
-*   **Tailwind CSS:** Configuración (`tailwind.config.js`, `tailwind.config.ts`, `postcss.config.js`) para un desarrollo rápido de la interfaz de usuario.
-*   **package.json/package-lock.json:** Gestión de dependencias.
-*   **.idx/dev.nix:** Configuración del entorno de desarrollo.
+*   **Autenticación de Usuarios:** Sistema completo de registro, inicio de sesión y protección de rutas.
+*   **Contexto Global:**
+    *   `AuthContext`: Gestiona el estado y la información del usuario autenticado.
+    *   `BusinessContext`: Gestiona la información del negocio (logo, nombre, tema) a través de la aplicación.
+    *   `DrawsContext`: Gestiona el estado de los sorteos.
+*   **Gestión de Negocio (Página `/business`):**
+    *   Actualización del nombre del negocio.
+    *   Subida y actualización del logo del negocio con almacenamiento en Firebase Storage.
+    *   Selección y aplicación de temas visuales para la aplicación.
+    *   Función para restablecer la información del negocio a sus valores por defecto.
+*   **Gestión de Sorteos (Página `/draws`):**
+    *   Creación, edición y eliminación de sorteos.
+    *   Subida de imágenes para los sorteos con almacenamiento en Firebase Storage.
+*   **Configuración de Next.js:**
+    *   Configurado para permitir imágenes desde `firebasestorage.googleapis.com`.
+*   **Diseño y Estilo:**
+    *   Interfaz moderna con componentes reutilizables.
+    *   Uso de Tailwind CSS para el diseño.
+    *   Componentes de `headlessui` y `heroicons`.
+*   **CI/CD:** Despliegue automático a través de GitHub.
 
 ## Plan y Pasos para el Cambio Actual
 
-Actualmente no hay un cambio solicitado específico, pero este blueprint servirá como base para cualquier solicitud futura.
+1.  **Restaurar y Corregir `business/page.tsx`:**
+    *   **Acción:** Reintegrar el código JSX para las secciones de "Temas" y "Zona de Peligro (Restablecer)" que fueron eliminadas por error.
+    *   **Verificación:** Asegurarse de que la lógica de subida de logo (ruta `logos/`, guardado inmediato) y la sintaxis del componente `<Image>` (uso de `fill` y `style`) se mantengan correctas.
+
+2.  **Corregir Problema de Subida en `draws/page.tsx`:**
+    *   **Análisis:** Investigar el archivo `src/app/(dashboard)/draws/page.tsx` para encontrar la causa del bucle "subiendo". La hipótesis principal es que la ruta de subida a Firebase Storage es incorrecta (no coincide con las reglas de seguridad).
+    *   **Acción:** Modificar la función que sube la imagen del sorteo para que utilice la ruta correcta (`logos/` en lugar de cualquier otra).
+    *   **Verificación:** Asegurar que el manejo del estado de la subida (por ejemplo, `setUploadStatus`) se reinicie correctamente tanto en caso de éxito como de error, utilizando un bloque `finally`.
+
+3.  **Verificación Final y Despliegue:**
+    *   **Acción:** Ejecutar el comando `npm run build` en el entorno de desarrollo para simular el proceso de compilación de producción y detectar cualquier error de sintaxis o de tipo.
+    *   **Acción:** Una vez la compilación sea exitosa, hacer `commit` de todos los archivos modificados (`blueprint.md`, `business/page.tsx`, `draws/page.tsx`) a GitHub.
+    *   **Resultado Esperado:** El `push` a la rama `main` activará el flujo de CI/CD, que esta vez debería completarse sin errores de compilación, desplegando la versión completamente funcional de la aplicación.

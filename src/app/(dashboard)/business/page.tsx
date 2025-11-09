@@ -63,14 +63,12 @@ export default function BusinessPage() {
 
     setLogoUploadStatus('uploading');
     try {
-      // Corregido: Usar la ruta 'logos/' que coincide con las reglas de Storage
       const storageRef = ref(storage, `logos/${user.uid}/${Date.now()}-${file.name}`);
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      // Lógica mejorada: Guardar inmediatamente en el contexto global y local
-      setBusinessLogo(downloadURL); // Guarda en el contexto global
-      setTempLogo(downloadURL); // Actualiza la previsualización local
+      setBusinessLogo(downloadURL);
+      setTempLogo(downloadURL);
       
       setLogoUploadStatus('success');
     } catch (error) {
@@ -119,7 +117,6 @@ export default function BusinessPage() {
     }
 
     if (tempLogo && tempLogo !== 'default') {
-      // Corregido: Usar props modernas de `next/image`
       return <Image src={tempLogo} alt="Previsualización del logo" fill style={{ objectFit: 'cover' }} />;
     } else {
       return (
@@ -147,7 +144,7 @@ export default function BusinessPage() {
         </p>
       );
     }
-    return <div className="h-5"></div>; // Placeholder para mantener el espacio
+    return <div className="h-5"></div>;
   };
 
   if (isLoading) {
@@ -156,6 +153,7 @@ export default function BusinessPage() {
 
   return (
     <div className="p-4 md:p-8 space-y-8 min-h-screen">
+      {/* ---- Contenedor principal de configuración ---- */}
       <div className={`max-w-2xl mx-auto rounded-2xl p-6 ${themeStyles.glassClasses}`}>
         <h2 className={`text-xl font-semibold mb-6 ${themeStyles.textPrimary}`}>Personalizar Negocio</h2>
         <div className="space-y-6">
@@ -207,8 +205,98 @@ export default function BusinessPage() {
         </div>
       </div>
 
-      {/* ... (El resto del código de temas y reseteo permanece igual) ... */}
+      {/* ---- Contenedor de Tema ---- */}
+      <div className={`max-w-2xl mx-auto rounded-2xl p-6 ${themeStyles.glassClasses}`}>
+        <h2 className={`text-xl font-semibold mb-6 ${themeStyles.textPrimary}`}>Temas</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-8">
+          {themes.map((t) => (
+            <div key={t.name} className="flex flex-col items-center gap-3">
+              <div
+                className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/30 shadow-inner flex items-center justify-center bg-cover bg-center"
+                style={{ backgroundImage: t.styles.backgroundImage }}
+              ></div>
+              <p className={`text-sm font-medium -mb-1 ${themeStyles.textSecondary}`}>{t.name}</p>
+              <button
+                onClick={() => setTempTheme(t.name)}
+                className={`px-4 py-1 text-xs font-bold rounded-full transition-all duration-200 ${tempTheme === t.name
+                    ? 'text-white shadow-md'
+                    : 'bg-black/20 text-gray-200 border border-white/30 hover:bg-white/10'
+                  }`}
+                  style={{ backgroundColor: tempTheme === t.name ? 'var(--color-primary)' : undefined }}
+              >
+                {tempTheme === t.name ? 'Seleccionado' : 'Seleccionar'}
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-end mt-8">
+          <button
+            onClick={handleThemeSave}
+            className="flex items-center justify-center gap-2 px-6 py-2.5 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all"
+            style={{ backgroundColor: 'var(--color-primary)', '--tw-ring-color': 'var(--color-primary)' } as React.CSSProperties}
+          >
+            <CheckCircleIcon className="w-5 h-5" />
+            Guardar y Aplicar
+          </button>
+        </div>
+        <div className="h-5 mt-2">
+          {renderSaveMessage(themeSaveStatus)}
+        </div>
+      </div>
 
+      {/* ---- Contenedor de Restablecer ---- */}
+      <div className="max-w-2xl mx-auto bg-red-900/30 backdrop-blur-xl border border-red-400/50 p-6 rounded-2xl shadow-2xl">
+        <div className="flex items-center gap-4">
+          <div className="flex-shrink-0 text-red-300">
+            <ExclamationTriangleIcon className="w-8 h-8" />
+          </div>
+          <div className="flex-grow">
+            <h3 className="text-lg font-semibold text-red-200">Zona de Peligro</h3>
+            <p className="text-sm text-red-300 mt-1">
+              Restablecer la configuración eliminará tu logo, nombre y tema personalizados.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowResetConfirm(true)}
+            className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+          >
+            <ArrowPathIcon className="w-5 h-5" />
+            Restablecer
+          </button>
+        </div>
+      </div>
+
+      {/* ---- Modal de Confirmación de Reseteo ---- */}
+      {showResetConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-md z-50 flex justify-center items-center p-4">
+          <div className={`rounded-2xl shadow-xl max-w-sm w-full p-6 text-center ${themeStyles.glassClasses}`}>
+            <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-900/50">
+              <ShieldExclamationIcon className="h-7 w-7 text-red-300" aria-hidden="true" />
+            </div>
+            <h3 className={`mt-4 text-lg font-semibold ${themeStyles.textPrimary}`}>¿Restablecer Ajustes?</h3>
+            <p className={`mt-2 text-sm ${themeStyles.textSecondary}`}>
+              Esta acción es permanente y devolverá el logo, el nombre y el tema a sus valores por defecto. ¿Estás
+              seguro de que quieres continuar?
+            </p>
+            <div className="mt-6 flex justify-center gap-4">
+              <button
+                type="button"
+                onClick={() => setShowResetConfirm(false)}
+                className={`px-6 py-2 text-sm font-medium bg-black/20 border border-white/30 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 ${themeStyles.textSecondary}`}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmAndReset}
+                className="px-6 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
