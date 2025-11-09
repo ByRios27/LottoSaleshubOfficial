@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useDraws, type Draw } from '@/contexts/DrawsContext';
 import { useBusiness } from '@/contexts/BusinessContext';
 import Link from 'next/link';
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { TicketIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import SalesModal from '@/components/sales/SalesModal';
 import { SalesProvider } from '@/contexts/SalesContext'; // 1. Importar el proveedor
@@ -27,7 +27,14 @@ function SalesPageContent() {
                           <button key={draw.id} onClick={() => setSelectedDraw(draw)} className="block group text-center transform transition-transform duration-200 hover:scale-110">
                               <div className="w-24 h-24 mx-auto mb-3 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 border-2 border-white/20 group-hover:border-green-500/80 transition-colors duration-300 overflow-hidden relative">
                                   {draw.logo ? (
-                                      <Image src={draw.logo} alt={draw.name} layout="fill" objectFit="cover" />
+                                      <Image
+                                        src={draw.logo}
+                                        alt={draw.name}
+                                        fill
+                                        sizes="100vw"
+                                        style={{
+                                          objectFit: "cover"
+                                        }} />
                                   ) : (
                                       <PhotoIcon className="w-12 h-12 text-white/50 group-hover:text-green-400 transition-colors duration-300"/>
                                   )}
@@ -51,7 +58,6 @@ function SalesPageContent() {
           )}
         </div>
       </div>
-
       {selectedDraw && (
         <SalesModal 
           draw={selectedDraw} 

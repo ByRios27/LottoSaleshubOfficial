@@ -3,7 +3,7 @@
 import { ChartBarIcon, TicketIcon, BuildingStorefrontIcon, ArrowLeftOnRectangleIcon, TrophyIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 import { useBusiness } from '@/contexts/BusinessContext';
-import Image from "next/legacy/image";
+import Image from "next/image";
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -34,7 +34,15 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
     ];
 
     const renderLogo = () => businessLogo && businessLogo !== 'default' ? (
-        <div className="w-32 h-32 relative rounded-full overflow-hidden shadow-lg"><Image src={businessLogo} alt={`${businessName} logo`} layout="fill" objectFit="cover" priority /></div>
+        <div className="w-32 h-32 relative rounded-full overflow-hidden shadow-lg"><Image
+            src={businessLogo}
+            alt={`${businessName} logo`}
+            priority
+            fill
+            sizes="100vw"
+            style={{
+                objectFit: "cover"
+            }} /></div>
     ) : (
         <div className="p-8 bg-green-500 rounded-full shadow-lg"><ChartBarIcon className="w-16 h-16 text-white" /></div>
     );

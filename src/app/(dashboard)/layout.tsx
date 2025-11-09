@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useBusiness } from '@/contexts/BusinessContext';
 import { DrawsProvider } from '@/contexts/DrawsContext';
 import { themes } from '@/lib/themes';
-import Image from "next/legacy/image";
+import Image from "next/image";
 
 // Componente de Carga
 function LoadingSpinner() {
@@ -29,14 +29,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (businessLogo && businessLogo !== 'default') {
       return (
         <div className="w-12 h-12 relative rounded-full overflow-hidden flex-shrink-0">
-            <Image 
-                src={businessLogo}
-                alt={`${businessName} logo`}
-                fill
-                sizes="48px"
-                priority
-                style={{ objectFit: 'cover' }}
-            />
+          <Image
+            src={businessLogo}
+            alt={`${businessName} logo`}
+            fill
+            priority
+            sizes="48px"
+            style={{
+              objectFit: 'cover',
+              maxWidth: "100%",
+              height: "auto"
+            }} />
         </div>
       );
     } else {

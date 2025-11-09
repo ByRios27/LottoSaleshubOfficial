@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, FormEvent, useRef } from 'react';
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { useDraws, type Draw } from '@/contexts/DrawsContext';
 import { Plus, Edit, Trash2, Image as ImageIcon, X, XCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -93,7 +93,15 @@ function EditDrawModal({ draw, isOpen, onClose, onSave }: EditDrawModalProps) {
                                     <Loader2 className="w-12 h-12 text-black/40 animate-spin" />
                                 ) : logo ? (
                                     // CORREGIDO: Usar props de `next/image` modernas
-                                    (<Image src={logo} alt="Logo del sorteo" fill style={{ objectFit: 'cover' }} />)
+                                    (<Image
+                                    src={logo}
+                                    alt="Logo del sorteo"
+                                    fill
+                                    style={{
+                                        objectFit: 'cover',
+                                        maxWidth: "100%",
+                                        height: "auto"
+                                    }} />)
                                 ) : (
                                     <ImageIcon className="w-16 h-16 text-black/40"/>
                                 )}
@@ -211,7 +219,15 @@ export default function DrawsPage() {
                                    <Loader2 className="w-12 h-12 text-white/50 animate-spin" />
                                ) : newDrawLogo ? (
                                     // CORREGIDO: Usar props de `next/image` modernas
-                                    (<Image src={newDrawLogo} alt="Logo del nuevo sorteo" fill style={{ objectFit: 'cover' }} />)
+                                    (<Image
+                                   src={newDrawLogo}
+                                   alt="Logo del nuevo sorteo"
+                                   fill
+                                   style={{
+                                       objectFit: 'cover',
+                                       maxWidth: "100%",
+                                       height: "auto"
+                                   }} />)
                                 ) : (
                                     <ImageIcon className="w-16 h-16 text-white/50"/>
                                 )}
@@ -237,7 +253,15 @@ export default function DrawsPage() {
                                 <div className="relative w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                                     {draw.logo ? (
                                         // CORREGIDO: Usar props de `next/image` modernas
-                                        (<Image src={draw.logo} alt={draw.name} fill style={{ objectFit: 'cover' }} />)
+                                        (<Image
+                                        src={draw.logo}
+                                        alt={draw.name}
+                                        fill
+                                        style={{
+                                            objectFit: 'cover',
+                                            maxWidth: "100%",
+                                            height: "auto"
+                                        }} />)
                                     ) : (
                                         <ImageIcon className="w-8 h-8 text-white/50"/>
                                     )}

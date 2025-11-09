@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useBusiness } from '@/contexts/BusinessContext';
-import Image from "next/legacy/image";
+import Image from "next/image";
 import {
   PhotoIcon,
   ArrowPathIcon,
@@ -117,7 +117,17 @@ export default function BusinessPage() {
     }
 
     if (tempLogo && tempLogo !== 'default') {
-      return <Image src={tempLogo} alt="Previsualización del logo" fill style={{ objectFit: 'cover' }} />;
+      return (
+        <Image
+          src={tempLogo}
+          alt="Previsualización del logo"
+          fill
+          style={{
+            objectFit: 'cover',
+            maxWidth: "100%",
+            height: "auto"
+          }} />
+      );
     } else {
       return (
         <div className="w-full h-full flex items-center justify-center bg-primary">
