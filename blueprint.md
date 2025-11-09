@@ -1,48 +1,60 @@
-# Blueprint: LottoSalesHub
+# Proyecto LottoSaleshubOfficial - Blueprint
 
-## Overview
+## Visión General del Proyecto
 
-This document outlines the architecture, design, and features of the LottoSalesHub application. It serves as a single source of truth to ensure consistency and guide future development.
+LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la venta de loterías, sorteos y resultados. Incluye funcionalidades para la gestión de negocios, vendedores, ventas y resultados de sorteos, con autenticación de usuarios y una interfaz de usuario moderna y adaptable.
 
-## Project Architecture
+## Características Implementadas
 
-The project follows a hybrid Next.js setup, leveraging both the `pages` and `app` routers for specific functionalities.
+### Estructura de Proyecto
+*   **Next.js App Router:** Utiliza la estructura de enrutamiento basada en archivos en el directorio `/app`.
+*   **Componentes de Servidor (RSC):** Predominantemente usa React Server Components para un rendimiento óptimo.
+*   **Client Components:** Uso selectivo de `"use client"` para componentes interactivos y estados específicos del navegador.
+*   **Gestión de Rutas:**
+    *   `/app/(dashboard)/`: Rutas protegidas para el panel de control.
+    *   `/app/login`: Página de inicio de sesión.
+    *   `/app/verificacion`: Ruta para la verificación de tickets con subrutas dinámicas (`/[ticketId]`).
+*   **Directorios Comunes:**
+    *   `/components`: Componentes UI reutilizables.
+    *   `/contexts`: Contextos de React para la gestión de estados globales (Autenticación, Negocios, Sorteos, Resultados, Ventas).
+    *   `/hooks`: Hooks personalizados (ej. `usePersistentSales`).
+    *   `/lib`: Funciones de utilidad y configuración de Firebase.
 
-*   **Authentication (`pages` router):**
-    *   The login functionality is handled by `pages/login.tsx`. This component is responsible for user authentication via Firebase.
-    *   Upon successful login, the user is redirected to the root path (`/`).
+### Autenticación y Autorización
+*   **AuthContext:** Contexto para la gestión del estado de autenticación del usuario.
+*   **Firebase Admin SDK:** Utilizado en el backend (ej. `src/lib/firebase/admin.ts`) para operaciones de administrador y seguridad.
 
-*   **Main Application (`app` router):**
-    *   The core application is built using the App Router within the `src/app` directory.
-    *   A route group `src/app/(dashboard)` contains all the protected routes and the main UI for the application after a user logs in.
+### Gestión de Datos
+*   **Firebase:** Integración con Firebase para la base de datos (Firestore), autenticación y otras funcionalidades.
+*   **Server Actions:** Utilizado para mutaciones de datos seguras desde el lado del cliente al servidor (ej. `src/app/verificacion/actions.ts`, `src/app/(dashboard)/sales/actions.ts`).
+*   **Contextos:**
+    *   `BusinessContext`: Para la gestión de datos relacionados con negocios.
+    *   `DrawsContext`: Para la gestión de datos de sorteos.
+    *   `ResultsContext`: Para la gestión de resultados de sorteos.
+    *   `SalesContext`: Para la gestión de datos de ventas.
 
-## Design & Features
+### Interfaz de Usuario (UI) y Diseño
+*   **Componentes UI:** Utiliza componentes UI modernos y estilizados (ej. `src/components/ui/alert-dialog.tsx`, `button.tsx`, `card.tsx`, `input.tsx`, `select.tsx`, `table.tsx`).
+*   **Tematización:** Integración de temas (ej. `src/lib/themes.ts`, `public/theme-*.png`).
+*   **Diseño Responsivo:** Adaptabilidad a diferentes tamaños de pantalla (web y móvil).
+*   **Elementos Visuales:** Incorporación de iconos (`public/*.svg`), imágenes de fondo (`public/background-main.jpg.png`) y componentes interactivos como `AppLogo.tsx` y `ThemeManager.tsx`.
+*   **Accesibilidad (A11Y):** Consideración de estándares de accesibilidad en el diseño.
 
-*   **Styling:** The application uses Tailwind CSS for a modern, utility-first design approach.
-*   **UI:** The user interface is designed to be clean, intuitive, and responsive, with a dark theme (`bg-gray-900`). Interactive elements feature hover effects and transitions for a better user experience.
-*   **Iconography:** The app utilizes `@heroicons/react` for clear and consistent iconography. A custom SVG logo is used for branding.
-*   **Authentication Flow:**
-    1.  User visits the root URL.
-    2.  The `src/app/(dashboard)/layout.tsx` checks the user's authentication status.
-    3.  If not logged in, the user is redirected to `pages/login.tsx`.
-    4.  User submits credentials on the login page.
-    5.  `signInWithEmailAndPassword` from Firebase authenticates the user.
-    6.  On success, `router.push("/")` sends the user back to the root.
-    7.  The layout now detects the authenticated user and renders the requested dashboard page (e.g., `src/app/(dashboard)/page.tsx`).
+### Funcionalidades Específicas
+*   **Módulo de Verificación de Tickets:**
+    *   Ruta `/app/verificacion` para la entrada y verificación de tickets.
+    *   Ruta dinámica `/app/verificacion/[ticketId]` para la visualización de detalles de un ticket específico.
+    *   Server Actions (`actions.ts`) para procesar la verificación.
+*   **Panel de Control (Dashboard):**
+    *   Rutas dedicadas para `business`, `draws`, `sales` y `sellers`.
+    *   Componentes específicos de ventas (ej. `Receipt.tsx`, `SalesModal.tsx`).
 
-## Current Development Plan: Main Dashboard
+### Herramientas y Configuración
+*   **ESLint:** Configuración (`eslint.config.mjs`) para asegurar la calidad del código.
+*   **Tailwind CSS:** Configuración (`tailwind.config.js`, `tailwind.config.ts`, `postcss.config.js`) para un desarrollo rápido de la interfaz de usuario.
+*   **package.json/package-lock.json:** Gestión de dependencias.
+*   **.idx/dev.nix:** Configuración del entorno de desarrollo.
 
-1.  **Create `(dashboard)` Route Group:**
-    *   Create a new directory: `src/app/(dashboard)`. This allows sharing a layout across all dashboard pages without affecting the URL.
+## Plan y Pasos para el Cambio Actual
 
-2.  **Create Dashboard Layout (`layout.tsx`):**
-    *   Create `src/app/(dashboard)/layout.tsx` to act as the shell for the dashboard UI.
-    *   **Route Protection:** This layout will contain the authentication check, protecting all child routes.
-    *   **Shared UI:** It will define the shared UI elements like a top navigation bar (Navbar) and a sidebar menu (Sidebar).
-
-3.  **Create Main Dashboard Page (`page.tsx`):**
-    *   Create `src/app/(dashboard)/page.tsx`. This will be the main content page displayed at the root URL (`/`) after login.
-    *   It will feature a welcome message, quick stats, and placeholders for future content like lottery draws.
-
-4.  **Refactor Root Page:**
-    *   The original `src/app/page.tsx` will be cleaned up to simply render the content from the new `(dashboard)` group, keeping the project structure organized.
+Actualmente no hay un cambio solicitado específico, pero este blueprint servirá como base para cualquier solicitud futura.
