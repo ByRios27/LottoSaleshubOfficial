@@ -4,5 +4,16 @@
   },
   "storage": {
     "rules": "storage.rules"
+  },
+  "apphosting": {
+    "backendId": "newhublotto-54341291",
+    "rootDir": "./",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      "functions"
+    ]
   }
 }
