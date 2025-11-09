@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useBusiness } from '@/contexts/BusinessContext';
 import { DrawsProvider } from '@/contexts/DrawsContext';
 import { themes } from '@/lib/themes';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 
 // Componente de Carga
 function LoadingSpinner() {

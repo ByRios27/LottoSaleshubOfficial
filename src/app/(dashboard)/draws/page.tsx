@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, FormEvent, useRef } from 'react';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { useDraws, type Draw } from '@/contexts/DrawsContext';
 import { Plus, Edit, Trash2, Image as ImageIcon, X, XCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';

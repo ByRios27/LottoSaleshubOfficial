@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useDraws, type Draw } from '@/contexts/DrawsContext';
 import { useBusiness } from '@/contexts/BusinessContext';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { TicketIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import SalesModal from '@/components/sales/SalesModal';
 import { SalesProvider } from '@/contexts/SalesContext'; // 1. Importar el proveedor

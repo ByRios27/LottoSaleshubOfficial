@@ -1,4 +1,4 @@
-import "next/image";
+import "next/legacy/image";
 declare module "next/image" {
   interface ImageProps {
     // @ts-expect-error Props deprecadas (bloquear)

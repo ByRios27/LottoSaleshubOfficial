@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useBusiness } from '@/contexts/BusinessContext';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import {
   PhotoIcon,
   ArrowPathIcon,

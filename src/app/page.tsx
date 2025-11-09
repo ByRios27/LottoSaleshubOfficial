@@ -3,7 +3,7 @@
 import { ChartBarIcon, TicketIcon, BuildingStorefrontIcon, ArrowLeftOnRectangleIcon, TrophyIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 import { useBusiness } from '@/contexts/BusinessContext';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';

@@ -2,7 +2,7 @@
 
 import { ShareIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import QRCode from 'react-qr-code';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import React from 'react';
 import { Sale } from '@/contexts/SalesContext'; // <- IMPORTAR TIPO UNIFICADO
 

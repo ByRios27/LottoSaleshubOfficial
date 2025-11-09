@@ -1,4 +1,4 @@
-import Image, { ImageProps } from "next/image";
+import Image, { ImageProps } from "next/legacy/image";
 
 type Props = Omit<ImageProps, "layout" | "objectFit"> & { sizesFixed?: string };
 
