@@ -83,11 +83,7 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
                                 alt="Logo del Negocio"
                                 width={36}
                                 height={36}
-                                className="rounded-full"
-                                style={{
-                                    maxWidth: "100%",
-                                    height: "auto"
-                                }} />
+                                className="rounded-full" />
                         ) : (
                            <DefaultLogo />
                         )}

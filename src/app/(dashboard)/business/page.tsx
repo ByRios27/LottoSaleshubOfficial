@@ -122,11 +122,9 @@ export default function BusinessPage() {
           src={tempLogo}
           alt="Previsualización del logo"
           fill
-          style={{
-            objectFit: 'cover',
-            maxWidth: "100%",
-            height: "auto"
-          }} />
+          sizes="160px"
+          priority
+          className="object-cover" />
       );
     } else {
       return (

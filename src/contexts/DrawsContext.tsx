@@ -90,44 +90,38 @@ export function DrawsProvider({ children }: DrawsProviderProps) {
 
       fetchDraws().catch(console.error);
     }
-  }, [user]); // Se ejecuta cada vez que el usuario cambia
+  }, [user]); // ✅ CORRECCIÓN: Depender del objeto de usuario completo
 
   // --- Funciones de Modificación con Firestore ---
-  const addDraw = async (newDrawData: Omit<Draw, 'id'>) => {
+  const addDraw = useCallback(async (newDrawData: Omit<Draw, 'id'>) => {
     if (!user) throw new Error('User not authenticated');
     const drawsCollectionRef = collection(db, 'users', user.uid, 'draws');
     
-    // Añadir el nuevo sorteo a Firestore
     const newDocRef = await addDoc(drawsCollectionRef, newDrawData);
     
-    // Actualizar el estado local (actualización optimista)
     const newDraw: Draw = { id: newDocRef.id, ...newDrawData };
     setDraws(prevDraws => [newDraw, ...prevDraws].sort((a,b) => a.name.localeCompare(b.name)));
-  };
+  }, [user]); // ✅ CORRECIÓN: Memoizar con dependencia del usuario
 
-  const updateDraw = async (updatedDraw: Draw) => {
+  const updateDraw = useCallback(async (updatedDraw: Draw) => {
     if (!user) throw new Error('User not authenticated');
     const drawDocRef = doc(db, 'users', user.uid, 'draws', updatedDraw.id);
 
-    // Actualizar el documento en Firestore
     await updateDoc(drawDocRef, { ...updatedDraw });
 
-    // Actualizar el estado local
     setDraws(prevDraws =>
       prevDraws.map(d => (d.id === updatedDraw.id ? updatedDraw : d))
     );
-  };
+  }, [user]); // ✅ CORRECIÓN: Memoizar con dependencia del usuario
 
-  const deleteDraw = async (id: string) => {
+  const deleteDraw = useCallback(async (id: string) => {
     if (!user) throw new Error('User not authenticated');
     const drawDocRef = doc(db, 'users', user.uid, 'draws', id);
 
-    // Borrar el documento de Firestore
     await deleteDoc(drawDocRef);
 
-    // Actualizar el estado local
     setDraws(prevDraws => prevDraws.filter(d => d.id !== id));
-  };
+  }, [user]); // ✅ CORRECIÓN: Memoizar con dependencia del usuario
 
   const value = { draws, addDraw, updateDraw, deleteDraw, isLoading };
 

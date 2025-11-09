@@ -47,7 +47,6 @@ function EditDrawModal({ draw, isOpen, onClose, onSave }: EditDrawModalProps) {
         if (!file || !user?.uid) return;
         setIsUploading(true);
         try {
-            // CORREGIDO: Usar la ruta 'logos/' que coincide con las reglas de Storage
             const storageRef = ref(storage, `logos/${user.uid}/${Date.now()}-${file.name}`);
             await uploadBytes(storageRef, file);
             const downloadURL = await getDownloadURL(storageRef);
@@ -92,16 +91,12 @@ function EditDrawModal({ draw, isOpen, onClose, onSave }: EditDrawModalProps) {
                                 {isUploading ? (
                                     <Loader2 className="w-12 h-12 text-black/40 animate-spin" />
                                 ) : logo ? (
-                                    // CORREGIDO: Usar props de `next/image` modernas
-                                    (<Image
-                                    src={logo}
-                                    alt="Logo del sorteo"
-                                    fill
-                                    style={{
-                                        objectFit: 'cover',
-                                        maxWidth: "100%",
-                                        height: "auto"
-                                    }} />)
+                                    <Image
+                                        src={logo}
+                                        alt="Logo del sorteo"
+                                        fill
+                                        sizes="128px"
+                                        className="object-cover" />
                                 ) : (
                                     <ImageIcon className="w-16 h-16 text-black/40"/>
                                 )}
@@ -146,7 +141,6 @@ export default function DrawsPage() {
     if (!file || !user?.uid) return;
     setIsUploading(true);
     try {
-        // CORREGIDO: Usar la ruta 'logos/' que coincide con las reglas de Storage
         const storageRef = ref(storage, `logos/${user.uid}/${Date.now()}-${file.name}`);
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
@@ -218,16 +212,12 @@ export default function DrawsPage() {
                                {isUploading ? (
                                    <Loader2 className="w-12 h-12 text-white/50 animate-spin" />
                                ) : newDrawLogo ? (
-                                    // CORREGIDO: Usar props de `next/image` modernas
-                                    (<Image
-                                   src={newDrawLogo}
-                                   alt="Logo del nuevo sorteo"
-                                   fill
-                                   style={{
-                                       objectFit: 'cover',
-                                       maxWidth: "100%",
-                                       height: "auto"
-                                   }} />)
+                                    <Image
+                                       src={newDrawLogo}
+                                       alt="Logo del nuevo sorteo"
+                                       fill
+                                       sizes="128px"
+                                       className="object-cover" />
                                 ) : (
                                     <ImageIcon className="w-16 h-16 text-white/50"/>
                                 )}
@@ -252,16 +242,12 @@ export default function DrawsPage() {
                             <div className="flex items-center gap-4 flex-grow">
                                 <div className="relative w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                                     {draw.logo ? (
-                                        // CORREGIDO: Usar props de `next/image` modernas
-                                        (<Image
-                                        src={draw.logo}
-                                        alt={draw.name}
-                                        fill
-                                        style={{
-                                            objectFit: 'cover',
-                                            maxWidth: "100%",
-                                            height: "auto"
-                                        }} />)
+                                        <Image
+                                            src={draw.logo}
+                                            alt={draw.name}
+                                            fill
+                                            sizes="48px"
+                                            className="object-cover" />
                                     ) : (
                                         <ImageIcon className="w-8 h-8 text-white/50"/>
                                     )}

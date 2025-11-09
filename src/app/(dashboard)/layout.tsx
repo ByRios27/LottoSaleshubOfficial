@@ -34,11 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             fill
             priority
             sizes="48px"
-            style={{
-              objectFit: 'cover',
-              maxWidth: "100%",
-              height: "auto"
-            }} />
+            className="object-cover" />
         </div>
       );
     } else {
