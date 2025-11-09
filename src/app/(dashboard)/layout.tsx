@@ -32,8 +32,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Image 
                 src={businessLogo}
                 alt={`${businessName} logo`}
-                layout="fill"
-                objectFit="cover"
+                fill
+                sizes="48px"
+                priority
+                style={{ objectFit: 'cover' }}
             />
         </div>
       );
