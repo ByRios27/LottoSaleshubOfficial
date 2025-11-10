@@ -54,11 +54,10 @@ interface SalesProviderProps {
 }
 
 export function SalesProvider({ children }: SalesProviderProps) {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth(); // 1. Usar el estado de carga de la autenticación
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 1. Extraer la lógica de fetching a una función `useCallback` para estabilidad
   const fetchSales = useCallback(async () => {
     if (!user) return;
     setIsLoading(true);
@@ -82,15 +81,20 @@ export function SalesProvider({ children }: SalesProviderProps) {
     }
   }, [user]);
 
-  // 2. El useEffect ahora solo llama a fetchSales cuando el usuario cambia.
   useEffect(() => {
+    // 2. No hacer nada mientras la autenticación está cargando
+    if (isAuthLoading) {
+      return;
+    }
+
     if (user) {
       fetchSales();
     } else {
+      // 3. Limpiar solo cuando sabemos que no hay usuario
       setSales([]);
       setIsLoading(false);
     }
-  }, [user, fetchSales]);
+  }, [user, isAuthLoading, fetchSales]);
 
   const addSale = async (newSale: Omit<Sale, 'id' | 'timestamp'>) => {
     if (!user) throw new Error('User not authenticated to add sale');
@@ -101,20 +105,14 @@ export function SalesProvider({ children }: SalesProviderProps) {
         timestamp: new Date().toISOString(),
       };
   
-    // Actualización optimista para la UI inmediata
     setSales(prevSales => [optimisticSale, ...prevSales]);
 
     try {
-      // Llamada a la server action para la persistencia real
       await createSaleWithIndex(user.uid, newSale as any);
-      
-      // 3. Después de que la venta se guarda con éxito, se vuelven a cargar todas las ventas.
-      // Esto asegura que el estado local es un reflejo exacto de la base de datos.
       await fetchSales(); 
 
     } catch (error) {
       console.error('Error creating sale with index:', error);
-      // Revertir la actualización optimista en caso de error
       setSales(prevSales => prevSales.filter(sale => sale.id !== optimisticSale.id));
     }
   };
@@ -126,10 +124,9 @@ export function SalesProvider({ children }: SalesProviderProps) {
     try {
       const saleDocRef = doc(db, 'users', user.uid, 'sales', id);
       await deleteDoc(saleDocRef);
-      // Opcional: podrías llamar a fetchSales() aquí también si fuera necesario.
     } catch (error) {
       console.error('Error deleting sale:', error);
-      setSales(originalSales); // Revertir en caso de error
+      setSales(originalSales);
     }
   };
 
