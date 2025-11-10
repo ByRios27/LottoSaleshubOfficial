@@ -1,4 +1,3 @@
-
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { DrawsProvider } from '../contexts/DrawsContext';
@@ -32,13 +31,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </ThemeManager>
           </BusinessProvider>
         </AuthProvider>
-        {process.env.NODE_ENV === 'development' && (
-          <div className="fixed bottom-0 left-0 w-full bg-yellow-400 text-black text-center py-2 text-sm z-50">
-            <p>
-              Estás en la rama de <span className="font-bold">desarrollo</span>.
-            </p>
-          </div>
-        )}
       </body>
     </html>
   );
