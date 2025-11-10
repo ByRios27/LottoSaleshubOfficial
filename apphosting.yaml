@@ -4,40 +4,42 @@ runConfig:
   minInstances: 0
 
 # Environment variables and secrets.
+# See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
 env:
-  # Firebase SDK configuration
+  # --- Variables Públicas ---
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    value: AIzaSyBa7gpgT0PLhlom_Yb9TB-iubIBISQfpGY
-    availability:
-      - BUILD
-      - RUNTIME
+    value: "AIzaSyBa7gpgT0PLhlom_Yb9TB-iubIBISQfpGY"
+    availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-    value: new-proyect-lotto-hub.firebaseapp.com
-    availability:
-      - BUILD
-      - RUNTIME
+    value: "new-proyect-lotto-hub.firebaseapp.com"
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_DATABASE_URL
+    value: "https://new-proyect-lotto-hub-default-rtdb.firebaseio.com"
+    availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    value: new-proyect-lotto-hub
-    availability:
-      - BUILD
-      - RUNTIME
+    value: "new-proyect-lotto-hub"
+    availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-    value: new-proyect-lotto-hub.firebasestorage.app
-    availability:
-      - BUILD
-      - RUNTIME
+    value: "new-proyect-lotto-hub.firebasestorage.app"
+    availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
     value: "390413033115"
-    availability:
-      - BUILD
-      - RUNTIME
+    availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    value: 1:390413033115:web:e530f25d91c350a6ebb03e
-    availability:
-      - BUILD
-      - RUNTIME
+    value: "1:390413033115:web:e530f25d91c350a6ebb03e"
+    availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-    value: G-06QRT9FSHX
-    availability:
-      - BUILD
-      - RUNTIME
+    value: "G-06QRT9FSHX"
+    availability: [BUILD, RUNTIME]
+
+  # --- Variables de Administrador (LAS IMPORTANTES QUE FALTAN) ---
+  # Abre tu archivo JSON de la cuenta de servicio y pega los valores aquí
+  - variable: FIREBASE_PROJECT_ID
+    value: "new-proyect-lotto-hub"
+    availability: [BUILD, RUNTIME]
+  - variable: FIREBASE_CLIENT_EMAIL
+    value: "firebase-adminsdk-fbsvc@new-proyect-lotto-hub.iam.gserviceaccount.com"
+    availability: [BUILD, RUNTIME]
+  - variable: FIREBASE_PRIVATE_KEY
+    value: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDtN3T2LQDh5bB4\nprUvL9leRjDg82jDhMmG0TIHM7kl3cTsc3XSIJQ3L7e6pLC28WS32g0fdfhrC14S\n84DAGS6F7iF17qDhljTMIgrfV26C4g6hZyWtpgXTzz7OUKqSAe9CEcq8FuLp+uMp\nbRZpiX5F1XWqlD/Q3RXSaYrkfypNPYw8BLGU9uFtv90RrsC0Yk5SvbYdSKXIEIwL\nXaWM90JysqWnGr2x6BcibFcQ34Ac7gdkkJqCt0+4949pzsi5JE9aze+I7sAy/A4i\nTsEV7pzixkPOGSusNDklUiCfiiURvyVyjhp+hiAC2mpG5x8wydwIlX1GAi3TZ4aY\nSV2blgZNAgMBAAECggEADiH2MW539X1qOJ3yAHgw0pmK8vP9g1yHZyVSfjRaLQPb\n5hxw4g531hvdLdz+/D9AeWWfz4aHQNViCu3/9zHo4CjSTITlh9sblSfYDvtWBa0z\nIvGSwJg6E6buvnr21pEP8Jc/xVn1tevxGbg6lBoRcFap1npTnP12/dy03i0nV4ec\nUcZrIIIlyy7XrUhE20JLXgIxAHZ3dzeMDhuzuf+yc3HCTQrNUN9x2qMC9Z+wRHSz\nrXw9kvDtjA+R0Es/wXeBGiv13g2kyaxJrJVTBM0x952s3xAdffaQdFjMSa7wKYcI\nAYMKLDnVqUuT+NV9iQHlPY+Dt+k0UDTpwsIwSxuaDwKBgQD9X/L5WWcO//BljKlL\nqJ0nxR6VbB+3uMCbX3dQ6rrm7GEvQXnKNTe/jVyIzelH1J0B8vnbjqJ/AeFQEMip\njORhtLYb+T92agf997LFumMnroqQDH+T/6p9sekm6fjN+RQ5xFRFFBaiG6ddm5Z7\nA36xIv+1WMHbUCcemicLLMdBEwKBgQDvrKZc30KygnzD7Yk8CPlETM5utGhNtSi2\n1SgBUduNtKi/J6FBZmmMpu/m31u44SbBcK0h8fur926BtXeL7oC8M3KqJ+TdlNLu\nDFF1yu0h8sokzuC6MGLj4LDkTaoiUYhuWXrL/V314RYNVKPaM/P7bix/Wcy/pu/k\n4ix7Me/nHwKBgQCHEjRcGv3msCf+arsBe1S0E9BXBbnu3g3Hhl/8AfY7Dn5Mi9Ia\nKr6aXgibYXHf+gbtOBNcqTAVFvJ/FUNzp4lEUOrYBMqBHMs/52ElKVScnd5+JjuI\nsT25HjPVq9sYKpVOqkvmO2xJZQaWz0+sKlPKqIa6rSNC//qqxLDVszxRgwKBgDEf\nOZmfSJQ9mkSt0oqzbCNLeqPF5frHPmj6lxBuLomElXFYNfypeMiTDmhLLwldXAwZ\ng+KJLgO42rVK9A2B/HCWOtIVCxs+/Vw8uhViWeezUyroG7cNY7dAvgCMymnuPAAh\n5sEYVMGoOFTTHCIEs+S8V/Jh/UzqchB/Ko61VW4RAoGAc0i1xW4Vk4PbXMTY3mrM\ncz43W+P2LeGXzoLqhhgl5Z7tLFxHWjZpakLkYQk4xCa8tutZY2v/41UG4e1Q8NwE\nUmbQJJbVXTnQuO2iJgfUhvQjF5gLOO0+mYcwTnpTe1/hpc+ObENXcGzNvSINWOJ4\nv7o8JrGDvs+zUXqF7VWssHM=\n-----END PRIVATE KEY-----\n"
+    availability: [BUILD, RUNTIME]
