@@ -13,9 +13,6 @@ import { toast } from 'sonner';
 import React from 'react';
 import { Ticket as TicketIcon } from 'lucide-react';
 
-/* ====== BLOQUE ÚNICO — ALINEA Zod + RHF + TS SIN CAMBIAR UI ====== */
-
-/** 1) Schema único (clave: quantity con coerce a number) */
 const formSchema = z.object({
   schedules: z.array(z.string()).nonempty("Debes seleccionar al menos un sorteo."),
   numbers: z.array(
@@ -28,10 +25,7 @@ const formSchema = z.object({
   clientPhone: z.string().optional(),
 });
 
-/** 2) Tipo del formulario derivado del schema (no declares otro distinto) */
 type FormValues = z.infer<typeof formSchema>;
-
-/* ====== FIN DEL BLOQUE ====== */
 
 interface SalesModalProps {
   draw: Draw | null;
@@ -50,12 +44,17 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
   const [activeTab, setActiveTab] = useState('sell');
   const { sales, addSale, deleteSale, isLoading } = useSales(); 
   const [viewingReceipt, setViewingReceipt] = useState<Sale | null>(null);
+  
+  // SOLUCIÓN: Estado local para el historial, aislado de re-renders del contexto.
+  const [completedSales, setCompletedSales] = useState<Sale[]>([]);
 
-  const completedSales = useMemo(() => 
-    sales.filter(s => s.drawId === draw?.id?.toString()), 
-  [sales, draw]);
+  useEffect(() => {
+    // Se inicializa UNA VEZ con las ventas del sorteo actual.
+    if (draw) {
+      setCompletedSales(sales.filter(s => s.drawId === draw.id.toString()));
+    }
+  }, [sales, draw]); // Dependencias correctas para la actualización inicial.
 
-  /** 3) useForm SIN genérico — deja que el resolver marque el tipo de entrada/salida */
   const form = useForm({
       resolver: zodResolver(formSchema),
       mode: "all",
@@ -64,10 +63,9 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
         numbers: [{ number: "", quantity: 1 }],
         clientName: "",
         clientPhone: "",
-      } as FormValues, // asegura compatibilidad de defaultValues
+      } as FormValues,
   });
 
-  /** 4) FieldArray tipado por name (no cambia tu render) */
   const { fields, append, remove } = useFieldArray({
       control: form.control,
       name: "numbers",
@@ -87,11 +85,10 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
 
   if (!draw) return null;
 
-  /** 5) onSubmit tipado con el tipo inferido del schema */
   const onSubmit: SubmitHandler<FormValues> = (values) => {
     if (!draw) return;
 
-    const newSale: Omit<Sale, 'id' | 'timestamp'> = {
+    const newSaleData: Omit<Sale, 'id' | 'timestamp'> = {
       ticketId: generateTicketId(),
       drawId: draw.id.toString(),
       drawName: draw.name,
@@ -103,12 +100,24 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
       ...values,
     };
 
-    addSale(newSale);
-    toast.success('Venta realizada con éxito');
-    form.reset();
-    setActiveTab('history');
+    addSale(newSaleData).then(newlyAddedSale => {
+      if (newlyAddedSale) {
+        // Actualiza el historial LOCAL al añadir una venta.
+        setCompletedSales(prevSales => [newlyAddedSale, ...prevSales]);
+      }
+      toast.success('Venta realizada con éxito');
+      form.reset();
+      setActiveTab('history');
+    });
   };
   
+  const handleDeleteSale = (saleId: string) => {
+      deleteSale(saleId);
+      // Actualiza el historial LOCAL al eliminar una venta.
+      setCompletedSales(prevSales => prevSales.filter(s => s.id !== saleId));
+      toast.success("Venta eliminada correctamente");
+  };
+
   const handleShareSale = async (saleToShare: Sale) => {
     const verificationUrl = new URL(
       `/verificacion/${encodeURIComponent(saleToShare.ticketId)}`,
@@ -217,7 +226,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                   <h3 className="text-lg font-semibold text-white">Historial de Ventas</h3>
                   <p className="text-sm text-white/60">Un resumen de todas las ventas para {draw.name}.</p>
                 </div>
-                {isLoading ? ( <div className="text-center text-white/60 py-10"><p>Cargando ventas...</p></div> ) : 
+                {isLoading && completedSales.length === 0 ? ( <div className="text-center text-white/60 py-10"><p>Cargando ventas...</p></div> ) : 
                 completedSales.length > 0 ? (
                   <div className="overflow-x-auto">
                     <div className="min-w-full">
@@ -245,7 +254,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                               ${sale.totalCost.toFixed(2)}
                             </div>
                             <div className="col-span-2 flex justify-center">
-                              <ActionMenu sale={sale} onVisualize={() => setViewingReceipt(sale)} onShare={() => handleShareSale(sale)} onDelete={() => sale.id && deleteSale(sale.id)} />
+                              <ActionMenu sale={sale} onVisualize={() => setViewingReceipt(sale)} onShare={() => handleShareSale(sale)} onDelete={() => sale.id && handleDeleteSale(sale.id)} />
                             </div>
                           </div>
                         ))}
