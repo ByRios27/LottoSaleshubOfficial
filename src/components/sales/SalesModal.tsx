@@ -12,6 +12,7 @@ import type { Draw } from '@/contexts/DrawsContext';
 import { toast } from 'sonner';
 import React from 'react';
 import { Ticket as TicketIcon } from 'lucide-react';
+import { Timestamp } from 'firebase/firestore';
 
 const formSchema = z.object({
   schedules: z.array(z.string()).nonempty("Debes seleccionar al menos un sorteo."),
@@ -40,6 +41,17 @@ const generateTicketId = () => {
     return `S${timePart}-${randomPart}`;
 };
 
+const getSafeDate = (timestamp: Sale['timestamp']): Date => {
+  if (!timestamp) return new Date();
+  if (typeof timestamp === 'string') {
+    return new Date(timestamp);
+  }
+  if (timestamp && typeof (timestamp as any).toDate === 'function') {
+    return (timestamp as Timestamp).toDate();
+  }
+  return new Date();
+};
+
 const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, logoUrl }) => {
   const [activeTab, setActiveTab] = useState('sell');
   const { sales, addSale, deleteSale, isLoading } = useSales(); 
@@ -52,9 +64,9 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
     const combined = [...contextDrawSales, ...sessionSales];
     const uniqueSales = Array.from(new Map(combined.map(sale => [sale.id || sale.ticketId, sale])).values());
     return uniqueSales.sort((a, b) => {
-        const dateA = a.timestamp?.toDate?.() || new Date(a.timestamp as string);
-        const dateB = b.timestamp?.toDate?.() || new Date(b.timestamp as string);
-        return dateB.getTime() - dateA.getTime();
+      const dateA = getSafeDate(a.timestamp);
+      const dateB = getSafeDate(b.timestamp);
+      return dateB.getTime() - dateA.getTime();
     });
   }, [sales, sessionSales, draw]);
 
@@ -249,7 +261,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                             </div>
                             <div className="col-span-3">
                               <div>{sale.clientName || 'Cliente General'}</div>
-                              <div className="text-xs text-white/50">{typeof sale.timestamp === 'string' ? new Date(sale.timestamp).toLocaleString() : sale.timestamp?.toDate?.().toLocaleString()}</div>
+                              <div className="text-xs text-white/50">{getSafeDate(sale.timestamp).toLocaleString()}</div>
                             </div>
                             <div className="col-span-2 text-right font-mono text-green-400">
                               ${sale.totalCost.toFixed(2)}
