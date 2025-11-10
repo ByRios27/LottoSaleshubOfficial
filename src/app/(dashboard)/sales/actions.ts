@@ -1,50 +1,70 @@
-
 'use server';
 import 'server-only';
 import { adminDb } from '@/lib/firebase/admin';
-import { Sale } from '@/contexts/SalesContext';
 import { firestore } from 'firebase-admin';
 
-type SaleData = Omit<Sale, 'id' | 'timestamp'> & {
-    timestamp: firestore.FieldValue;
-};
+// --- Tipos de Datos del Servidor ---
+// Definimos la estructura de los datos que esperamos del cliente.
+// Esto desacopla el archivo del servidor de cualquier archivo de cliente.
+interface ClientSaleNumber {
+    number: string;
+    quantity: number;
+}
+
+interface ClientSaleData {
+    ticketId: string;
+    drawId: string;
+    drawName: string;
+    schedules: string[];
+    numbers: ClientSaleNumber[];
+    sellerId: string;
+    costPerFraction: number;
+    totalCost: number;
+    receiptUrl: string;
+    clientName?: string;
+    clientPhone?: string;
+    drawLogo?: string;
+}
 
 export async function createSaleWithIndex(
     userId: string,
-    newSaleData: SaleData
+    newSaleData: ClientSaleData
 ) {
     if (!userId) {
-        throw new Error('User not authenticated to create sale');
+        return { error: 'User not authenticated to create sale' };
     }
 
-    const saleWithServerTimestamp = {
-        ...newSaleData,
-        timestamp: firestore.FieldValue.serverTimestamp(),
-    };
+    try {
+        const saleToCreate = {
+            ...newSaleData,
+            timestamp: firestore.FieldValue.serverTimestamp(),
+            sellerId: userId, // Sobrescribimos para seguridad
+        };
 
-    const salesCollectionRef = adminDb.collection(`users/${userId}/sales`);
-    
-    // Usamos .add() para que Firestore genere un ID de documento único
-    const newSaleRef = await salesCollectionRef.add(saleWithServerTimestamp);
-    
-    // Normalizamos el ticketId a MAYÚSCULAS
-    const ticketId = String(newSaleData.ticketId).trim().toUpperCase();
+        const salesCollectionRef = adminDb.collection(`users/${userId}/sales`);
+        const newSaleRef = await salesCollectionRef.add(saleToCreate);
 
-    if (!ticketId) {
-        // En un caso real, podríamos querer revertir la venta o registrar el error
-        console.error('Error: La venta se creó sin ticketId. No se puede crear el índice.', newSaleRef.id);
-        // Devolvemos el ID de la venta creada, aunque el índice falló.
+        const ticketId = String(newSaleData.ticketId).trim().toUpperCase();
+        if (!ticketId) {
+            console.warn(`Alerta: Venta ${newSaleRef.id} creada sin ticketId válido. Índice no creado.`);
+            return { saleId: newSaleRef.id };
+        }
+
+        const ticketIndexRef = adminDb.collection('ticketIndex').doc(ticketId);
+        await ticketIndexRef.set({
+            salePath: newSaleRef.path,
+            createdAt: firestore.FieldValue.serverTimestamp()
+        });
+
+        console.log(`Venta e índice creados: SaleID: ${newSaleRef.id}, TicketID: ${ticketId}`);
+        
         return { saleId: newSaleRef.id };
+
+    } catch (error) {
+        console.error('Error catastrófico al crear venta e índice:', error);
+        if (error instanceof Error) {
+            return { error: `Server error: ${error.message}` };
+        }
+        return { error: 'An unknown server error occurred.' };
     }
-
-    // Crear el índice con el path a la venta recién creada
-    const ticketIndexRef = adminDb.collection('ticketIndex').doc(ticketId);
-    await ticketIndexRef.set({
-        salePath: newSaleRef.path,
-        createdAt: firestore.FieldValue.serverTimestamp()
-    });
-
-    console.log(`Venta e índice creados. SaleID: ${newSaleRef.id}, TicketID: ${ticketId}`);
-    
-    return { saleId: newSaleRef.id };
 }
