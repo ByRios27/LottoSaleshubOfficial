@@ -34,7 +34,7 @@ export type Sale = {
 
 type SalesContextType = {
   sales: Sale[];
-  addSale: (newSale: Omit<Sale, 'id' | 'timestamp'>) => Promise<void>;
+  addSale: (newSale: Omit<Sale, 'id' | 'timestamp'>) => Promise<Sale | undefined>;
   deleteSale: (id: string) => Promise<void>;
   isLoading: boolean;
 };
@@ -54,7 +54,7 @@ interface SalesProviderProps {
 }
 
 export function SalesProvider({ children }: SalesProviderProps) {
-  const { user, isLoading: isAuthLoading } = useAuth(); // 1. Usar el estado de carga de la autenticación
+  const { user, loading: isAuthLoading } = useAuth(); // CORRECCIÓN: 'loading' en lugar de 'isLoading'
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -82,7 +82,6 @@ export function SalesProvider({ children }: SalesProviderProps) {
   }, [user]);
 
   useEffect(() => {
-    // 2. No hacer nada mientras la autenticación está cargando
     if (isAuthLoading) {
       return;
     }
@@ -90,13 +89,12 @@ export function SalesProvider({ children }: SalesProviderProps) {
     if (user) {
       fetchSales();
     } else {
-      // 3. Limpiar solo cuando sabemos que no hay usuario
       setSales([]);
       setIsLoading(false);
     }
   }, [user, isAuthLoading, fetchSales]);
 
-  const addSale = async (newSale: Omit<Sale, 'id' | 'timestamp'>) => {
+  const addSale = async (newSale: Omit<Sale, 'id' | 'timestamp'>): Promise<Sale | undefined> => {
     if (!user) throw new Error('User not authenticated to add sale');
     
     const optimisticSale: Sale = {
@@ -108,12 +106,30 @@ export function SalesProvider({ children }: SalesProviderProps) {
     setSales(prevSales => [optimisticSale, ...prevSales]);
 
     try {
-      await createSaleWithIndex(user.uid, newSale as any);
-      await fetchSales(); 
+      const { saleId } = await createSaleWithIndex(user.uid, newSale as any);
+      
+      if (!saleId) {
+        throw new Error('Sale creation failed, no ID returned.');
+      }
+      
+      const finalSale: Sale = {
+        ...newSale,
+        id: saleId,
+        timestamp: new Date().toISOString(), // Usamos la fecha actual, aunque el servidor tiene la definitiva
+      };
+
+      // Reemplazamos la venta optimista con la venta real
+      setSales(prevSales => 
+        prevSales.map(sale => sale.id === optimisticSale.id ? finalSale : sale)
+      );
+      
+      return finalSale;
 
     } catch (error) {
       console.error('Error creating sale with index:', error);
+      // Si falla, eliminamos la venta optimista
       setSales(prevSales => prevSales.filter(sale => sale.id !== optimisticSale.id));
+      return undefined; // Devolvemos undefined en caso de error
     }
   };
 
