@@ -44,16 +44,19 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
   const [activeTab, setActiveTab] = useState('sell');
   const { sales, addSale, deleteSale, isLoading } = useSales(); 
   const [viewingReceipt, setViewingReceipt] = useState<Sale | null>(null);
-  
-  // SOLUCIÓN: Estado local para el historial, aislado de re-renders del contexto.
-  const [completedSales, setCompletedSales] = useState<Sale[]>([]);
+  const [sessionSales, setSessionSales] = useState<Sale[]>([]);
 
-  useEffect(() => {
-    // Se inicializa UNA VEZ con las ventas del sorteo actual.
-    if (draw) {
-      setCompletedSales(sales.filter(s => s.drawId === draw.id.toString()));
-    }
-  }, [sales, draw]); // Dependencias correctas para la actualización inicial.
+  const completedSales = useMemo(() => {
+    if (!draw) return [];
+    const contextDrawSales = sales.filter(s => s.drawId === draw.id.toString());
+    const combined = [...contextDrawSales, ...sessionSales];
+    const uniqueSales = Array.from(new Map(combined.map(sale => [sale.id || sale.ticketId, sale])).values());
+    return uniqueSales.sort((a, b) => {
+        const dateA = a.timestamp?.toDate?.() || new Date(a.timestamp as string);
+        const dateB = b.timestamp?.toDate?.() || new Date(b.timestamp as string);
+        return dateB.getTime() - dateA.getTime();
+    });
+  }, [sales, sessionSales, draw]);
 
   const form = useForm({
       resolver: zodResolver(formSchema),
@@ -102,8 +105,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
 
     addSale(newSaleData).then(newlyAddedSale => {
       if (newlyAddedSale) {
-        // Actualiza el historial LOCAL al añadir una venta.
-        setCompletedSales(prevSales => [newlyAddedSale, ...prevSales]);
+        setSessionSales(prev => [newlyAddedSale, ...prev]);
       }
       toast.success('Venta realizada con éxito');
       form.reset();
@@ -111,10 +113,9 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
     });
   };
   
-  const handleDeleteSale = (saleId: string) => {
-      deleteSale(saleId);
-      // Actualiza el historial LOCAL al eliminar una venta.
-      setCompletedSales(prevSales => prevSales.filter(s => s.id !== saleId));
+  const handleDeleteSale = async (saleId: string) => {
+      await deleteSale(saleId);
+      setSessionSales(prev => prev.filter(s => s.id !== saleId));
       toast.success("Venta eliminada correctamente");
   };
 
@@ -176,7 +177,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {schedules.map(schedule => (
                         <label key={schedule} className={`flex items-center space-x-2 p-2.5 rounded-md cursor-pointer transition-colors ${form.watch('schedules').includes(schedule) ? 'bg-green-500/15 border-green-500' : 'bg-black/20 border-transparent'} border`}>
-                          <input type="checkbox" {...form.register('schedules')} value={schedule} className="hidden" />
+                          <input type="checkbox" {...form.register('schedules')} value={schedule} className="sr-only" />
                           <div className={`w-4 h-4 rounded border-2 ${form.watch('schedules').includes(schedule) ? 'border-green-400 bg-green-500' : 'border-white/40'} flex items-center justify-center`}><div className="w-1.5 h-1.5 rounded-sm bg-white"></div></div>
                           <span className="text-sm font-medium text-white/90">{schedule}</span>
                         </label>
@@ -280,11 +281,11 @@ const ActionMenu: React.FC<{sale: Sale; onVisualize: () => void; onShare: () => 
             <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="transform opacity-0 scale-95" enterTo="transform opacity-100 scale-100" leave="transition ease-in duration-75" leaveFrom="transform opacity-100 scale-100" leaveTo="transform opacity-0 scale-95">
                 <Menu.Items className="absolute right-0 w-48 mt-2 origin-top-right bg-gray-800 border border-white/20 divide-y divide-white/10 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20">
                     <div className="px-1 py-1">
-                        <Menu.Item>{({ active }) => <button onClick={onVisualize} className={`${active ? 'bg-green-600 text-white' : 'text-white/90'} group flex rounded-md items-center w-full px-2 py-2 text-sm`}><Eye className="w-5 h-5 mr-2"/>Visualizar</button>}</Menu.Item>
-                        <Menu.Item>{({ active }) => <button onClick={onShare} className={`${active ? 'bg-green-600 text-white' : 'text-white/90'} group flex rounded-md items-center w-full px-2 py-2 text-sm`}><Share2 className="w-5 h-5 mr-2"/>Compartir</button>}</Menu.Item>
+                        <Menu.Item>{({ active }) => <button onClick={onVisualize} className={`${active ? 'bg-green-600 text-white' : 'text-white/90'} group flex rounded-md items-center w-full px-2 py-2 text-sm`}><Eye className="w-5 h-5 mr-2" />Visualizar</button>}</Menu.Item>
+                        <Menu.Item>{({ active }) => <button onClick={onShare} className={`${active ? 'bg-green-600 text-white' : 'text-white/90'} group flex rounded-md items-center w-full px-2 py-2 text-sm`}><Share2 className="w-5 h-5 mr-2" />Compartir</button>}</Menu.Item>
                     </div>
                     <div className="px-1 py-1">
-                        <Menu.Item>{({ active }) => <button onClick={onDelete} className={`${active ? 'bg-red-600 text-white' : 'text-red-400'} group flex rounded-md items-center w-full px-2 py-2 text-sm`}><Trash2 className="w-5 h-5 mr-2"/>Eliminar</button>}</Menu.Item>
+                        <Menu.Item>{({ active }) => <button onClick={onDelete} className={`${active ? 'bg-red-600 text-white' : 'text-red-400'} group flex rounded-md items-center w-full px-2 py-2 text-sm`}><Trash2 className="w-5 h-5 mr-2" />Eliminar</button>}</Menu.Item>
                     </div>
                 </Menu.Items>
             </Transition>

@@ -10,20 +10,23 @@ LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la ven
 
 ## Resumen del Último Cambio (Estable)
 
-**Objetivo:** Solucionar un error crítico de compilación (`build`) que impedía el despliegue de nuevas versiones y corregir la inconsistencia en el historial de ventas.
+**Objetivo:** Solucionar un error de persistencia visual en el historial de ventas y mejorar la accesibilidad general de la aplicación sin alterar el diseño.
 
 **Pasos Realizados:**
 
-1.  **Diagnóstico del Error:** Se identificó que un `commit` anterior (`4e947f9`) introdujo un error de tipo. La función `addSale` en `SalesContext` fue modificada para no devolver ningún valor (`void`), pero el componente `SalesModal` esperaba recibir el objeto de la venta creada, causando el fallo de la compilación de Next.js.
-2.  **Corrección de Causa Raíz en `SalesContext`:**
-    *   Se modificó la función `addSale` para que llame a la `Server Action` `createSaleWithIndex`.
-    *   La función ahora espera el `saleId` devuelto por la acción del servidor.
-    *   Se construye un objeto de venta final (`finalSale`) con los datos correctos y el ID devuelto.
-    *   `addSale` ahora devuelve una `Promise<Sale>`, proporcionando el objeto de la venta real al componente que la llama.
-    *   Se mejoró la actualización del estado local, reemplazando la venta "optimista" temporal por la venta real devuelta por el servidor, asegurando la consistencia de los datos.
-3.  **Corrección de Error Secundario:** Se arregló un error de tipo en `SalesContext` donde se intentaba acceder a la propiedad `isLoading` del `AuthContext`, cuando el nombre correcto era `loading`.
-4.  **Verificación del Build:** Se ejecutó `npm run build` localmente para confirmar que todos los errores de compilación estaban resueltos y que la aplicación se construía con éxito.
-5.  **Resultado:** El error de despliegue ha sido eliminado. La creación de ventas y la actualización del historial ahora son robustas y predecibles, eliminando el parpadeo (`flickering`) y la desaparición de datos.
+1.  **Estabilización del Historial de Ventas (`SalesModal`):**
+    *   Se diagnosticó que el historial de ventas desaparecía en el entorno de producción debido a un problema de sincronización de estado.
+    *   Se implementó un estado local (`sessionSales`) en el modal para almacenar las ventas creadas durante la sesión actual del usuario, asegurando que aparezcan instantáneamente.
+    *   El historial mostrado (`completedSales`) ahora es una combinación estable (usando `useMemo`) de las ventas globales del `SalesContext` y las ventas de la sesión local, eliminando el parpadeo y la desaparición de datos.
+
+2.  **Mejoras de Accesibilidad (A11Y):**
+    *   **Clase `.sr-only`:** Se añadió una clase de utilidad estándar a `globals.css` para ocultar elementos visualmente mientras se mantienen accesibles para lectores de pantalla.
+    *   **Checkboxes Accesibles:** En `SalesModal`, se reemplazó la clase `hidden` por `sr-only` en los checkboxes de selección de horarios, permitiendo que los lectores de pantalla los identifiquen correctamente sin cambiar el diseño.
+    *   **Input Accesible:** En la página de `verificacion`, se añadió una etiqueta (`<label>`) al campo de texto del ID del ticket, ocultándola visualmente con la clase `.sr-only` para corregir un fallo de accesibilidad sin impacto visual.
+
+3.  **Verificación de Calidad:** Se ejecutó `npm run lint -- --fix` para asegurar que los cambios no introdujeran errores y mantuvieran la calidad del código.
+
+**Resultado:** La aplicación es ahora más robusta, con un historial de ventas estable y una mejor accesibilidad para todos los usuarios.
 
 ## Características Implementadas
 
@@ -47,8 +50,9 @@ LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la ven
     *   Historial de ventas por sorteo, con funciones para visualizar, compartir y eliminar.
 *   **Capacidades de Progressive Web App (PWA):**
     *   Manifiesto de la aplicación y service worker para una experiencia instalable.
-*   **Optimización de Rendimiento:**
-    *   Se ha añadido la propiedad `priority` a la imagen del logo del negocio para mejorar el Largest Contentful Paint (LCP) y acelerar la carga visual.
+*   **Optimización y Accesibilidad:**
+    *   Se añadió la propiedad `priority` a la imagen del logo para mejorar la carga visual (LCP).
+    *   Se implementaron mejoras de accesibilidad (A11Y) en formularios clave para asegurar la compatibilidad con lectores de pantalla sin alterar el diseño.
 
 ## Plan y Pasos para el Cambio Actual
 

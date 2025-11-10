@@ -65,7 +65,9 @@ export default function VerificationPage() {
             <input type="text" name="extra_field" tabIndex={-1} value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
           </div>
 
+          <label htmlFor="ticketId" className="sr-only">ID del Ticket</label>
           <input
+            id="ticketId"
             type="text"
             value={ticketId}
             onChange={(e) => setTicketId(e.target.value)}
