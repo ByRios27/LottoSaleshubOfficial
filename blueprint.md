@@ -1,58 +1,47 @@
-# Proyecto LottoSaleshubOfficial - Blueprint
+# Blueprint de la Aplicación: LottoSalesHub
 
-## Visión General del Proyecto
+## Propósito y Capacidades
 
-LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la venta de loterías, sorteos y resultados. Incluye funcionalidades para la gestión de negocios, vendedores, ventas y resultados de sorteos, con autenticación de usuarios y una interfaz de usuario moderna y adaptable.
+LottoSalesHub es una aplicación web moderna construida con Next.js y desplegada en Firebase App Hosting. Permite a los vendedores registrar y gestionar ventas de tickets de lotería de forma eficiente. La aplicación se conecta a una base de datos Firestore para la persistencia de datos en tiempo real y utiliza Server Actions para una lógica de backend segura y robusta.
 
-## Punto de Recuperación Estable (Checkpoint)
+---
 
-**Esta versión del proyecto se considera estable y funcional.** Todos los cambios han sido probados, compilados y subidos a la rama `main` de GitHub. Este estado representa un punto de recuperación seguro antes de implementar nuevas funcionalidades.
+## Esquema del Proyecto y Características Implementadas
 
-## Resumen del Último Cambio (Estable)
+### Estructura y Estilo
+- **Framework:** Next.js con App Router.
+- **Base de Datos:** Cloud Firestore para almacenar datos de usuarios, ventas, sorteos y negocios.
+- **Autenticación:** Firebase Authentication para la gestión de usuarios.
+- **Despliegue:** Firebase App Hosting, conectado a un repositorio de GitHub para CI/CD.
+- **Estilo:** Componentes de React estilizados para una interfaz limpia y funcional.
 
-**Objetivo:** Solucionar un error de persistencia visual en el historial de ventas y mejorar la accesibilidad general de la aplicación sin alterar el diseño.
+### Funcionalidades Clave
+1.  **Autenticación de Usuarios:** Sistema completo de registro e inicio de sesión con Firebase.
+2.  **Gestión de Ventas en Tiempo Real:**
+    - Creación de nuevas ventas a través de un modal interactivo.
+    - Las ventas se guardan en la sub-colección `sales` de cada usuario en Firestore.
+    - Se utiliza `onSnapshot` de Firestore en el `SalesContext` para escuchar cambios en la base de datos y actualizar la interfaz de usuario en tiempo real, garantizando que los datos mostrados siempre sean un reflejo fiel de la base de datos.
+3.  **Server Actions Seguras:** La lógica para crear ventas (`createSaleWithIndex`) se ejecuta en el servidor a través de Server Actions de Next.js, protegiendo la integridad de los datos.
+4.  **Variables de Entorno Diferenciadas:**
+    - **Públicas (`NEXT_PUBLIC_...`):** Para la configuración del cliente de Firebase que se ejecuta en el navegador.
+    - **Privadas (Admin):** Para la configuración del Firebase Admin SDK que se ejecuta en el servidor (Server Actions), permitiendo operaciones con privilegios.
 
-**Pasos Realizados:**
+---
 
-1.  **Estabilización del Historial de Ventas (`SalesModal`):**
-    *   Se diagnosticó que el historial de ventas desaparecía en el entorno de producción debido a un problema de sincronización de estado.
-    *   Se implementó un estado local (`sessionSales`) en el modal para almacenar las ventas creadas durante la sesión actual del usuario, asegurando que aparezcan instantáneamente.
-    *   El historial mostrado (`completedSales`) ahora es una combinación estable (usando `useMemo`) de las ventas globales del `SalesContext` y las ventas de la sesión local, eliminando el parpadeo y la desaparición de datos.
+## Historial de Cambios Recientes
 
-2.  **Mejoras de Accesibilidad (A11Y):**
-    *   **Clase `.sr-only`:** Se añadió una clase de utilidad estándar a `globals.css` para ocultar elementos visualmente mientras se mantienen accesibles para lectores de pantalla.
-    *   **Checkboxes Accesibles:** En `SalesModal`, se reemplazó la clase `hidden` por `sr-only` en los checkboxes de selección de horarios, permitiendo que los lectores de pantalla los identifiquen correctamente sin cambiar el diseño.
-    *   **Input Accesible:** En la página de `verificacion`, se añadió una etiqueta (`<label>`) al campo de texto del ID del ticket, ocultándola visualmente con la clase `.sr-only` para corregir un fallo de accesibilidad sin impacto visual.
+### Resolución de Error Crítico en Producción (Error 500)
 
-3.  **Verificación de Calidad:** Se ejecutó `npm run lint -- --fix` para asegurar que los cambios no introdujeran errores y mantuvieran la calidad del código.
+**Diagnóstico:**
+Se detectó un error crítico que impedía crear ventas en el entorno de producción. Al intentar crear una venta, la aplicación devolvía un `Error 500 (Internal Server Error)`. La causa raíz fue la ausencia de las credenciales del **Firebase Admin SDK** en la configuración del entorno de producción (`apphosting.yaml`). Esto provocaba que la `Server Action` para crear ventas fallara antes de poder escribir en la base de datos.
 
-**Resultado:** La aplicación es ahora más robusta, con un historial de ventas estable y una mejor accesibilidad para todos los usuarios.
+**Solución Implementada:**
+Se modificó el archivo `apphosting.yaml` para inyectar las variables de entorno de administrador (`FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) en el entorno de ejecución del backend. Esto permitió al Firebase Admin SDK autenticarse correctamente y ejecutar operaciones en la base de datos con los privilegios necesarios.
 
-## Características Implementadas
+**Resultado:**
+El error 500 ha sido resuelto. La creación de ventas en producción funciona correctamente. La aplicación está en un estado estable y verificado.
 
-*   **Autenticación de Usuarios:** Sistema completo de registro, inicio de sesión y protección de rutas.
-*   **Contexto Global:**
-    *   `AuthContext`: Gestiona el estado y la información del usuario autenticado.
-    *   `BusinessContext`: Gestiona la información del negocio (logo, nombre, tema) a través de la aplicación.
-    *   `DrawsContext`: Gestiona el estado de los sorteos.
-    *   `SalesContext`: Gestiona el estado de las ventas de forma robusta y optimista.
-*   **Gestión de Negocio (Página `/business`):**
-    *   Actualización del nombre del negocio.
-    *   Subida y actualización del logo del negocio con almacenamiento en Firebase Storage.
-    *   Selección y aplicación de temas visuales para la aplicación.
-    *   Función para restablecer la información del negocio a sus valores por defecto.
-*   **Gestión de Sorteos (Página `/draws`):**
-    *   Creación, edición y eliminación de sorteos.
-    *   Subida de imágenes para los sorteos con almacenamiento en Firebase Storage.
-*   **Gestión de Ventas (Modal de Ventas):**
-    *   Formulario de venta con selección de horarios y números.
-    *   Cálculo de costo total en tiempo real.
-    *   Historial de ventas por sorteo, con funciones para visualizar, compartir y eliminar.
-*   **Capacidades de Progressive Web App (PWA):**
-    *   Manifiesto de la aplicación y service worker para una experiencia instalable.
-*   **Optimización y Accesibilidad:**
-    *   Se añadió la propiedad `priority` a la imagen del logo para mejorar la carga visual (LCP).
-    *   Se implementaron mejoras de accesibilidad (A11Y) en formularios clave para asegurar la compatibilidad con lectores de pantalla sin alterar el diseño.
+---
 
 ## Plan y Pasos para el Cambio Actual
 
