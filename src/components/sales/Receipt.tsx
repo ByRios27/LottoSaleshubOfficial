@@ -3,9 +3,9 @@
 import { ShareIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import QRCode from 'react-qr-code';
 import Image from "next/image";
-import React, { useRef } from 'react'; // Import useRef
+import React, { useRef } from 'react';
 import { Sale } from '@/contexts/SalesContext';
-import html2canvas from 'html2canvas'; // Import html2canvas
+import html2canvas from 'html2canvas';
 
 interface ReceiptProps {
   sale: Sale | null;
@@ -26,7 +26,7 @@ const DefaultLogo = () => (
 );
 
 const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName, logoUrl }) => {
-  const receiptRef = useRef<HTMLDivElement>(null); // Create a ref for the ticket div
+  const receiptRef = useRef<HTMLDivElement>(null);
 
   if (!sale) return null;
 
@@ -34,7 +34,6 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
     ? sale.timestamp 
     : sale.timestamp.toDate().toISOString();
 
-  // --- NEW, ROBUST SHARE FUNCTION ---
   const handleShareAsImage = async () => {
     const element = receiptRef.current;
     if (!element) {
@@ -43,20 +42,17 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
     }
 
     try {
-      // Use html2canvas to take a "picture" of the receipt div
       const canvas = await html2canvas(element, { 
-        useCORS: true, // Important if the logo is from an external URL
-        backgroundColor: null, // Use transparent background
+        useCORS: true,
+        backgroundColor: null, 
       });
 
-      // Convert the canvas to a PNG image Blob
       canvas.toBlob(async (blob) => {
         if (!blob) {
           alert("Hubo un error al generar la imagen del recibo.");
           return;
         }
 
-        // Create a file from the blob
         const file = new File([blob], "comprobante.png", { type: "image/png" });
         const shareData = {
           title: `Comprobante - ${businessName || 'Lotto Hub'}`,
@@ -64,19 +60,16 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
           files: [file],
         };
 
-        // Check if the browser can share files and try to share
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
             await navigator.share(shareData);
           } catch (err: any) {
-            // This will catch the "Permission Denied" error and trigger the download fallback
             if (err.name !== 'AbortError') {
               console.error("Error al compartir, iniciando descarga...", err);
               triggerDownload(blob);
             }
           }
         } else {
-          // If sharing is not supported, trigger download directly
           triggerDownload(blob);
         }
       }, 'image/png');
@@ -108,13 +101,11 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
               </button>
           </div>
           <div className="absolute top-4 left-4">
-             {/* Use the new share function */}
              <button onClick={handleShareAsImage} className="p-2 rounded-full bg-black/30 text-white/70 hover:bg-black/50 hover:text-white transition-colors">
                  <ShareIcon className="w-6 h-6" />
              </button>
          </div>
          
-          {/* Add the ref to this div */}
           <div ref={receiptRef} className="bg-white w-full max-w-[300px] font-sans text-black p-1 border-2 border-dashed border-gray-400">
             <div className="p-4">
                 {/* Header */}
@@ -126,7 +117,9 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
                                 alt="Logo del Negocio"
                                 width={36}
                                 height={36}
-                                className="rounded-full" />
+                                className="rounded-full"
+                                priority // <-- AQUÍ ESTÁ EL CAMBIO
+                            />
                         ) : (
                            <DefaultLogo />
                         )}
@@ -135,7 +128,7 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
                     <p className="text-sm text-gray-500">Comprobante de Venta</p>
                 </div>
 
-                {/* Meta Info (rest of the component is the same) */}
+                {/* Meta Info */}
                 <div className="my-4 border-t border-b border-dashed border-gray-300 py-3 text-xs space-y-1.5 text-gray-800">
                     <p><strong>Ticket ID:</strong> <span className="font-mono ml-1">{sale.ticketId}</span></p>
                     <p><strong>Fecha:</strong> <span className="font-mono ml-1">{new Date(displayTimestamp).toLocaleString()}</span></p>
@@ -150,6 +143,7 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
                     </div>
                 </div>
 
+                {/* Items */}
                 <div className="text-xs font-mono">
                     <div className="flex justify-between font-sans font-semibold text-black border-b border-gray-300 pb-1 mb-2">
                         <span>Número</span>
@@ -165,6 +159,7 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
                     ))}
                 </div>
 
+                {/* Total */}
                 <div className="mt-4 pt-2 border-t border-dashed border-gray-300">
                     <div className="flex justify-end items-baseline text-lg font-bold font-mono">
                     <span className="text-sm font-sans mr-2">TOTAL:</span>
@@ -172,12 +167,14 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
                     </div>
                 </div>
 
+                {/* QR Code */}
                 <div className="mt-4 flex justify-center">
                     <div className="p-1 bg-white border border-gray-200 rounded-md shadow-sm">
                         <QRCode value={sale.ticketId || 'LottoSalesHub-Test'} size={80} bgColor="#FFFFFF" fgColor="#000000"/>
                     </div>
                 </div>
 
+                 {/* Footer */}
                 <div className="text-center text-xs mt-3 text-gray-500">
                     <p>¡Gracias por su compra!</p>
                     <p>Conserve este comprobante.</p>
