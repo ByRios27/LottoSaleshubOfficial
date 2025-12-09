@@ -4,56 +4,30 @@
 
 LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la venta de loterías, sorteos y resultados. Incluye funcionalidades para la gestión de negocios, vendedores, ventas y resultados de sorteos, con autenticación de usuarios y una interfaz de usuario moderna y adaptable.
 
-## Punto de Recuperación Estable (Checkpoint)
-
-**Esta versión del proyecto se considera estable y funcional.** Todos los cambios han sido probados, compilados y subidos a la rama `main` de GitHub. Este estado representa un punto de recuperación seguro antes de implementar nuevas funcionalidades.
-
-## Resumen del Último Cambio (Estable)
-
-**Objetivo:** Solucionar un error de persistencia visual en el historial de ventas y mejorar la accesibilidad general de la aplicación sin alterar el diseño.
-
-**Pasos Realizados:**
-
-1.  **Estabilización del Historial de Ventas (`SalesModal`):**
-    *   Se diagnosticó que el historial de ventas desaparecía en el entorno de producción debido a un problema de sincronización de estado.
-    *   Se implementó un estado local (`sessionSales`) en el modal para almacenar las ventas creadas durante la sesión actual del usuario, asegurando que aparezcan instantáneamente.
-    *   El historial mostrado (`completedSales`) ahora es una combinación estable (usando `useMemo`) de las ventas globales del `SalesContext` y las ventas de la sesión local, eliminando el parpadeo y la desaparición de datos.
-
-2.  **Mejoras de Accesibilidad (A11Y):**
-    *   **Clase `.sr-only`:** Se añadió una clase de utilidad estándar a `globals.css` para ocultar elementos visualmente mientras se mantienen accesibles para lectores de pantalla.
-    *   **Checkboxes Accesibles:** En `SalesModal`, se reemplazó la clase `hidden` por `sr-only` en los checkboxes de selección de horarios, permitiendo que los lectores de pantalla los identifiquen correctamente sin cambiar el diseño.
-    *   **Input Accesible:** En la página de `verificacion`, se añadió una etiqueta (`<label>`) al campo de texto del ID del ticket, ocultándola visualmente con la clase `.sr-only` para corregir un fallo de accesibilidad sin impacto visual.
-
-3.  **Verificación de Calidad:** Se ejecutó `npm run lint -- --fix` para asegurar que los cambios no introdujeran errores y mantuvieran la calidad del código.
-
-**Resultado:** La aplicación es ahora más robusta, con un historial de ventas estable y una mejor accesibilidad para todos los usuarios.
-
-## Características Implementadas
-
-*   **Autenticación de Usuarios:** Sistema completo de registro, inicio de sesión y protección de rutas.
-*   **Contexto Global:**
-    *   `AuthContext`: Gestiona el estado y la información del usuario autenticado.
-    *   `BusinessContext`: Gestiona la información del negocio (logo, nombre, tema) a través de la aplicación.
-    *   `DrawsContext`: Gestiona el estado de los sorteos.
-    *   `SalesContext`: Gestiona el estado de las ventas de forma robusta y optimista.
-*   **Gestión de Negocio (Página `/business`):**
-    *   Actualización del nombre del negocio.
-    *   Subida y actualización del logo del negocio con almacenamiento en Firebase Storage.
-    *   Selección y aplicación de temas visuales para la aplicación.
-    *   Función para restablecer la información del negocio a sus valores por defecto.
-*   **Gestión de Sorteos (Página `/draws`):**
-    *   Creación, edición y eliminación de sorteos.
-    *   Subida de imágenes para los sorteos con almacenamiento en Firebase Storage.
-*   **Gestión de Ventas (Modal de Ventas):**
-    *   Formulario de venta con selección de horarios y números.
-    *   Cálculo de costo total en tiempo real.
-    *   Historial de ventas por sorteo, con funciones para visualizar, compartir y eliminar.
-*   **Capacidades de Progressive Web App (PWA):**
-    *   Manifiesto de la aplicación y service worker para una experiencia instalable.
-*   **Optimización y Accesibilidad:**
-    *   Se añadió la propiedad `priority` a la imagen del logo para mejorar la carga visual (LCP).
-    *   Se implementaron mejoras de accesibilidad (A11Y) en formularios clave para asegurar la compatibilidad con lectores de pantalla sin alterar el diseño.
-
 ## Plan y Pasos para el Cambio Actual
 
-*No hay cambios en curso. La aplicación está en un estado estable y verificado.*
+**Objetivo:** Recuperación Crítica del Sistema.
+
+**Contexto:** Tras una serie de modificaciones fallidas, la aplicación entró en un estado crítico con dos errores principales:
+1.  **Error de Permisos de Firestore (`Missing or insufficient permissions`):** Causado por reglas de seguridad incorrectas que bloqueaban el acceso inicial a la configuración pública.
+2.  **Error de Credenciales del Servidor (`Faltan FIREBASE_PROJECT_ID...`):** Causado por la eliminación accidental del archivo de entorno `.env.local` que contenía las claves secretas del Admin SDK.
+
+**Pasos de Recuperación Realizados:**
+
+1.  **Restauración de Reglas de Seguridad:**
+    *   Se implementaron nuevas `firestore.rules` que permiten el acceso de lectura público (`allow read: if true;`) a una colección específica (`/public/{document=**}`) para la configuración inicial de la app.
+    *   Se mantuvo la regla de que cualquier otra operación de lectura o escritura (`/{path=**}/{document}`) requiere que el usuario esté autenticado (`if request.auth != null;`).
+    *   Se desplegaron las reglas corregidas usando `firebase deploy --only firestore:rules`.
+
+2.  **Recreación de Credenciales del Servidor:**
+    *   Se creó un nuevo archivo `.env.local` en la raíz del proyecto.
+    *   Se rellenó el archivo con las credenciales **públicas** del cliente (obtenidas del objeto `firebaseConfig`).
+    *   Se instruyó al usuario para que generara una **nueva clave privada** desde la sección "Cuentas de servicio" de la consola de Firebase.
+    *   Se guio al usuario para que insertara las credenciales **secretas** (`FIREBASE_CLIENT_EMAIL` y `FIREBASE_PRIVATE_KEY`) en el archivo `.env.local`.
+
+**Resultado Esperado:**
+
+La aplicación debería ser completamente funcional. El error de permisos debe estar resuelto, y el servidor debe tener las credenciales para realizar operaciones autenticadas. El sistema se considera recuperado.
+
+---
+*Este blueprint ha sido actualizado para reflejar la recuperación de un estado crítico. A partir de aquí, se reanuda el desarrollo normal.*
