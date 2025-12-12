@@ -12,6 +12,7 @@ import type { Draw } from '@/contexts/DrawsContext';
 import { toast } from 'sonner';
 import React from 'react';
 import { Ticket as TicketIcon } from 'lucide-react';
+import { Timestamp } from 'firebase/firestore'; // <-- PASO 2: IMPORTACIÓN AÑADIDA
 
 const formSchema = z.object({
   schedules: z.array(z.string()).nonempty("Debes seleccionar al menos un sorteo."),
@@ -40,6 +41,22 @@ const generateTicketId = () => {
     return `S${timePart}-${randomPart}`;
 };
 
+// --- PASO 3: FUNCIÓN HELPER AÑADIDA ---
+type SaleTimestamp = string | Timestamp | undefined | null;
+
+const getSaleDate = (timestamp: SaleTimestamp): Date => {
+  if (!timestamp) {
+    return new Date(0); // Fecha mínima para evitar errores
+  }
+
+  if (timestamp instanceof Timestamp) {
+    return timestamp.toDate();
+  }
+
+  return new Date(timestamp as string);
+};
+// -------------------------------------
+
 const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, logoUrl }) => {
   const [activeTab, setActiveTab] = useState('sell');
   const { sales, addSale, deleteSale, isLoading } = useSales(); 
@@ -50,12 +67,19 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
     if (!draw) return [];
     const contextDrawSales = sales.filter(s => s.drawId === draw.id.toString());
     const combined = [...contextDrawSales, ...sessionSales];
-    const uniqueSales = Array.from(new Map(combined.map(sale => [sale.id || sale.ticketId, sale])).values());
+    
+    // --- PASO 4 y 5: CÓDIGO REEMPLAZADO ---
+    const uniqueSales = Array.from(
+      new Map(combined.map(sale => [sale.id || sale.ticketId, sale])).values()
+    );
+    
     return uniqueSales.sort((a, b) => {
-        const dateA = a.timestamp?.toDate?.() || new Date(a.timestamp as string);
-        const dateB = b.timestamp?.toDate?.() || new Date(b.timestamp as string);
-        return dateB.getTime() - dateA.getTime();
+      const dateA = getSaleDate(a.timestamp as SaleTimestamp);
+      const dateB = getSaleDate(b.timestamp as SaleTimestamp);
+      return dateB.getTime() - dateA.getTime();
     });
+    // -------------------------------------
+
   }, [sales, sessionSales, draw]);
 
   const form = useForm({
@@ -249,7 +273,8 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                             </div>
                             <div className="col-span-3">
                               <div>{sale.clientName || 'Cliente General'}</div>
-                              <div className="text-xs text-white/50">{typeof sale.timestamp === 'string' ? new Date(sale.timestamp).toLocaleString() : sale.timestamp?.toDate?.().toLocaleString()}</div>
+                              {/* --- PASO 7: OTRA CONVERSIÓN CORREGIDA --- */}
+                              <div className="text-xs text-white/50">{getSaleDate(sale.timestamp as SaleTimestamp).toLocaleString()}</div>
                             </div>
                             <div className="col-span-2 text-right font-mono text-green-400">
                               ${sale.totalCost.toFixed(2)}

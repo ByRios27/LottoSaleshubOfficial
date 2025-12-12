@@ -1,9 +1,11 @@
 {
   "firestore": {
-    "rules": "firestore.rules"
+    "rules": "firestore.rules",
+    "database": "(default)"
   },
   "storage": {
-    "rules": "storage.rules"
+    "rules": "storage.rules",
+    "bucket": "new-proyect-lotto-hub.firebasestorage.app"
   },
   "apphosting": {
     "backendId": "newhublotto-54341291",
@@ -14,6 +16,7 @@
       "firebase-debug.log",
       "firebase-debug.*.log",
       "functions"
-    ]
+    ],
+    "alwaysDeployFromSource": true
   }
 }
