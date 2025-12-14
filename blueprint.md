@@ -8,6 +8,31 @@ LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la ven
 
 ## Historial de Cambios
 
+### Mejora de la Seguridad Visual del Recibo (Marca de Agua)
+
+**Objetivo:** Aumentar drásticamente la seguridad y la resistencia a la manipulación de los recibos digitales mediante la implementación de un sistema de marca de agua complejo y de alta densidad.
+
+**Funcionalidades Implementadas:**
+
+1.  **Refinamiento de la Marca de Agua Macro (Capa 1):**
+    *   Se modificó el componente `WatermarkBackground` en `src/components/sales/Receipt.tsx`.
+    *   La marca de agua de texto grande (`macro-text`) ahora se renderiza en 6 líneas para cubrir una mayor área del recibo.
+    *   Se introdujo una variación dinámica a cada línea, aplicando un `translateX` y una micro-rotación (`tilt`) únicos, creando un patrón menos predecible.
+    *   El formato del texto se estandarizó a `TICKET_ID • TOTAL • ORIGINAL` para mayor claridad.
+
+2.  **Implementación de Marca de Agua Cruzada (Capa 2):**
+    *   Para eliminar por completo las "zonas vacías" y dificultar la edición, se duplicó la capa de `macro-text`.
+    *   Esta segunda capa se rota en la dirección opuesta (`rotate(30deg)`) con una opacidad ligeramente reducida, creando un patrón de "X" que cubre todo el documento.
+
+3.  **Corrección de Errores y Refactorización Robusta:**
+    *   Se identificó y corrigió un `SyntaxError` causado por la falta de comillas invertidas (template literals) en la construcción de una cadena de texto.
+    *   Durante la compilación (`npm run build`), se detectó un `TypeError` en `src/lib/ticket-utils.ts` debido a nombres de propiedad inconsistentes (`numero` vs. `number`) en las estructuras de datos de los tickets.
+    *   **Solución Profesional:** En lugar de usar un atajo inseguro como `any`, se refactorizó el archivo `ticket-utils.ts` para usar **Type Guards** de TypeScript. Se crearon funciones (`isItemA`, `getNum`, `getQty`) y tipos claros (`TicketItemA`, `TicketItemB`) para normalizar los datos de forma segura, garantizando la integridad de los tipos en todo el flujo.
+    *   La lógica ahora unifica el origen de los datos (`ticket.items` o `ticket.numbers`) para un procesamiento consistente.
+
+4.  **Confirmación y Compilación:**
+    *   Tras la refactorización, el comando `npm run build` se ejecutó con éxito, confirmando que todos los errores de sintaxis y de tipo fueron resueltos de manera efectiva.
+
 ### Implementación de la Página de Finanzas y Reportes PDF
 
 **Objetivo:** Crear una sección de finanzas para que los usuarios puedan analizar sus ventas, calcular comisiones y generar reportes detallados.
