@@ -5,19 +5,35 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { app } from "@/lib/firebase";
 import { ArrowRightIcon, AtSymbolIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import Image from "next/image"; // <-- 1. IMPORTADO Image
 
-// Componente del Logo con un estilo más prominente y moderno
-const AppLogo = () => (
-    <div className="flex items-center justify-center p-4 bg-green-500/20 rounded-full w-24 h-24 mb-6 border-2 border-green-500 shadow-lg">
-        <svg className="w-12 h-12 text-green-400" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <g fill="currentColor">
-                <path fillRule="evenodd" clipRule="evenodd" d="M43,59 C51.836556,59 59,51.836556 59,43 C59,34.163444 51.836556,27 43,27 C34.163444,27 27,34.163444 27,43 C27,51.836556 34.163444,59 43,59 Z M43,51 C47.418278,51 51,47.418278 51,43 C51,38.581722 47.418278,35 43,35 C38.581722,35 35,38.581722 35,43 C35,47.418278 38.581722,51 43,51 Z" />
-                <path fillRule="evenodd" clipRule="evenodd" d="M21,59 C29.836556,59 37,51.836556 37,43 C37,34.163444 29.836556,27 21,27 C12.163444,27 5,34.163444 5,43 C5,51.836556 12.163444,59 21,59 Z M21,51 C25.418278,51 29,47.418278 29,43 C29,38.581722 25.418278,35 21,35 C16.581722,35 13,38.581722 13,43 C13,47.418278 16.581722,51 21,51 Z" />
-                <path fillRule="evenodd" clipRule="evenodd" d="M32,38 C40.836556,38 48,30.836556 48,22 C48,13.163444 40.836556,6 32,6 C23.163444,6 16,13.163444 16,22 C16,30.836556 23.163444,38 32,38 Z M32,30 C36.418278,30 40,26.418278 40,22 C40,17.581722 36.418278,14 32,14 C27.581722,14 24,17.581722 24,22 C24,26.418278 27.581722,30 32,30 Z" />
-            </g>
-        </svg>
-    </div>
-);
+// --- Componente del Logo modificado ---
+// Ahora acepta la URL del logo y muestra un fallback.
+const AppLogo = ({ logoUrl }: { logoUrl: string | null }) => {
+    if (logoUrl) {
+        // 2. USA next/image CON LAS OPTIMIZACIONES CORRECTAS CUANDO LA URL EXISTE
+        return (
+            <Image
+                src={logoUrl}
+                alt="Logo del negocio"
+                width={180}
+                height={180}
+                priority // <-- Marcar como prioritaria para LCP
+                sizes="(max-width: 768px) 140px, 180px"
+                className="rounded-full object-cover w-24 h-24 mb-6 border-2 border-green-500 shadow-lg"
+            />
+        );
+    }
+
+    // Fallback: Muestra el logo SVG si la URL no está disponible todavía.
+    return (
+        <div className="flex items-center justify-center p-4 bg-green-500/20 rounded-full w-24 h-24 mb-6 border-2 border-green-500 shadow-lg">
+            <svg className="w-12 h-12 text-green-400" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <g fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M43,59 C51.836556,59 59,51.836556 59,43 C59,34.163444 51.836556,27 43,27 C34.163444,27 27,34.163444 27,43 C27,51.836556 34.163444,59 43,59 Z M43,51 C47.418278,51 51,47.418278 51,43 C51,38.581722 47.418278,35 43,35 C38.581722,35 35,38.581722 35,43 C35,47.418278 38.581722,51 43,51 Z" /><path fillRule="evenodd" clipRule="evenodd" d="M21,59 C29.836556,59 37,51.836556 37,43 C37,34.163444 29.836556,27 21,27 C12.163444,27 5,34.163444 5,43 C5,51.836556 12.163444,59 21,59 Z M21,51 C25.418278,51 29,47.418278 29,43 C29,38.581722 25.418278,35 21,35 C16.581722,35 13,38.581722 13,43 C13,47.418278 16.581722,51 21,51 Z" /><path fillRule="evenodd" clipRule="evenodd" d="M32,38 C40.836556,38 48,30.836556 48,22 C48,13.163444 40.836556,6 32,6 C23.163444,6 16,13.163444 16,22 C16,30.836556 23.163444,38 32,38 Z M32,30 C36.418278,30 40,26.418278 40,22 C40,17.581722 36.418278,14 32,14 C27.581722,14 24,17.581722 24,22 C24,26.418278 27.581722,30 32,30 Z" /></g>
+            </svg>
+        </div>
+    );
+};
 
 export default function LoginPage() {
     const router = useRouter();
@@ -28,6 +44,7 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [appName, setAppName] = useState("LottoSalesHub");
     const [appSubtitle, setAppSubtitle] = useState("Inicia sesión para gestionar tus ventas");
+    const [logoUrl, setLogoUrl] = useState<string | null>(null); // <-- 3. AÑADIDO ESTADO PARA LA URL DEL LOGO
 
     useEffect(() => {
         const fetchConfig = async () => {
@@ -40,6 +57,7 @@ export default function LoginPage() {
                     const configData = configSnap.data();
                     setAppName(configData.appName || "LottoSalesHub");
                     setAppSubtitle(configData.appSubtitle || "Inicia sesión para gestionar tus ventas");
+                    setLogoUrl(configData.logoUrl || null); // <-- 4. OBTENER LA URL DEL LOGO DE FIRESTORE
                 } else {
                     console.warn("Public config not found, using default values.");
                 }
@@ -68,12 +86,11 @@ export default function LoginPage() {
 
     return (
         <main className="relative min-h-screen w-full flex flex-col items-center justify-center bg-gray-900 text-white overflow-hidden">
-            {/* Textura de ruido de fondo */}
             <div className="absolute inset-0 bg-repeat bg-center" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.04\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
             
             <div className="relative z-10 w-full max-w-md px-6 sm:px-8">
                 <div className="flex flex-col items-center mb-8">
-                    <AppLogo />
+                    <AppLogo logoUrl={logoUrl} /> {/* <-- 5. PASAR LA URL AL COMPONENTE */}
                     <h1 className="text-4xl font-bold text-white tracking-tight">{appName}</h1>
                     <p className="text-lg text-gray-400 mt-2">{appSubtitle}</p>
                 </div>
@@ -82,7 +99,6 @@ export default function LoginPage() {
                     onSubmit={onSubmit}
                     className="space-y-6 bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl backdrop-blur-sm"
                 >
-                    {/* Campo de Correo Electrónico con Flexbox */}
                     <div className="flex items-center w-full bg-white/5 border border-white/10 rounded-xl focus-within:ring-2 focus-within:ring-green-500/50 transition-all duration-300">
                         <AtSymbolIcon className="h-5 w-5 text-gray-400 ml-4 mr-4 flex-shrink-0" />
                         <input
@@ -96,7 +112,6 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    {/* Campo de Contraseña con Flexbox */}
                     <div className="relative flex items-center w-full bg-white/5 border border-white/10 rounded-xl focus-within:ring-2 focus-within:ring-green-500/50 transition-all duration-300">
                         <LockClosedIcon className="h-5 w-5 text-gray-400 ml-4 mr-4 flex-shrink-0" />
                         <input
@@ -123,7 +138,6 @@ export default function LoginPage() {
 
                     {err && <p className="text-red-400 text-sm text-center bg-red-500/10 p-3 rounded-lg">{err}</p>}
 
-                    {/* Botón de Envío */}
                     <button
                         type="submit"
                         disabled={loading}
