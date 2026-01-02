@@ -8,6 +8,33 @@ LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la ven
 
 ## Historial de Cambios
 
+### Corrección de Error de Compilación y Estabilización
+
+**Objetivo:** Solucionar un `TypeError` crítico que impedía el despliegue exitoso de la aplicación y mejorar la estabilidad del componente de resultados.
+
+**Pasos Realizados:**
+
+1.  **Diagnóstico del Problema:**
+    *   Se ejecutó el comando `npm run build` para replicar el entorno de despliegue.
+    *   La compilación falló con un `TypeError: Object is possibly 'undefined'`, localizado en la lógica de filtrado de la consulta de *fallback* en `src/app/(dashboard)/resultados/page.tsx`.
+    *   El error ocurría porque `toDateSafe(data.timestamp)?.getTime()` podía devolver `undefined`, y una comparación (`>=`, `<=`) con `undefined` no es válida en TypeScript.
+
+2.  **Solución del `TypeError`:**
+    *   Se refactorizó el bloque de filtrado para hacerlo seguro frente a tipos (`type-safe`).
+    *   Se introdujo una variable intermedia (`dt`) para almacenar el resultado de `toDateSafe(data.timestamp)`.
+    *   Se añadió una guarda (`if (!dt) return false;`) para asegurar que la fecha es un objeto válido antes de intentar usar su método `.getTime()`.
+    *   Esto eliminó por completo la posibilidad de que la comparación se realice con un valor `undefined`.
+
+3.  **Eliminación de Advertencias de React Hooks (`useEffect`):**
+    *   El linter advertía que la función `loadSavedResults` no estaba incluida en el array de dependencias de dos hooks `useEffect`.
+    *   Para solucionar esto y optimizar el rendimiento, la función `loadSavedResults` se envolvió en un hook `useCallback`.
+    *   `useCallback` memoriza la función, evitando que se recree en cada renderizado a menos que sus dependencias (`user?.uid`) cambien.
+    *   Finalmente, se añadió `loadSavedResults` al array de dependencias de los `useEffect`, cumpliendo con las reglas de los hooks y eliminando las advertencias.
+
+4.  **Verificación Final:**
+    *   Se ejecutó `npm run build` nuevamente.
+    *   La compilación se completó con éxito (`✓ Compiled successfully`), confirmando que todos los errores y advertencias fueron resueltos.
+
 ### Implementación y Mejora Avanzada de la Página de Resultados
 
 **Objetivo:** Crear y optimizar la página de "Resultados y Ganadores", proporcionando una herramienta robusta para calcular premios, gestionar pagos y visualizar los resultados de manera detallada y profesional.

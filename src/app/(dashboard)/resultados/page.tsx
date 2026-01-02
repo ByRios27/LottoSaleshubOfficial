@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   collection,
   doc,
   addDoc,
   getDocs,
-  getDoc,
   setDoc,
   deleteDoc,
   updateDoc,
@@ -124,6 +123,30 @@ export default function ResultsPage() {
     return (winners || []).reduce((acc, w) => acc + (Number(w.totalWin) || 0), 0);
   }, [winners]);
 
+ const loadSavedResults = useCallback(async (drawId?: string) => {
+    if (!user?.uid) return;
+    setLoadingSaved(true);
+    const resultsRef = collection(db, "users", user.uid, "results");
+    try {
+      let snap;
+      const baseQuery = drawId ? query(resultsRef, where("drawId", "==", drawId)) : resultsRef;
+      snap = await getDocs(query(baseQuery, orderBy("createdAt", "desc"), limit(50)));
+      
+      const all: SavedResult[] = snap.docs.map(d => ({ id: d.id, ...d.data() } as SavedResult));
+      setSavedResults(all);
+    } catch(e) {
+        console.warn("Error loading results, likely missing index. Falling back.");
+        const fallbackSnap = await getDocs(collection(db, "users", user.uid, "results"));
+        let all = fallbackSnap.docs.map(d => ({ id: d.id, ...d.data() } as SavedResult));
+        if(drawId) all = all.filter(r => r.drawId === drawId);
+        all.sort((a,b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+        setSavedResults(all.slice(0, 50));
+    } finally {
+      setLoadingSaved(false);
+    }
+  }, [user?.uid]);
+
+
   useEffect(() => {
     const foundDraw = draws.find((d) => d.id === draw);
     setSelectedDraw(foundDraw || null);
@@ -131,7 +154,9 @@ export default function ResultsPage() {
       loadSavedResults(draw);
     }
     setSchedule("");
-  }, [draw, draws]);
+  }, [draw, draws, loadSavedResults]);
+
+  useEffect(() => { loadSavedResults(); }, [loadSavedResults]);
 
   const loadPaidStatuses = async (drawId: string, dateStr: string, scheduleStr: string) => {
     if (!user?.uid || !drawId || !dateStr || !scheduleStr) return;
@@ -158,31 +183,6 @@ export default function ResultsPage() {
       setPaidMap(map);
     }
   };
-
-  const loadSavedResults = async (drawId?: string) => {
-    if (!user?.uid) return;
-    setLoadingSaved(true);
-    const resultsRef = collection(db, "users", user.uid, "results");
-    try {
-      let snap;
-      const baseQuery = drawId ? query(resultsRef, where("drawId", "==", drawId)) : resultsRef;
-      snap = await getDocs(query(baseQuery, orderBy("createdAt", "desc"), limit(50)));
-      
-      const all: SavedResult[] = snap.docs.map(d => ({ id: d.id, ...d.data() } as SavedResult));
-      setSavedResults(all);
-    } catch(e) {
-        console.warn("Error loading results, likely missing index. Falling back.");
-        const fallbackSnap = await getDocs(collection(db, "users", user.uid, "results"));
-        let all = fallbackSnap.docs.map(d => ({ id: d.id, ...d.data() } as SavedResult));
-        if(drawId) all = all.filter(r => r.drawId === drawId);
-        all.sort((a,b) => b.createdAt?.toMillis() - a.createdAt?.toMillis());
-        setSavedResults(all.slice(0, 50));
-    } finally {
-      setLoadingSaved(false);
-    }
-  };
-
-  useEffect(() => { loadSavedResults(); }, []);
 
   const markAsPaid = async (winner: Winner, drawId: string, date: string, schedule: string) => {
     if (!user?.uid) return;
@@ -211,10 +211,20 @@ export default function ResultsPage() {
       console.warn("Índice de ventas no disponible. Usando fallback.");
       const qFallback = query(salesCollectionRef, where("drawId", "==", drawId));
       const snap = await getDocs(qFallback);
-      querySnapshot = { docs: snap.docs.filter(docSnap => {
-        const data = docSnap.data();
-        return (data.schedules || []).includes(schedule) && toDateSafe(data.timestamp)?.getTime() >= start.getTime() && toDateSafe(data.timestamp)?.getTime() <= end.getTime();
-      }) };
+      querySnapshot = {
+        docs: snap.docs.filter((docSnap) => {
+          const data: any = docSnap.data();
+      
+          const sch = Array.isArray(data?.schedules) ? data.schedules : [];
+          if (!sch.includes(schedule)) return false;
+      
+          const dt = toDateSafe(data?.timestamp);
+          if (!dt) return false;
+      
+          const t = dt.getTime();
+          return t >= start.getTime() && t <= end.getTime();
+        }),
+      };
     }
     const winnersMap: Map<string, Winner> = new Map();
     const pf = padToCif(first,cif), ps = padToCif(second,cif), pt = padToCif(third,cif);
