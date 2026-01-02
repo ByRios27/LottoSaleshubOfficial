@@ -29,6 +29,7 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
     const menuItems = [
         { name: 'Ventas', href: '/sales', icon: LotteryIcon },
         { name: 'Sorteos', href: '/draws', icon: TicketIcon },
+        { name: 'Resultados', href: '/resultados', icon: TrophyIcon },
         { name: 'Finanzas', href: '/finanzas', icon: CurrencyDollarIcon },
         { name: 'Verificación', href: '/verificacion', icon: ShieldCheckIcon },
         { name: 'Negocio', href: '/business', icon: BuildingStorefrontIcon },
