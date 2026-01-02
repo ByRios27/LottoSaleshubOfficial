@@ -8,6 +8,47 @@ LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la ven
 
 ## Historial de Cambios
 
+### Implementación y Mejora Avanzada de la Página de Resultados
+
+**Objetivo:** Crear y optimizar la página de "Resultados y Ganadores", proporcionando una herramienta robusta para calcular premios, gestionar pagos y visualizar los resultados de manera detallada y profesional.
+
+**Funcionalidades Implementadas:**
+
+1.  **Navegación y Acceso:**
+    *   Se añadió un enlace directo a "Resultados" en la página de navegación principal (`src/app/page.tsx`), asegurando un acceso rápido y visible para el usuario.
+
+2.  **Cálculo de Ganadores y Gestión de Resultados:**
+    *   **Creación de la Página `resultados/page.tsx`:** Se desarrolló la interfaz principal para que el usuario pueda introducir la fecha, el sorteo, el horario y los números ganadores.
+    *   **Guardado de Resultados:** Se implementó la lógica para guardar los resultados de cada sorteo en la colección `results` de Firestore, utilizando `serverTimestamp` para registrar la fecha de creación.
+    *   **Normalización de Datos:** Se aseguró que los números ganadores se guarden con el formato correcto (`padding` de ceros a la izquierda) según la configuración de cifras (`cif`) de cada sorteo.
+
+3.  **Solución de Error de Índice de Firestore (Fallback Query):**
+    *   **Problema:** Al consultar la colección `sales` con múltiples filtros (`where`), Firestore requería un índice compuesto que no se podía crear desde el código.
+    *   **Solución Profesional:** Se implementó una estrategia de `try/catch`. El código primero intenta ejecutar la consulta ideal. Si falla con un error de "requires an index", ejecuta una consulta de *fallback* más simple (solo por `drawId`) y realiza el resto del filtrado (por horario y fecha) en memoria del lado del cliente. Esto garantiza que la funcionalidad no se interrumpa y no requiere intervención manual en la consola de Firebase.
+
+4.  **Tabla de Ganadores Mejorada y Detallada:**
+    *   **Estructura de Datos Avanzada (`Winner`, `WinnerHit`):** Se refactorizó el cálculo para generar una lista de ganadores con una estructura detallada. Cada ganador (`Winner`) contiene información del cliente y una lista de sus aciertos (`hits`), donde cada acierto (`WinnerHit`) especifica la posición (1ero, 2do, 3ro), el número, la tasa de pago, la cantidad jugada y el monto ganado por ese acierto.
+    *   **Visualización Jerárquica:** La nueva tabla de ganadores (JSX) muestra la información de manera clara:
+        *   Datos del cliente (nombre y teléfono).
+        *   Desglose de cada número acertado, con su cálculo (`cantidad x tasa = monto`).
+        *   Monto total ganado por ticket.
+
+5.  **Funcionalidad de Gestión de Pagos:**
+    *   **Colección `payoutStatus`:** Se creó una nueva colección en Firestore para persistir el estado de los pagos de cada premio.
+    *   **Botón "PAGAR":** Se añadió un botón en cada fila de la tabla de ganadores.
+        *   El botón es **verde ("PAGAR")** si el premio está pendiente.
+        *   Al hacer clic, se ejecuta la función `markAsPaid`, que guarda el estado como pagado en Firestore y muestra un estado de carga ("PAGANDO...").
+        *   Una vez pagado, el botón se vuelve **rojo ("PAGADO")** y se deshabilita, proporcionando una retroalimentación visual clara y persistente.
+    *   **Carga de Estados:** El estado de los pagos se carga automáticamente al seleccionar un sorteo, garantizando que la interfaz siempre refleje la información correcta.
+
+6.  **Cálculo de Payout Total:**
+    *   El `Total Payout` ahora se calcula como la suma acumulada de los `totalWin` de todos los ganadores mostrados, ofreciendo un resumen financiero preciso para la consulta actual.
+
+7.  **Corrección de Errores y Estabilización:**
+    *   Se solucionó un `TypeError` crítico causado por un error de tipeo (`e.targe.value` en lugar de `e.target.value`) en uno de los campos de entrada.
+    *   Se validó el proyecto completo con `npm run lint` para asegurar la calidad y consistencia del código.
+    *   Finalmente, se consolidaron todos los cambios en un commit y se subieron al repositorio remoto.
+
 ### Mejora de la Seguridad Visual del Recibo (Marca de Agua)
 
 **Objetivo:** Aumentar drásticamente la seguridad y la resistencia a la manipulación de los recibos digitales mediante la implementación de un sistema de marca de agua complejo y de alta densidad.
