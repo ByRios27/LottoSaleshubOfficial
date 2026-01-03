@@ -55,11 +55,12 @@ const getSaleDate = (timestamp: SaleTimestamp): Date => {
  * - Acepta guiones raros: –, —, −
  * - Ignora texto extra alrededor
  * - Normaliza número (padStart) según draw.cif
+ * - SOPORTA INVERTIR: "10-35" => (qty-num) si invert=true
  */
 type ParsedItem = { number: string; quantity: number };
 type ParseResult = { items: ParsedItem[]; errors: string[] };
 
-const parseBulkNumbers = (raw: string, digits: number): ParseResult => {
+const parseBulkNumbers = (raw: string, digits: number, invert: boolean): ParseResult => {
   const errors: string[] = [];
   if (!raw || typeof raw !== 'string') {
     return { items: [], errors: ['Entrada vacía.'] };
@@ -70,7 +71,7 @@ const parseBulkNumbers = (raw: string, digits: number): ParseResult => {
     .replace(/[\u200B-\u200D\uFEFF]/g, '')
     .replace(/[–—−]/g, '-');
 
-  // Captura: numero (1..digits) - cantidad (1..4 digitos)
+  // Captura: izquierda (1..digits) - derecha (1..4 digitos)
   // Nota: cantidad puede ser 1..9999 (ajusta si quieres)
   const re = new RegExp(`\\b(\\d{1,${Math.max(1, digits)}})\\s*-\\s*(\\d{1,4})\\b`, 'g');
   const matches = [...s.matchAll(re)];
@@ -82,8 +83,13 @@ const parseBulkNumbers = (raw: string, digits: number): ParseResult => {
   const items: ParsedItem[] = [];
 
   for (const m of matches) {
-    const numRaw = m[1];
-    const qtyRaw = m[2];
+    const left = m[1];
+    const right = m[2];
+
+    // OFF: left=num, right=qty
+    // ON : left=qty, right=num
+    const numRaw = invert ? right : left;
+    const qtyRaw = invert ? left : right;
 
     const numInt = Number(numRaw);
     const qtyInt = Number(qtyRaw);
@@ -170,6 +176,9 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
   const [duplicatePolicy, setDuplicatePolicy] = useState<DuplicatePolicy>('sum');
   const [applyMode, setApplyMode] = useState<ApplyMode>('add');
 
+  // NUEVO: toggle para invertir formato cantidad-número
+  const [invertList, setInvertList] = useState(false);
+
   const completedSales = useMemo(() => {
     if (!draw) return [];
     const contextDrawSales = sales.filter(s => s.drawId === draw.id.toString());
@@ -240,6 +249,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
       setBulkText('');
       setBulkPreview([]);
       setBulkErrors([]);
+      setInvertList(false);
       setActiveTab('history');
     });
   };
@@ -282,7 +292,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
 
   // ----- Bulk handlers -----
   const handleProcessBulk = () => {
-    const result = parseBulkNumbers(bulkText, draw.cif);
+    const result = parseBulkNumbers(bulkText, draw.cif, invertList);
     setBulkPreview(result.items);
     setBulkErrors(result.errors);
 
@@ -319,9 +329,6 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
 
     replace(next.map(r => ({ number: r.number, quantity: r.quantity })));
 
-    // Limpiar preview (opcional). Yo lo dejo para que el usuario lo vea; si prefieres limpiar, descomenta:
-    // setBulkText('');
-    // setBulkPreview([]);
     toast.success('Lista aplicada correctamente.');
   };
   // -------------------------
@@ -418,11 +425,27 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                         <div>
                           <p className="text-sm font-semibold text-white/90">Pegado rápido (lista)</p>
                           <p className="text-xs text-white/60">
-                            Pega formatos como: <span className="font-mono">26-6, 25-12 24-6</span> (comas/espacios/saltos de línea).
+                            Pega formatos como:{' '}
+                            <span className="font-mono">26-6, 25-12 24-6</span> (comas/espacios/saltos de línea).{' '}
+                            <span className="font-mono">Invertir</span> para listas tipo <span className="font-mono">10-35</span>.
                           </p>
                         </div>
 
                         <div className="flex items-center gap-2 flex-wrap">
+                          {/* Toggle: Invertir lista */}
+                          <button
+                            type="button"
+                            onClick={() => setInvertList(v => !v)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors
+                              ${invertList
+                                ? "bg-orange-600 text-white border-orange-500"
+                                : "bg-white/10 text-white/80 border-white/20 hover:bg-white/15"
+                              }`}
+                            title="Invertir formato: cantidad-número"
+                          >
+                            {invertList ? "Invertir: ACTIVO" : "Invertir: DESACTIVADO"}
+                          </button>
+
                           <select
                             value={applyMode}
                             onChange={(e) => setApplyMode(e.target.value as ApplyMode)}
@@ -466,7 +489,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                       <textarea
                         value={bulkText}
                         onChange={(e) => setBulkText(e.target.value)}
-                        placeholder={`Ej:\n26-6 25-12 24-6\n23-6, 21-10\n...`}
+                        placeholder={`Ej:\n26-6 25-12 24-6\n23-6, 21-10\nInvertir ON: 10-35 8-99 5-03`}
                         className="mt-3 w-full min-h-[110px] bg-black/20 border border-white/20 rounded-lg p-3 text-white text-sm focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-all"
                       />
 
