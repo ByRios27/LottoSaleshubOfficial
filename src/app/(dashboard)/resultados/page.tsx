@@ -231,10 +231,22 @@ export default function ResultsPage() {
     querySnapshot.docs.forEach((doc) => {
       const sale = doc.data() as Sale;
       const hits: WinnerHit[] = [];
-      sale.numbers.forEach(n => {
-        if (n.number === pf) hits.push({ position: "1ero", number: n.number, rate: 11, quantity: n.quantity, amount: n.quantity * 11 });
-        else if (n.number === ps) hits.push({ position: "2do", number: n.number, rate: 3, quantity: n.quantity, amount: n.quantity * 3 });
-        else if (n.number === pt) hits.push({ position: "3ro", number: n.number, rate: 2, quantity: n.quantity, amount: n.quantity * 2 });
+      (sale.numbers || []).forEach((n: any) => {
+        const num = padToCif(n.number, cif);
+        const qty = Number(n.quantity) || 0;
+        if (qty <= 0) return;
+
+        if (num === pf) {
+          hits.push({ position: "1ero", number: num, rate: 11, quantity: qty, amount: qty * 11 });
+        }
+
+        if (num === ps) {
+          hits.push({ position: "2do", number: num, rate: 3, quantity: qty, amount: qty * 3 });
+        }
+
+        if (num === pt) {
+          hits.push({ position: "3ro", number: num, rate: 2, quantity: qty, amount: qty * 2 });
+        }
       });
       if (hits.length > 0) {
         const totalWin = hits.reduce((acc, h) => acc + h.amount, 0);
@@ -251,8 +263,22 @@ export default function ResultsPage() {
     if (!user || !date || !draw || !schedule || !first || !second || !third || !selectedDraw) return toast.error("Por favor, complete todos los campos.");
     try {
       const cif = selectedDraw.cif;
-      await addDoc(collection(db, "users", user.uid, "results"), { date, drawId: draw, schedule, first: padToCif(first,cif), second: padToCif(second,cif), third: padToCif(third,cif), createdAt: serverTimestamp() });
-      await calculateAndSetWinners({ drawId: draw, date, schedule, first, second, third });
+      const firstN = padToCif(first, cif);
+      const secondN = padToCif(second, cif);
+      const thirdN = padToCif(third, cif);
+
+      if (!firstN || !secondN || !thirdN) {
+        toast.error("Por favor, complete 1ero, 2do y 3ro correctamente.");
+        return;
+      }
+
+      if (firstN === secondN || firstN === thirdN || secondN === thirdN) {
+        const ok = confirm("Hay números repetidos en los resultados (ej. 2do=3ro). ¿Confirmas que es correcto?");
+        if (!ok) return;
+      }
+
+      await addDoc(collection(db, "users", user.uid, "results"), { date, drawId: draw, schedule, first: firstN, second: secondN, third: thirdN, createdAt: serverTimestamp() });
+      await calculateAndSetWinners({ drawId: draw, date, schedule, first: firstN, second: secondN, third: thirdN });
       await loadSavedResults(draw);
       toast.success("Resultados guardados y ganadores calculados.");
     } catch (error) { console.error("Error: ", error); toast.error("Error al guardar."); }
@@ -272,7 +298,10 @@ export default function ResultsPage() {
     const cif = selectedDrawObj?.cif || 2;
     const firstN = padToCif(editFirst, cif), secondN = padToCif(editSecond, cif), thirdN = padToCif(editThird, cif);
     if (!firstN || !secondN || !thirdN) return toast.error("Completa 1ero, 2do y 3ro.");
-    if (firstN === secondN || firstN === thirdN || secondN === thirdN) return toast.error("Los resultados no pueden repetirse.");
+    if (firstN === secondN || firstN === thirdN || secondN === thirdN) {
+        const ok = confirm("Hay números repetidos en los resultados (ej. 2do=3ro). ¿Confirmas que es correcto?");
+        if (!ok) return;
+    }
     setIsEditSaving(true);
     try {
       const resultDocRef = doc(db, "users", user.uid, "results", editingResult.id);
