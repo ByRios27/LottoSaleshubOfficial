@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/lib/firebase';
-import { createSaleWithIndex } from '@/app/(dashboard)/sales/actions';
+import { createSaleWithIndex, updateSaleWithIndex } from '@/app/(dashboard)/sales/actions';
 import {
   collection,
   deleteDoc,
@@ -12,6 +12,8 @@ import {
   query,
   orderBy,
   Timestamp,
+  updateDoc,
+  serverTimestamp
 } from 'firebase/firestore';
 
 // --- Definición de Tipos ---
@@ -35,6 +37,7 @@ export type Sale = {
 type SalesContextType = {
   sales: Sale[];
   addSale: (newSale: Omit<Sale, 'id' | 'timestamp'>) => Promise<Sale | undefined>;
+  updateSale: (id: string, updatedData: Partial<Omit<Sale, 'id' | 'timestamp'>>) => Promise<void>;
   deleteSale: (id: string) => Promise<void>;
   isLoading: boolean;
 };
@@ -54,7 +57,7 @@ interface SalesProviderProps {
 }
 
 export function SalesProvider({ children }: SalesProviderProps) {
-  const { user, loading: isAuthLoading } = useAuth(); // CORRECCIÓN: 'loading' en lugar de 'isLoading'
+  const { user, loading: isAuthLoading } = useAuth();
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -115,10 +118,9 @@ export function SalesProvider({ children }: SalesProviderProps) {
       const finalSale: Sale = {
         ...newSale,
         id: saleId,
-        timestamp: new Date().toISOString(), // Usamos la fecha actual, aunque el servidor tiene la definitiva
+        timestamp: new Date().toISOString(),
       };
 
-      // Reemplazamos la venta optimista con la venta real
       setSales(prevSales => 
         prevSales.map(sale => sale.id === optimisticSale.id ? finalSale : sale)
       );
@@ -127,9 +129,35 @@ export function SalesProvider({ children }: SalesProviderProps) {
 
     } catch (error) {
       console.error('Error creating sale with index:', error);
-      // Si falla, eliminamos la venta optimista
       setSales(prevSales => prevSales.filter(sale => sale.id !== optimisticSale.id));
-      return undefined; // Devolvemos undefined en caso de error
+      return undefined;
+    }
+  };
+
+  const updateSale = async (id: string, updatedData: Partial<Omit<Sale, 'id'>>) => {
+    if (!user) throw new Error('User not authenticated to update sale');
+
+    const saleIndex = sales.findIndex(sale => sale.id === id);
+    if (saleIndex === -1) {
+      console.error("Sale not found for update");
+      return;
+    }
+
+    const originalSales = [...sales];
+    const updatedSale = { ...sales[saleIndex], ...updatedData, timestamp: new Date().toISOString() };
+
+    setSales(prevSales => {
+        const newSales = [...prevSales];
+        newSales[saleIndex] = updatedSale as Sale;
+        return newSales;
+    });
+
+    try {
+      await updateSaleWithIndex(user.uid, id, updatedData as any);
+    } catch (error) {
+      console.error('Error updating sale:', error);
+      setSales(originalSales);
+      throw error;
     }
   };
 
@@ -149,6 +177,7 @@ export function SalesProvider({ children }: SalesProviderProps) {
   const value = {
     sales,
     addSale,
+    updateSale,
     deleteSale,
     isLoading,
   };

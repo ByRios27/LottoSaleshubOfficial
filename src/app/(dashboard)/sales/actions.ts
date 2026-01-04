@@ -13,9 +13,7 @@ export async function createSaleWithIndex(
     userId: string,
     newSaleData: SaleData
 ) {
-    // PASO 2: Envolver en un bloque try/catch detallado
     try {
-        // PASO 4: Validación defensiva
         if (!newSaleData || typeof newSaleData !== 'object') {
             console.error('⚠️ createSaleWithIndex fue llamado con newSaleData nulo, undefined, o no es un objeto.', { userId, newSaleData });
             throw new Error('Critical error: newSaleData is invalid.');
@@ -34,7 +32,6 @@ export async function createSaleWithIndex(
         
         const newSaleRef = await salesCollectionRef.add(saleWithServerTimestamp);
         
-        // PASO 4: Validación defensiva para ticketId
         if (!newSaleData.ticketId) {
             console.error('Error: La venta se creó pero newSaleData.ticketId viene vacío. No se puede crear el índice.', {
                 saleId: newSaleRef.id,
@@ -63,20 +60,54 @@ export async function createSaleWithIndex(
         
         return { saleId: newSaleRef.id };
     } catch (error: any) {
-        // PASO 2 y 7: Loguear el error DETALLADO en el servidor antes de relanzarlo
         console.error('🔥 Error detallado creando venta con índice:', {
             message: error?.message,
             name: error?.name,
             stack: error?.stack,
-            // Contexto adicional
             userId,
             ticketId: newSaleData?.ticketId,
-            // El objeto de error completo
             error,
         });
+        throw error;
+    }
+}
 
-        // Re-lanzar el error para que el flujo del cliente no cambie
-        // Esto producirá el error 500 que el usuario ve, pero ahora tendremos el log del servidor.
+export async function updateSaleWithIndex(
+    userId: string,
+    saleId: string,
+    updatedData: Partial<SaleData>
+) {
+    try {
+        if (!userId || !saleId || !updatedData) {
+            throw new Error('Faltan parámetros para actualizar la venta.');
+        }
+
+        const saleDocRef = adminDb.collection(`users/${userId}/sales`).doc(saleId);
+        
+        const dataWithTimestamp = {
+            ...updatedData,
+            updatedAt: firestore.FieldValue.serverTimestamp()
+        };
+
+        await saleDocRef.update(dataWithTimestamp);
+
+        console.log(`Venta actualizada. SaleID: ${saleId}`);
+
+        // Opcional: si el ticketId puede cambiar, también se debe actualizar el índice.
+        // Esto es más complejo ya que implica borrar el índice antiguo y crear uno nuevo.
+        // Por ahora, asumimos que ticketId no cambia en una edición.
+
+        return { success: true };
+    } catch (error: any) {
+        console.error('🔥 Error detallado actualizando venta:', {
+            message: error?.message,
+            name: error?.name,
+            stack: error?.stack,
+            userId,
+            saleId,
+            updatedData,
+            error,
+        });
         throw error;
     }
 }
