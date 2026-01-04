@@ -1,6 +1,6 @@
 'use client';
 
-import { ArchiveBoxIcon, ChartBarIcon, TicketIcon, BuildingStorefrontIcon, ArrowLeftOnRectangleIcon, TrophyIcon, ShieldCheckIcon, CurrencyDollarIcon } from '@heroicons/react/24/solid';
+import { ArchiveBoxIcon, ChartBarIcon, TicketIcon, BuildingStorefrontIcon, ArrowLeftOnRectangleIcon, TrophyIcon, ShieldCheckIcon, CurrencyDollarIcon, DocumentChartBarIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 import { useBusiness } from '@/contexts/BusinessContext';
 import Image from "next/image";
@@ -29,6 +29,7 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
     const menuItems = [
         { name: 'Ventas', href: '/sales', icon: LotteryIcon },
         { name: 'Sorteos', href: '/draws', icon: TicketIcon },
+        { name: 'Ventas del Día', href: '/ventas-del-dia', icon: DocumentChartBarIcon },
         { name: 'Resultados', href: '/resultados', icon: TrophyIcon },
         { name: 'Cierres', href: '/cierres-sorteos', icon: ArchiveBoxIcon },
         { name: 'Finanzas', href: '/finanzas', icon: CurrencyDollarIcon },
