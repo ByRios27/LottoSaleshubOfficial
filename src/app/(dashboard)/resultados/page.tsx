@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useTransition } from "react";
 import {
   collection,
   doc,
@@ -23,8 +23,10 @@ import { Sale } from "@/contexts/SalesContext";
 import toast, { Toaster } from 'react-hot-toast';
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { TrashIcon } from '@heroicons/react/24/solid';
 import {
   Select,
   SelectContent,
@@ -32,6 +34,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { deleteAllResultsForUser } from './actions';
+
 
 // HELPERS
 const toDateSafe = (ts: any): Date | null => {
@@ -119,6 +123,12 @@ export default function ResultsPage() {
   const [isEditSaving, setIsEditSaving] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState<string | null>(null);
 
+  // Delete All State
+  const [isDeletingAll, startTransition] = useTransition();
+  const [isDialogAllOpen, setIsDialogAllOpen] = useState(false);
+  const [confirmationInput, setConfirmationInput] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const totalPayout = useMemo(() => {
     return (winners || []).reduce((acc, w) => acc + (Number(w.totalWin) || 0), 0);
   }, [winners]);
@@ -157,6 +167,13 @@ export default function ResultsPage() {
   }, [draw, draws, loadSavedResults]);
 
   useEffect(() => { loadSavedResults(); }, [loadSavedResults]);
+
+  useEffect(() => {
+    if (!isDialogAllOpen) {
+      setConfirmationInput('');
+      setDeleteError(null);
+    }
+  }, [isDialogAllOpen]);
 
   const loadPaidStatuses = async (drawId: string, dateStr: string, scheduleStr: string) => {
     if (!user?.uid || !drawId || !dateStr || !scheduleStr) return;
@@ -329,6 +346,23 @@ export default function ResultsPage() {
     } finally { setIsDeleteLoading(null); }
   };
 
+  const handleDeleteAllResults = () => {
+    if (!user) return;
+    setDeleteError(null);
+    startTransition(async () => {
+      try {
+        await deleteAllResultsForUser(user.uid);
+        setSavedResults([]); // Limpiar el estado local
+        toast.success("Todos los resultados han sido eliminados.");
+        setIsDialogAllOpen(false);
+      } catch (error) {
+        console.error(error);
+        toast.error("No se pudieron eliminar los resultados. Inténtalo de nuevo.");
+        setDeleteError("No se pudieron eliminar los resultados. Inténtalo de nuevo.");
+      }
+    });
+  };
+
   return (
     <div className="container mx-auto p-4 bg-gray-900 text-white">
       <Toaster position="bottom-center" toastOptions={{ style: { background: '#333', color: '#fff' } }} />
@@ -397,6 +431,25 @@ export default function ResultsPage() {
           </div>
         ))}</div></div>
       </div>
+
+      <Card className="mt-8 border-red-500/30 bg-red-500/10">
+        <CardHeader><CardTitle className="text-red-400">Zona de Peligro</CardTitle><CardDescription className="text-red-400/80">Esta acción es irreversible y no se puede deshacer.</CardDescription></CardHeader>
+        <CardContent>
+            <Dialog open={isDialogAllOpen} onOpenChange={setIsDialogAllOpen}>
+                <DialogTrigger asChild><Button variant="destructive" className="w-full md:w-auto"><TrashIcon className="w-4 h-4 mr-2"/> Restablecer Resultados</Button></DialogTrigger>
+                <DialogContent className="bg-gray-800 border-gray-700 text-white">
+                    <DialogHeader><DialogTitle className="text-red-400">¿Estás absolutamente seguro?</DialogTitle><DialogDescription>Se borrarán permanentemente **todos** los resultados guardados de tu cuenta. Para confirmar, escribe **BORRAR** en el campo de texto.</DialogDescription></DialogHeader>
+                    <div className="py-4 space-y-4">
+                        <Input placeholder="Escribe BORRAR para confirmar" value={confirmationInput} onChange={(e) => setConfirmationInput(e.target.value)} className="bg-gray-700 border-gray-600 text-white"/>
+                        <Button variant="destructive" className="w-full" onClick={handleDeleteAllResults} disabled={confirmationInput !== 'BORRAR' || isDeletingAll}>
+                            {isDeletingAll ? 'Borrando resultados...' : 'Entiendo las consecuencias, borrar todo'}
+                        </Button>
+                        {deleteError && <p className="text-sm text-red-400 text-center">{deleteError}</p>}
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </CardContent>
+      </Card>
 
       {isEditOpen && editingResult && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
