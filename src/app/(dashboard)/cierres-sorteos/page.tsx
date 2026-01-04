@@ -210,13 +210,11 @@ export default function CierresSorteosPage() {
     const node = imageExportRef.current;
     const fileName = `cierre_${slugify(selectedDraw.name)}_${date}_${slugify(schedule)}.png`;
     
-    // Temporarily make the node visible for capture
     node.style.left = '0px';
     node.style.top = '0px';
     node.style.opacity = '1';
 
     try {
-        // Allow a short time for the browser to render the node
         await new Promise(resolve => setTimeout(resolve, 100));
 
         const dataUrl = await toPng(node, {
@@ -252,7 +250,6 @@ export default function CierresSorteosPage() {
             toast.error('Hubo un error al procesar la imagen.', { id: toastId });
         }
     } finally {
-        // Hide the node again
         node.style.left = '-9999px';
         node.style.top = '-9999px';
         node.style.opacity = '0';
@@ -264,7 +261,7 @@ export default function CierresSorteosPage() {
     position: 'fixed',
     left: '-9999px', 
     top: '-9999px',
-    opacity: 0, // Initially hidden
+    opacity: 0,
     pointerEvents: 'none',
     background: 'white',
     padding: '24px',
@@ -308,8 +305,10 @@ export default function CierresSorteosPage() {
                 <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', textAlign: 'center' }}>NÚMEROS VENDIDOS</h3>
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(6, 1fr)',
-                  gap: '4px',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gridTemplateRows: 'repeat(25, auto)',
+                  gridAutoFlow: 'column',
+                  gap: '4px 16px', 
                   fontSize: '14px'
                 }}>
                   {gridData.map(item => (
@@ -360,7 +359,7 @@ export default function CierresSorteosPage() {
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Opciones de Exportación</label>
                   <div className="space-y-3">
                     <Input value={operatorName} onChange={handleOperatorNameChange} placeholder="Nombre del Operador (default)" className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600" />
-                    <Input value={operatorPhone} onChange={handleOperatorPhoneChange} placeholder="Teléfono (default)" className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600" />
+                    <Input value={operatorPhone} onChange={handleOperatorPhoneChange} placeholder="Teléfono (default)" className="bg-gray-50 dark:bg-gamma-700 border-gray-300 dark:border-gray-600" />
                   </div>
                 </div>
                 <Button size="lg" className="w-full text-base bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white dark:text-gray-900 font-bold" onClick={loadAndConsolidate} disabled={isLoading}>{isLoading ? 'Generando... ' : 'Generar Cierre'}</Button>
