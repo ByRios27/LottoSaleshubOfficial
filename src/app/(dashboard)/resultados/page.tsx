@@ -363,18 +363,21 @@ export default function ResultsPage() {
         </div>
         <div className="p-4">
             {loadingSaved ? <p>Cargando resultados...</p> :
-            <div className="space-y-2">{savedResults.map(r => (
-                <div key={r.id} className={`w-full p-3 rounded-xl border transition-colors flex items-start justify-between gap-3 ${selectedResult?.id === r.id ? 'bg-green-500/20 border-green-500/50' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
-                    <button type="button" onClick={() => handleSelectSavedResult(r)} className="flex-1 text-left"><div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="text-sm text-white/90 font-semibold">{r.date} — {r.schedule}</div>
-                        <div className="text-xs text-white/60 font-mono">1ero: {r.first} · 2do: {r.second} · 3ro: {r.third}</div>
-                    </div></button>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                        <button onClick={() => handleOpenEditModal(r)} className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-md"><span className="sr-only">Editar</span><PencilIcon className="w-4 h-4" /></button>
-                        <button onClick={() => handleDeleteResult(r.id)} disabled={deletingId === r.id} className="p-2 text-red-400/70 hover:text-red-400 hover:bg-red-500/10 rounded-md"><span className="sr-only">Borrar</span><TrashIcon className="w-4 h-4"/></button>
+            <div className="space-y-2">{savedResults.map(r => {
+                const drawName = draws.find(d => d.id === r.drawId)?.name || 'Sorteo';
+                return (
+                    <div key={r.id} className={`w-full p-3 rounded-xl border transition-colors flex items-start justify-between gap-3 ${selectedResult?.id === r.id ? 'bg-green-500/20 border-green-500/50' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
+                        <button type="button" onClick={() => handleSelectSavedResult(r)} className="flex-1 text-left"><div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="text-sm text-white/90 font-semibold">{drawName} - {r.date} — {r.schedule}</div>
+                            <div className="text-xs text-white/60 font-mono">1ero: {r.first} · 2do: {r.second} · 3ro: {r.third}</div>
+                        </div></button>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                            <button onClick={() => handleOpenEditModal(r)} className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-md"><span className="sr-only">Editar</span><PencilIcon className="w-4 h-4" /></button>
+                            <button onClick={() => handleDeleteResult(r.id)} disabled={deletingId === r.id} className="p-2 text-red-400/70 hover:text-red-400 hover:bg-red-500/10 rounded-md"><span className="sr-only">Borrar</span><TrashIcon className="w-4 h-4"/></button>
+                        </div>
                     </div>
-                </div>
-            ))}</div>}
+                );
+            })}</div>}
         </div>
       </div>
 
