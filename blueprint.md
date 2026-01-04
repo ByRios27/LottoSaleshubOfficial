@@ -8,6 +8,30 @@ LottoSaleshubOfficial es una aplicación Next.js diseñada para gestionar la ven
 
 ## Historial de Cambios
 
+### Corrección de Interfaz y Compilación en Cierres de Sorteos
+
+**Objetivo:** Solucionar un error de compilación persistente y corregir un error de diseño visual en la función de exportación de imágenes para los cierres de sorteos.
+
+**Pasos Realizados:**
+
+1.  **Corrección del Error Visual en la Imagen Exportada:**
+    *   **Problema:** En la imagen generada, los números y sus cantidades vendidas aparecían desalineados, el color no era el correcto y faltaban separadores visuales.
+    *   **Solución:** Se modificó el estilo del `div` (`imageExportRef`) en `src/app/(dashboard)/cierres-sorteos/page.tsx`.
+        *   Se reemplazó `display: grid` y `justify-content: space-between` con una estructura de rejilla (`grid`) con bordes definidos para cada celda (`border-right`, `border-bottom`).
+        *   Se aseguró la alineación correcta de número y cantidad usando `display: flex`, `justify-content: center`, y un `gap`.
+        *   Se cambió el color de la cantidad a azul (`color: 'blue'`) como fue solicitado.
+
+2.  **Solución del Error de Compilación (`TypeError`):**
+    *   **Problema:** El comando `npm run build` fallaba repetidamente con el error `Type error: Object is possibly 'undefined'`. Este error se producía en la consulta de *fallback* al filtrar ventas, porque el resultado de `toDateSafe(data?.timestamp)` podía ser `null`, y se intentaba llamar al método `.getTime()` sobre un valor potencialmente nulo.
+    *   **Solución Definitiva:** Se refactorizó la lógica de filtrado dentro de la función `loadAndConsolidate`.
+        *   Se guarda el resultado de `toDateSafe(data?.timestamp)` en una variable temporal (`docDate`).
+        *   Se introduce una guarda (`if (!docDate) return false;`) para descartar inmediatamente cualquier registro que no tenga una fecha válida.
+        *   Esto garantiza que el código que ejecuta `.getTime()` solo se alcance si `docDate` es un objeto `Date` válido, eliminando el error de tipo.
+
+3.  **Verificación Final:**
+    *   Se ejecutó `npm run build` por última vez.
+    *   La compilación se completó con éxito, confirmando que tanto el error visual como el error de compilación fueron resueltos de forma definitiva.
+
 ### Corrección de Error de Compilación y Estabilización
 
 **Objetivo:** Solucionar un `TypeError` crítico que impedía el despliegue exitoso de la aplicación y mejorar la estabilidad del componente de resultados.
