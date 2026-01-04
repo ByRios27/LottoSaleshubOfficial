@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useDraws, Draw } from '@/contexts/DrawsContext';
 import { Sale } from '@/contexts/SalesContext';
 import { toast } from 'sonner';
+import { toPng } from 'html-to-image';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,10 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import { toPng } from 'html-to-image';
 
 // =========================
 // Helpers
@@ -62,6 +59,10 @@ const getTodayLocal = () => {
     return localDate.toISOString().split('T')[0];
 };
 
+const isMobileDevice = () => {
+  if (typeof navigator === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
 
 // =========================
 // Types
@@ -74,16 +75,14 @@ export default function CierresSorteosPage() {
   const { draws } = useDraws();
   const imageExportRef = useRef<HTMLDivElement>(null);
 
-  // Filtros
+  // Filters
   const [date, setDate] = useState(getTodayLocal);
   const [drawId, setDrawId] = useState('');
   const [schedule, setSchedule] = useState('');
 
-  // Opcionales
+  // Options
   const [operatorName, setOperatorName] = useState('');
   const [operatorPhone, setOperatorPhone] = useState('');
-  const [columns, setColumns] = useState<'2' | '3'>('3');
-  const [showBlankAsDash, setShowBlankAsDash] = useState(true);
 
   // Data
   const [isLoading, setIsLoading] = useState(false);
@@ -199,74 +198,7 @@ export default function CierresSorteosPage() {
     });
   }, [user?.uid, selectedDraw, date, schedule, drawId]);
 
-  const downloadPdf = useCallback(async () => {
-    if (!selectedDraw || rows.length === 0) {
-      toast.error('No hay datos para exportar.');
-      return;
-    }
-
-    const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const marginX = 30;
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(15);
-    doc.text(`Cierre: ${selectedDraw.name}`, marginX, 45);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.text(`Fecha: ${date}   Horario: ${schedule}`, marginX, 62);
-
-    if (operatorName?.trim()) {
-      doc.text(`Operador: ${operatorName.trim()}${operatorPhone?.trim() ? ` (${operatorPhone.trim()})` : ''}`,
-        marginX, 76);
-    }
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text(`Total Tiempos: ${totalTimes}`, marginX, 100);
-    doc.text(`Total Vendido: ${formatMoney(totalAmount)}`, pageWidth - marginX, 100, { align: 'right' });
-
-    const blocks = columns === '2' ? 2 : 3;
-    const perBlock = Math.ceil(gridData.length / blocks);
-    const chunk = (arr: GridRow[], size: number) => Array.from({ length: Math.ceil(arr.length / size) }, (_, i) => arr.slice(i * size, i * size + size));
-    const parts = chunk(gridData, perBlock);
-    const maxRows = Math.max(...parts.map(p => p.length));
-
-    const head = Array(blocks).fill(['Núm', 'Tiempos']).flat();
-    const body = Array.from({ length: maxRows }, (_, i) => {
-      const r: string[] = [];
-      for (let b = 0; b < blocks; b++) {
-        const item = parts[b]?.[i];
-        r.push(item?.num ?? '', item?.qty === null ? (showBlankAsDash ? '—' : '') : String(item?.qty ?? ''));
-      }
-      return r;
-    });
-
-    autoTable(doc, {
-      startY: 112,
-      head: [head],
-      body,
-      theme: 'grid',
-      margin: { left: marginX, right: marginX },
-      styles: { font: 'helvetica', fontSize: 9, cellPadding: 3.5, halign: 'center' },
-      headStyles: { fontStyle: 'bold', fillColor: '#F1F5F9', textColor: '#000' },
-      columnStyles: {
-        ...Array.from({ length: blocks }, (_, b) => b * 2).reduce((acc, i) => ({ ...acc, [i]: { fontStyle: 'bold', fontSize: 10 } }), {})
-      },
-      didDrawPage: () => {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-        doc.text(`Generado: ${(generatedAt ?? new Date()).toLocaleString()}`, pageWidth - marginX, doc.internal.pageSize.getHeight() - 20, { align: 'right' });
-      }
-    });
-
-    doc.save(`cierre_${slugify(selectedDraw.name)}_${date}_${slugify(schedule)}.pdf`);
-    toast.success('PDF descargado.');
-  }, [selectedDraw, date, schedule, rows, totalTimes, totalAmount, operatorName, operatorPhone, columns, showBlankAsDash, generatedAt, gridData]);
-
-
-  const shareAsImage = useCallback(async () => {
+  const handleShareOrDownload = useCallback(async () => {
     if (!imageExportRef.current || !selectedDraw || rows.length === 0) {
       toast.error('No hay resultados que compartir.');
       return;
@@ -277,97 +209,130 @@ export default function CierresSorteosPage() {
 
     const node = imageExportRef.current;
     const fileName = `cierre_${slugify(selectedDraw.name)}_${date}_${slugify(schedule)}.png`;
+    
+    // Temporarily make the node visible for capture
+    node.style.left = '0px';
+    node.style.top = '0px';
+    node.style.opacity = '1';
 
     try {
-      // 2 frames para asegurar render
-      await new Promise<void>((r) => requestAnimationFrame(() => r()));
-      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+        // Allow a short time for the browser to render the node
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-      const rect = node.getBoundingClientRect();
-      const width = Math.max(600, Math.round(rect.width || node.offsetWidth || 600));
-      const height = Math.max(800, Math.round(rect.height || node.offsetHeight || 800));
+        const dataUrl = await toPng(node, {
+            cacheBust: true,
+            pixelRatio: 2,
+            backgroundColor: '#ffffff',
+        });
 
-      const dataUrl = await toPng(node, {
-        cacheBust: true,
-        pixelRatio: 2.5,
-        backgroundColor: '#ffffff',
-        style: {
-          position: 'fixed',
-          left: '0px',
-          top: '0px',
-          opacity: '1',
-          visibility: 'visible',
-          transform: 'none',
-          filter: 'none',
-          pointerEvents: 'none',
-          zIndex: '2147483647',
-        },
-        width,
-        height,
-      });
+        if (isMobileDevice() && navigator.share) {
+            const response = await fetch(dataUrl);
+            const blob = await response.blob();
+            const file = new File([blob], fileName, { type: blob.type });
 
-      const link = document.createElement('a');
-      link.download = fileName;
-      link.href = dataUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      toast.success('¡Imagen descargada!', { id: toastId });
-    } catch (err) {
-      console.error('Error al generar la imagen:', err);
-      toast.error('Hubo un error al generar la imagen.', { id: toastId });
+            await navigator.share({
+                title: `Cierre: ${selectedDraw.name}`,
+                text: `Cierre del ${date} para el sorteo ${selectedDraw.name} a las ${schedule}.`,
+                files: [file],
+            });
+            toast.success('¡Compartido con éxito!', { id: toastId });
+        } else {
+            const link = document.createElement('a');
+            link.download = fileName;
+            link.href = dataUrl;
+            link.click();
+            toast.success('¡Imagen descargada!', { id: toastId });
+        }
+    } catch (err: any) {
+        if (err.name === 'AbortError' || err.name === 'NotAllowedError') {
+            console.log('Share action was cancelled by the user.', err.name);
+            toast.info('Acción de compartir cancelada.', { id: toastId });
+        } else {
+            console.error('Error al generar o compartir la imagen:', err);
+            toast.error('Hubo un error al procesar la imagen.', { id: toastId });
+        }
     } finally {
-      setIsSharing(false);
+        // Hide the node again
+        node.style.left = '-9999px';
+        node.style.top = '-9999px';
+        node.style.opacity = '0';
+        setIsSharing(false);
     }
-  }, [selectedDraw, date, schedule, rows.length]);
+}, [selectedDraw, date, schedule, rows.length]);
 
   const imageExportStyle: React.CSSProperties = {
     position: 'fixed',
-    left: '0px',
-    top: '0px',
-    opacity: 0,
+    left: '-9999px', 
+    top: '-9999px',
+    opacity: 0, // Initially hidden
     pointerEvents: 'none',
     background: 'white',
-    padding: '20px',
-    width: '600px',
-    zIndex: -1,
+    padding: '24px',
+    width: '640px',
+    color: '#111827',
+    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
+    border: '1px solid #e5e7eb',
+    zIndex: 9999,
   };
+  
 
   return (
     <>
       <div style={imageExportStyle} ref={imageExportRef}>
         {selectedDraw && rows.length > 0 && (
-          <div style={{ fontFamily: 'sans-serif', color: 'black' }}>
-            <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>Cierre: {selectedDraw.name}</h2>
-            <p style={{ fontSize: '16px', margin: '4px 0 12px' }}>{date} - {schedule}</p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: 'bold', borderTop: '1px solid #ccc', borderBottom: '1px solid #ccc', padding: '10px 0' }}>
-              <span>Total Tiempos: {totalTimes}</span>
-              <span style={{color: '#16A34A'}}>{formatMoney(totalAmount)}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ textAlign: 'center' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, textTransform: 'uppercase' }}>CIERRE DE SORTEO</h2>
+                <p style={{ fontSize: '16px', margin: '4px 0 0', color: '#4b5563' }}>{selectedDraw.name} - {schedule}</p>
+                <p style={{ fontSize: '14px', margin: '2px 0 0', color: '#6b7280' }}>{date}</p>
             </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(5, 1fr)',
-              borderTop: '1px solid #ccc',
-              borderLeft: '1px solid #ccc',
-              marginTop: '16px',
-              fontSize: '14px'
-            }}>
-              {gridData.map(item => (
-                <div key={item.num} style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '4px',
-                  borderBottom: '1px solid #ccc',
-                  borderRight: '1px solid #ccc'
-                }}>
-                  <span style={{ fontWeight: 'bold' }}>{item.num}</span>
-                  <span style={{ color: 'blue', fontWeight: 'bold' }}>{item.qty ?? '—'}</span>
+
+            {operatorName && (
+                <div style={{ borderTop: '1px dashed #d1d5db', borderBottom: '1px dashed #d1d5db', padding: '8px 0', textAlign: 'center' }}>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#4b5563' }}>
+                        Operador: <span style={{ fontWeight: 600, color: '#111827' }}>{operatorName}</span>
+                    </p>
                 </div>
-              ))}
+            )}
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: 700, padding: '12px', background: '#f3f4f6', borderRadius: '8px' }}>
+              <span>Total Tiempos:</span>
+              <span>{totalTimes}</span>
             </div>
-            {operatorName && <p style={{marginTop: '15px', fontSize: '12px', color: '#555'}}>Operador: {operatorName}</p>}
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '20px', fontWeight: 800, padding: '12px', background: '#10b981', color: 'white', borderRadius: '8px' }}>
+              <span>TOTAL VENDIDO:</span>
+              <span>{formatMoney(totalAmount)}</span>
+            </div>
+
+            <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px', textAlign: 'center' }}>NÚMEROS VENDIDOS</h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(6, 1fr)',
+                  gap: '4px',
+                  fontSize: '14px'
+                }}>
+                  {gridData.map(item => (
+                    <div key={item.num} style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '4px 6px',
+                      borderRadius: '4px',
+                      background: item.qty ? '#f3f4f6' : 'transparent',
+                      border: '1px solid #e5e7eb'
+                    }}>
+                      <span style={{ fontWeight: 600 }}>{item.num}</span>
+                      <span style={{ fontWeight: item.qty ? 700 : 400, color: item.qty ? '#059669' : '#9ca3af' }}>
+                        {item.qty ?? '-'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+            </div>
+
+            <div style={{ marginTop: '16px', textAlign: 'center', fontSize: '12px', color: '#9ca3af' }}>
+                <p style={{margin: 0}}>Generado el {generatedAt?.toLocaleString()}</p>
+            </div>
           </div>
         )}
       </div>
@@ -396,8 +361,6 @@ export default function CierresSorteosPage() {
                   <div className="space-y-3">
                     <Input value={operatorName} onChange={handleOperatorNameChange} placeholder="Nombre del Operador (default)" className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600" />
                     <Input value={operatorPhone} onChange={handleOperatorPhoneChange} placeholder="Teléfono (default)" className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600" />
-                    <Select value={columns} onValueChange={(v) => setColumns(v as '2' | '3')}><SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"><SelectValue placeholder="Columnas en PDF" /></SelectTrigger><SelectContent className="bg-white dark:bg-gray-800"><SelectItem value="2">2 columnas</SelectItem><SelectItem value="3">3 columnas</SelectItem></SelectContent></Select>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700"><span className="text-sm text-gray-800 dark:text-gray-200">No vendidos como "—"</span><input type="checkbox" className="h-5 w-5 rounded text-green-600 focus:ring-green-500" checked={showBlankAsDash} onChange={(e) => setShowBlankAsDash(e.target.checked)} /></div>
                   </div>
                 </div>
                 <Button size="lg" className="w-full text-base bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white dark:text-gray-900 font-bold" onClick={loadAndConsolidate} disabled={isLoading}>{isLoading ? 'Generando... ' : 'Generar Cierre'}</Button>
@@ -419,8 +382,7 @@ export default function CierresSorteosPage() {
                       </div>
                       <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border"><h4 className="font-medium text-gray-800 dark:text-gray-200 mb-3">Números Vendidos</h4><div className="max-h-64 overflow-y-auto pr-2"><div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-3 gap-y-2">{rows.map((r) => (<div key={r.number} className="flex items-baseline justify-between rounded-md px-2 py-1 bg-white dark:bg-gray-800 border"><span className="font-mono font-bold text-base text-gray-800 dark:text-gray-100">{r.number}</span><span className="font-mono text-sm text-gray-600 dark:text-gray-400">{r.quantity}</span></div>))}</div></div></div>
                       <div className="flex flex-col sm:flex-row gap-3">
-                        <Button size="lg" className="w-full text-base bg-blue-600 hover:bg-blue-700 text-white font-bold" onClick={downloadPdf}>Descargar PDF</Button>
-                        <Button size="lg" className="w-full text-base bg-gray-700 hover:bg-gray-600 text-white font-bold" onClick={shareAsImage} disabled={isSharing}>{isSharing ? 'Generando...' : 'Compartir Imagen'}</Button>
+                        <Button size="lg" className="w-full text-base bg-blue-600 hover:bg-blue-700 text-white font-bold" onClick={handleShareOrDownload} disabled={isSharing}>{isSharing ? 'Generando...' : 'Compartir'}</Button>
                       </div>
                     </div>
                   )}
