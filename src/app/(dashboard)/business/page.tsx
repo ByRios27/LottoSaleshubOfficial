@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useBusiness, BusinessData } from '@/contexts/BusinessContext';
 import Image from "next/image";
 import {
   PhotoIcon,
@@ -18,22 +18,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { app } from '@/lib/firebase';
 
+const DEFAULT_BUSINESS: BusinessData = { name: 'Mi Negocio', logoUrl: '' };
+
 export default function BusinessPage() {
   const { user } = useAuth();
   const storage = getStorage(app);
-  const {
-    businessName,
-    businessLogo,
-    theme,
-    setBusinessName,
-    setBusinessLogo,
-    setTheme,
-    resetBusinessInfo,
-    isLoading,
-  } = useBusiness();
+  const { business, setBusiness, theme, setTheme, loading } = useBusiness();
 
-  const [tempName, setTempName] = useState(businessName);
-  const [tempLogo, setTempLogo] = useState(businessLogo);
+  const [tempBusiness, setTempBusiness] = useState<BusinessData>(business || DEFAULT_BUSINESS);
   const [tempTheme, setTempTheme] = useState(theme);
 
   const [nameSaveStatus, setNameSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -48,18 +40,15 @@ export default function BusinessPage() {
   const themeStyles = selectedTheme.styles;
 
   useEffect(() => {
-    if (!isLoading) {
-      setTempName(businessName);
-      setTempLogo(businessLogo);
+    if (!loading && business) {
+      setTempBusiness(business);
       setTempTheme(theme);
     }
-  }, [businessName, businessLogo, theme, isLoading]);
+  }, [business, theme, loading]);
 
   const handleLogoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !user) {
-      return;
-    }
+    if (!file || !user) return;
 
     setLogoUploadStatus('uploading');
     try {
@@ -67,8 +56,8 @@ export default function BusinessPage() {
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      setBusinessLogo(downloadURL);
-      setTempLogo(downloadURL);
+      setBusiness({ logoUrl: downloadURL });
+      setTempBusiness(prev => ({...prev, logoUrl: downloadURL}));
       
       setLogoUploadStatus('success');
     } catch (error) {
@@ -81,7 +70,7 @@ export default function BusinessPage() {
 
   const handleNameSave = () => {
     try {
-      setBusinessName(tempName);
+      setBusiness({ name: tempBusiness.name });
       setNameSaveStatus('success');
     } catch (e) {
       console.error("Error saving name:", e);
@@ -102,9 +91,15 @@ export default function BusinessPage() {
   };
 
   const confirmAndReset = () => {
-    resetBusinessInfo();
+    // Esta función necesitaría una implementación en el contexto
+    // Por ahora, recargará la página para obtener los valores por defecto.
+    // idealmente `resetBusinessInfo` estaría en el contexto.
     setShowResetConfirm(false);
-    window.location.reload();
+    window.location.reload(); 
+  };
+  
+  const handleTempNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTempBusiness(prev => ({...prev, name: e.target.value}));
   };
 
   const renderLogoPreview = () => {
@@ -116,10 +111,10 @@ export default function BusinessPage() {
         );
     }
 
-    if (tempLogo && tempLogo !== 'default') {
+    if (tempBusiness.logoUrl) {
       return (
         <Image
-          src={tempLogo}
+          src={tempBusiness.logoUrl}
           alt="Previsualización del logo"
           fill
           sizes="160px"
@@ -155,8 +150,8 @@ export default function BusinessPage() {
     return <div className="h-5"></div>;
   };
 
-  if (isLoading) {
-    return null;
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen"><p>Cargando...</p></div>;
   }
 
   return (
@@ -191,8 +186,8 @@ export default function BusinessPage() {
             <input
               type="text"
               id="businessName"
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
+              value={tempBusiness.name || ''}
+              onChange={handleTempNameChange}
               className={`w-full px-3 py-2 bg-black/20 border border-white/30 rounded-lg shadow-sm focus:outline-none focus:ring-2 placeholder:text-gray-400 ${themeStyles.textPrimary}`}
               style={{ '--tw-ring-color': 'var(--color-primary)' } as React.CSSProperties}
             />

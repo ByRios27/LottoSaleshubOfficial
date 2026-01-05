@@ -1,21 +1,27 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect, useMemo, useTransition } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowDownTrayIcon, ShareIcon, TrashIcon } from '@heroicons/react/24/solid';
+import { ArrowDownTrayIcon, ShareIcon, TrashIcon, ArrowUturnUpIcon } from '@heroicons/react/24/solid';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusiness } from '@/contexts/BusinessContext';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, Timestamp, doc, getDoc, setDoc } from 'firebase/firestore'; // <-- Imports añadidos
 import type { Sale } from '@/contexts/SalesContext';
 import { deleteAllSalesForUser } from './actions';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+
+function toNumber(value: string | number): number {
+    const n = Number(value);
+    return isNaN(n) ? 0 : n;
+}
 
 type DailySummary = {
     date: string;
@@ -40,34 +46,66 @@ function FinanceSkeleton() {
 
 export default function FinanzasPage() {
   const { user } = useAuth();
-  // CORRECCIÓN: Usar businessLogo y renombrarlo a logoUrl
-  const { businessName, businessLogo: logoUrl } = useBusiness();
+  const { business } = useBusiness();
   const [sales, setSales] = useState<Sale[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState({ sales: true, settings: true });
   const [commissionRate, setCommissionRate] = useState(10);
   const [isDeleting, startTransition] = useTransition();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [confirmationInput, setConfirmationInput] = useState('');
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  // --- LÓGICA DE DATOS ---
   useEffect(() => {
     if (!user) return;
+
     const fetchSalesData = async () => {
-      setIsLoading(true);
+      setIsLoading(prev => ({ ...prev, sales: true }));
       const q = query(collection(db, 'users', user.uid, 'sales'), orderBy('timestamp', 'desc'));
       try {
         const querySnapshot = await getDocs(q);
         const salesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), timestamp: doc.data().timestamp }) as Sale);
         setSales(salesData);
       } catch (error) { console.error("Error al obtener las ventas:", error); } 
-      finally { setIsLoading(false); }
+      finally { setIsLoading(prev => ({ ...prev, sales: false })); }
     };
+
+    const fetchSettings = async () => {
+        setIsLoading(prev => ({...prev, settings: true}));
+        const settingsRef = doc(db, 'users', user.uid, 'settings', 'main');
+        try {
+            const docSnap = await getDoc(settingsRef);
+            if(docSnap.exists() && docSnap.data().commissionRate) {
+                setCommissionRate(docSnap.data().commissionRate);
+            }
+        } catch (error) {
+            console.error("Error al obtener configuraciones:", error);
+        } finally {
+            setIsLoading(prev => ({...prev, settings: false}));
+        }
+    };
+
     fetchSalesData();
+    fetchSettings();
   }, [user]);
 
-  const commission = commissionRate / 100;
+  // Guardar cambios en la comisión
+  useEffect(() => {
+    if(isLoading.settings || !user) return;
 
+    const handler = setTimeout(() => {
+        const settingsRef = doc(db, 'users', user.uid, 'settings', 'main');
+        setDoc(settingsRef, { commissionRate }, { merge: true })
+            .catch(err => console.error("Error al guardar la comisión:", err));
+    }, 1000); // Debounce de 1 segundo
+
+    return () => clearTimeout(handler);
+  }, [commissionRate, user, isLoading.settings]);
+
+
+  // --- CÁLCULOS ---
   const { totalToday, commissionToday, dailyBreakdown } = useMemo(() => {
+    const commission = commissionRate / 100;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const dailyMap = new Map<string, DailySummary>();
@@ -89,8 +127,9 @@ export default function FinanzasPage() {
     const todayString = today.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
     const todaySummary = dailyMap.get(todayString);
     return { totalToday: todaySummary?.totalSales || 0, commissionToday: todaySummary?.totalCommission || 0, dailyBreakdown: Array.from(dailyMap.values()) };
-  }, [sales, commission]);
+  }, [sales, commissionRate]);
 
+  // --- ACCIONES ---
   const handleDeleteAllSales = () => {
     if (!user) return;
     setDeleteError(null);
@@ -117,22 +156,11 @@ export default function FinanzasPage() {
     const doc = new jsPDF();
     const date = new Date().toLocaleString();
 
-    if (logoUrl && logoUrl !== 'default') {
-        try {
-            const response = await fetch(logoUrl);
-            const blob = await response.blob();
-            const reader = new FileReader();
-            await new Promise<void>((resolve, reject) => {
-                reader.onload = () => {
-                    doc.addImage(reader.result as string, 'PNG', 14, 15, 25, 25);
-                    resolve();
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-        } catch (e) { console.error("Error al cargar el logo para el PDF:", e); }
+    if (business?.logoUrl && business.logoUrl !== 'default') {
+        try { doc.addImage(business.logoUrl, 'PNG', 14, 15, 25, 25); } 
+        catch (e) { console.error("Error al cargar el logo para el PDF:", e); }
     }
-    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.text(businessName || "Reporte de Finanzas", 45, 32);
+    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.text(business?.name || "Reporte de Finanzas", 45, 32);
     doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.setTextColor(100); doc.text(`Fecha de generación: ${date}`, 45, 38);
 
     let startY = 55;
@@ -169,21 +197,26 @@ export default function FinanzasPage() {
       const blob = doc.output('blob');
       const file = new File([blob], 'Reporte-Finanzas.pdf', { type: 'application/pdf' });
       try { await navigator.share({ title: 'Reporte de Finanzas', files: [file] }); }
-      catch (error) { console.error('Error al compartir:', error); doc.save(`${businessName || 'LottoSalesHub'}_Reporte.pdf`); }
-    } else { doc.save(`${businessName || 'LottoSalesHub'}_Reporte.pdf`); }
+      catch (error) { console.error('Error al compartir:', error); doc.save(`${business?.name || 'LottoSalesHub'}_Reporte.pdf`); }
+    } else { doc.save(`${business?.name || 'LottoSalesHub'}_Reporte.pdf`); }
   };
 
-  if (isLoading) {
+  if (isLoading.sales || isLoading.settings) {
     return <div className="min-h-screen bg-gray-900 text-white"><main><FinanceSkeleton /></main></div>;
   }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
         <main className="container mx-auto p-4 md:p-8">
-          <h1 className="text-3xl font-bold mb-6">Tu Centro de Finanzas</h1>
+            <div className="flex items-center gap-4 mb-6">
+                <Link href="/" className="text-gray-400 hover:text-white transition-colors">
+                    <ArrowUturnUpIcon className="h-7 w-7" />
+                </Link>
+                <h1 className="text-3xl font-bold">Tu Centro de Finanzas</h1>
+            </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="md:col-span-1 bg-gray-800 border-gray-700"><CardHeader><CardTitle>Tu Comisión</CardTitle><CardDescription>Establece tu porcentaje de ganancia.</CardDescription></CardHeader><CardContent><div className="flex items-center space-x-2"><Input type="number" value={commissionRate} onChange={(e) => setCommissionRate(Number(e.target.value))} className="w-24 text-lg bg-gray-700 border-gray-600 text-white"/><span className="text-lg">%</span></div></CardContent></Card>
+              <Card className="md:col-span-1 bg-gray-800 border-gray-700"><CardHeader><CardTitle>Tu Comisión</CardTitle><CardDescription>Establece tu porcentaje de ganancia.</CardDescription></CardHeader><CardContent><div className="flex items-center space-x-2"><Input type="number" value={commissionRate} onChange={(e) => setCommissionRate(toNumber(e.target.value))} className="w-24 text-lg bg-gray-700 border-gray-600 text-white" disabled={isLoading.settings}/><span className="text-lg">%</span></div></CardContent></Card>
               <Card className="bg-blue-600 text-white"><CardHeader><CardTitle>Ventas de Hoy</CardTitle></CardHeader><CardContent><p className="text-4xl font-bold">${totalToday.toFixed(2)}</p></CardContent></Card>
               <Card className="bg-green-500 text-white"><CardHeader><CardTitle>Ganancia de Hoy</CardTitle></CardHeader><CardContent><p className="text-4xl font-bold">${commissionToday.toFixed(2)}</p></CardContent></Card>
           </div>

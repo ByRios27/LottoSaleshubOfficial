@@ -1,593 +1,300 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowDownTrayIcon, ShareIcon, TrashIcon } from '@heroicons/react/24/solid';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ArrowDownTrayIcon, TrashIcon, PlusCircleIcon, LockClosedIcon, ArrowUturnUpIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusiness } from '@/contexts/BusinessContext';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, query, orderBy, Timestamp, writeBatch, getFirestore } from 'firebase/firestore';
+import { collection, query, where, getDocs, Timestamp, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import type { Sale } from '@/contexts/SalesContext';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-type DailySummary = {
-  date: string;
-  totalSales: number;
-  totalCommission: number;
-  draws: { [key: string]: { name: string; totalSales: number; commission: number } };
-};
-
-type PrizeRow = {
-  id: string;
-  drawName: string;
-  amount: number;
-};
-
-type DayCashDraft = {
-  // Apertura
-  fondoCentralApertura: number;
-  bancaApertura: number;
-  efectivoApertura: number;
-
-  // Movimientos
-  centralEnviadoParaPagos: number;
-  ajustes: number;
-
-  // Caja actual
-  bancaActual: number;
-  efectivoActual: number;
-
-  // Premios (por ahora manual para pruebas)
-  premiosTotalPagados: number;
-  premiosPorSorteo: PrizeRow[];
-
-  // Cierre
-  fondoCentralCierre: number;
-  bancaCierre: number;
-  efectivoCierre: number;
-  notaCierre: string;
-};
-
-function FinanceSkeleton() {
-  return (
-    <div className="container mx-auto p-4 md:p-8 animate-pulse">
-      <div className="h-8 bg-gray-700 rounded w-1/3 mb-6"></div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="md:col-span-1 bg-gray-800 border-gray-700 rounded-lg p-6 space-y-4"><div className="h-6 bg-gray-700 rounded w-1/2"></div><div className="h-4 bg-gray-700 rounded w-3/4"></div><div className="h-10 bg-gray-700 rounded w-24"></div></div>
-        <div className="bg-gray-800 border-gray-700 rounded-lg p-6 space-y-4"><div className="h-6 bg-gray-700 rounded w-1/2"></div><div className="h-10 bg-gray-700 rounded w-1/3"></div></div>
-        <div className="bg-gray-800 border-gray-700 rounded-lg p-6 space-y-4"><div className="h-6 bg-gray-700 rounded w-1/2"></div><div className="h-10 bg-gray-700 rounded w-1/3"></div></div>
-      </div>
-      <div className="bg-gray-800 border-gray-700 rounded-lg p-6"><div className="h-8 bg-gray-700 rounded w-1/4 mb-4"></div><div className="space-y-2"><div className="h-12 bg-gray-700 rounded"></div><div className="h-12 bg-gray-700 rounded"></div><div className="h-12 bg-gray-700 rounded"></div></div></div>
-    </div>
-  );
-}
-
-function toNumberSafe(v: string): number {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
-}
-
+// --- HELPERS ---
 function formatMoney(n: number): string {
-  return `$${n.toFixed(2)}`;
+  return `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-function pad2(n: number) {
-  return String(n).padStart(2, '0');
+function toNumber(value: string | number): number {
+    const n = Number(value);
+    return isNaN(n) ? 0 : n;
 }
 
-function isoDateKey(d: Date): string {
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+function getTodayDocId(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
-function makeStorageKeys(dateKey: string) {
-  return {
-    draftKey: `finance_cash_draft:${dateKey}`,
-    closeKey: `finance_cash_close:${dateKey}`,
-  };
-}
+// --- TYPES ---
+type Prize = { id: string; name: string; amount: number };
+type ClosureStatus = 'open' | 'closed';
+type DailyClosure = {
+    commissionRate: number;
+    manualPrizes: Prize[];
+    initialFunds: number;
+    houseInjections: number;
+    status: ClosureStatus;
+    operatorName?: string;
+    phoneNumber?: string;
+};
 
-function loadLocal<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    return JSON.parse(raw) as T;
-  } catch {
-    return null;
-  }
-}
+type Payout = { 
+    totalWin: number;
+    date: string; 
+};
 
-function saveLocal(key: string, value: unknown) {
-  try {
-    if (value === null) localStorage.removeItem(key);
-    else localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // No-op
-  }
-}
-
-function defaultDraft(): DayCashDraft {
-  return {
-    fondoCentralApertura: 0,
-    bancaApertura: 0,
-    efectivoApertura: 0,
-
-    centralEnviadoParaPagos: 0,
-    ajustes: 0,
-
-    bancaActual: 0,
-    efectivoActual: 0,
-
-    premiosTotalPagados: 0,
-    premiosPorSorteo: [],
-
-    fondoCentralCierre: 0,
-    bancaCierre: 0,
-    efectivoCierre: 0,
-    notaCierre: '',
-  };
-}
-
-// ===== FIX: ya no importamos ./actions. Implementación local (sin romper compilación) =====
-async function deleteAllSalesForUserClient(uid: string) {
-  // Borra todos los docs de sales del usuario en batches.
-  const salesCol = collection(db, 'users', uid, 'sales');
-  const q = query(salesCol, orderBy('timestamp', 'desc'));
-  const snap = await getDocs(q);
-
-  if (snap.empty) return;
-
-  const firestore = getFirestore(); // por si db no es instancia directa
-  let batch = writeBatch(firestore);
-  let opCount = 0;
-
-  for (const docSnap of snap.docs) {
-    batch.delete(docSnap.ref);
-    opCount += 1;
-
-    // Firestore batch limit: 500
-    if (opCount === 450) {
-      await batch.commit();
-      batch = writeBatch(firestore);
-      opCount = 0;
-    }
-  }
-
-  if (opCount > 0) {
-    await batch.commit();
-  }
-}
-
+// --- COMPONENT ---
 export default function VentasDelDiaPage() {
   const { user } = useAuth();
-  const { businessName, businessLogo: logoUrl } = useBusiness();
-  const [sales, setSales] = useState<Sale[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { business } = useBusiness();
+
+  // --- ESTADO ---
+  const [totalSales, setTotalSales] = useState(0);
+  const [automaticPrizes, setAutomaticPrizes] = useState(0);
+  const [isLoading, setIsLoading] = useState({ sales: true, closure: true });
+
   const [commissionRate, setCommissionRate] = useState(10);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [confirmationInput, setConfirmationInput] = useState('');
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [manualPrizes, setManualPrizes] = useState<Prize[]>([]);
+  const [initialFunds, setInitialFunds] = useState(0);
+  const [houseInjections, setHouseInjections] = useState(0);
+  const [closureStatus, setClosureStatus] = useState<ClosureStatus>('open');
+  const [operatorName, setOperatorName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
-  const [cashDraft, setCashDraft] = useState<DayCashDraft>(defaultDraft());
-  const [cashLoaded, setCashLoaded] = useState(false);
-  const [cashSavedMsg, setCashSavedMsg] = useState<string | null>(null);
+  const isClosed = closureStatus === 'closed';
 
+  // --- DATOS INICIALES ---
+   useEffect(() => {
+    if (user?.displayName) setOperatorName(user.displayName);
+    if (business?.phone) setPhoneNumber(business.phone);
+  }, [user, business]);
+
+  // --- DATOS: OBTENER DE FIRESTORE ---
   useEffect(() => {
     if (!user) return;
-    const fetchSalesData = async () => {
-      setIsLoading(true);
-      const q = query(collection(db, 'users', user.uid, 'sales'), orderBy('timestamp', 'desc'));
-      try {
-        const querySnapshot = await getDocs(q);
-        const salesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), timestamp: doc.data().timestamp }) as Sale);
-        setSales(salesData);
-      } catch (error) {
-        console.error("Error al obtener las ventas:", error);
-      } finally {
-        setIsLoading(false);
-      }
+    const todayDocId = getTodayDocId();
+
+    const fetchSalesAndPayouts = async () => {
+        setIsLoading(prev => ({ ...prev, sales: true }));
+        const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+        const salesRef = collection(db, 'users', user.uid, 'sales');
+        const salesQuery = query(salesRef, where('timestamp', '>=', Timestamp.fromDate(todayStart)));
+        const payoutsRef = collection(db, 'users', user.uid, 'payoutStatus');
+        const payoutsQuery = query(payoutsRef, where('date', '==', todayDocId));
+        
+        try {
+            const [salesSnap, payoutsSnap] = await Promise.all([getDocs(salesQuery), getDocs(payoutsQuery)]);
+            setTotalSales(salesSnap.docs.reduce((acc, doc) => acc + (doc.data() as Sale).totalCost, 0));
+            setAutomaticPrizes(payoutsSnap.docs.reduce((acc, doc) => acc + (doc.data() as Payout).totalWin, 0));
+        } catch (error) { console.error("Error fetching sales/payouts:", error); }
+        finally { setIsLoading(prev => ({ ...prev, sales: false })); }
     };
-    fetchSalesData();
+
+    const fetchClosure = async () => {
+        setIsLoading(prev => ({ ...prev, closure: true }));
+        const closureRef = doc(db, 'users', user.uid, 'dailyClosures', todayDocId);
+        try {
+            const docSnap = await getDoc(closureRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data() as DailyClosure;
+                setCommissionRate(data.commissionRate || 10);
+                setManualPrizes(data.manualPrizes || []);
+                setInitialFunds(data.initialFunds || 0);
+                setHouseInjections(data.houseInjections || 0);
+                setClosureStatus(data.status || 'open');
+                if (data.operatorName) setOperatorName(data.operatorName);
+                if (data.phoneNumber) setPhoneNumber(data.phoneNumber);
+            }
+        } catch (error) { console.error("Error fetching closure:", error); }
+        finally { setIsLoading(prev => ({ ...prev, closure: false })); }
+    };
+
+    fetchSalesAndPayouts();
+    fetchClosure();
   }, [user]);
 
-  const commission = commissionRate / 100;
+  // --- DATOS: GUARDAR CIERRE EN FIRESTORE ---
+  useEffect(() => {
+    if (!user || isLoading.closure || isClosed) return;
+    const handler = setTimeout(() => {
+        const docId = getTodayDocId();
+        const closureRef = doc(db, 'users', user.uid, 'dailyClosures', docId);
+        const data: DailyClosure = { commissionRate, manualPrizes, initialFunds, houseInjections, status: closureStatus, operatorName, phoneNumber };
+        setDoc(closureRef, data, { merge: true }).catch(err => console.error("Error saving closure:", err));
+    }, 1000);
+    return () => clearTimeout(handler);
+  }, [user, commissionRate, manualPrizes, initialFunds, houseInjections, closureStatus, operatorName, phoneNumber, isLoading.closure, isClosed]);
 
-  const { totalToday, commissionToday, dailyBreakdown } = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  // --- LÓGICA DE PREMIOS MANUALES ---
+  const addManualPrizeRow = () => setManualPrizes([...manualPrizes, { id: `prize-${Date.now()}`, name: '', amount: 0 }]);
+  const updateManualPrize = (id: string, field: 'name' | 'amount', value: string | number) => setManualPrizes(manualPrizes.map(p => p.id === id ? { ...p, [field]: field === 'amount' ? toNumber(value) : value } : p));
+  const removeManualPrize = (id: string) => setManualPrizes(manualPrizes.filter(p => p.id !== id));
 
-    const dailyMap = new Map<string, DailySummary>();
+  // --- MÉTRICAS CALCULADAS ---
+  const { totalCommission, totalPrizes, netProfit, houseNet, amountToSettle } = useMemo(() => {
+    const totalManualPrizes = manualPrizes.reduce((acc, p) => acc + p.amount, 0);
+    const totalGeneratedPrizes = automaticPrizes + totalManualPrizes;
+    const sellersCommission = totalSales * (commissionRate / 100);
+    const finalHouseNet = totalSales - totalGeneratedPrizes - sellersCommission;
+    const shouldHave = initialFunds + totalSales + houseInjections - totalGeneratedPrizes - sellersCommission;
+    return { totalCommission: sellersCommission, totalPrizes: totalGeneratedPrizes, netProfit: sellersCommission, houseNet: finalHouseNet, amountToSettle: shouldHave };
+  }, [totalSales, commissionRate, automaticPrizes, manualPrizes, houseInjections, initialFunds]);
 
-    sales.forEach(sale => {
-      const saleTimestamp = (sale.timestamp as Timestamp).toDate();
-      const saleDate = saleTimestamp.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-      const saleCommission = sale.totalCost * commission;
+  // --- ACCIONES ---
+  const handleSaveClosure = () => { if (window.confirm("¿Seguro que quieres cerrar la caja? No podrás editar los datos de hoy.")) setClosureStatus('closed'); };
+  const handleResetDay = async () => {
+      if (window.confirm("¿Estás seguro? Se borrarán todos los datos contables de hoy.")) {
+        if (!user) return;
+        await deleteDoc(doc(db, 'users', user.uid, 'dailyClosures', getTodayDocId()));
+        window.location.reload();
+      }
+  }
 
-      let daySummary = dailyMap.get(saleDate);
-      if (!daySummary) daySummary = { date: saleDate, totalSales: 0, totalCommission: 0, draws: {} };
+  const handleGeneratePdf = () => {
+    const doc = new jsPDF();
+    const docId = getTodayDocId();
+    const pageW = doc.internal.pageSize.getWidth();
 
-      daySummary.totalSales += sale.totalCost;
-      daySummary.totalCommission += saleCommission;
+    if (business?.logoUrl) {
+        try { doc.addImage(business.logoUrl, 'PNG', 14, 12, 25, 25); } 
+        catch (e) { console.error("Error adding logo to PDF:", e); }
+    }
+    
+    doc.setFontSize(16); doc.setFont(undefined, 'bold');
+    doc.text(business?.name || 'Reporte de Caja', pageW / 2, 20, { align: 'center' });
 
-      let drawSummary = daySummary.draws[sale.drawId];
-      if (!drawSummary) drawSummary = { name: sale.drawName, totalSales: 0, commission: 0 };
-      drawSummary.totalSales += sale.totalCost;
-      drawSummary.commission += saleCommission;
+    doc.setFontSize(10); doc.setFont(undefined, 'normal');
+    doc.text(`Operador: ${operatorName || 'N/A'}`, pageW - 14, 16, { align: 'right' });
+    doc.text(`Tel: ${phoneNumber || 'N/A'}`, pageW - 14, 22, { align: 'right' });
+    doc.text(`Fecha: ${docId}`, pageW - 14, 28, { align: 'right' });
 
-      daySummary.draws[sale.drawId] = drawSummary;
-      dailyMap.set(saleDate, daySummary);
+    const startY = 45;
+    doc.setFontSize(18); doc.text("Resumen de Operaciones", 14, startY);
+    autoTable(doc, { 
+        startY: startY + 5, theme: 'striped', styles: { fontSize: 12 },
+        head: [[{content: 'Concepto', styles: {fillColor: [38, 38, 38]}}, {content: 'Monto', styles: {fillColor: [38, 38, 38]}}]],
+        body: [
+            ['Fondo Inicial', formatMoney(initialFunds)],
+            ['Ventas Totales Brutas', formatMoney(totalSales)],
+            ['Inyecciones de Casa Grande', formatMoney(houseInjections)],
+            ['Premios del Día (Automáticos)', formatMoney(automaticPrizes)],
+            ['Otros Premios / Gastos (Manuales)', manualPrizes.reduce((acc, p) => acc + p.amount, 0)],
+            [{ content: 'Total Premios del Día', styles: { fontStyle: 'bold' } }, { content: formatMoney(totalPrizes), styles: { fontStyle: 'bold' } }],
+            ['Tu Comisión', formatMoney(totalCommission)],
+            [{ content: 'Ganancia / Pérdida Neta (Casa Grande)', styles: { fontStyle: 'bold' } }, { content: formatMoney(houseNet), styles: { fontStyle: 'bold', textColor: houseNet >= 0 ? [0, 128, 0] : [255, 0, 0] } }],
+        ],
     });
 
-    const todayString = today.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-    const todaySummary = dailyMap.get(todayString);
-
-    return {
-      totalToday: todaySummary?.totalSales || 0,
-      commissionToday: todaySummary?.totalCommission || 0,
-      dailyBreakdown: Array.from(dailyMap.values()),
-    };
-  }, [sales, commission]);
-
-  useEffect(() => {
-    if (cashLoaded) return;
-
-    const today = new Date();
-    const todayKey = isoDateKey(today);
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-    const yesterdayKey = isoDateKey(yesterday);
-
-    const { draftKey: todayDraftKey } = makeStorageKeys(todayKey);
-    const { closeKey: yesterdayCloseKey } = makeStorageKeys(yesterdayKey);
-
-    const savedDraft = typeof window !== 'undefined' ? loadLocal<DayCashDraft>(todayDraftKey) : null;
-    if (savedDraft) {
-      setCashDraft(savedDraft);
-      setCashLoaded(true);
-      return;
-    }
-
-    const yesterdayClose = typeof window !== 'undefined' ? loadLocal<DayCashDraft>(yesterdayCloseKey) : null;
-
-    const next = defaultDraft();
-    if (yesterdayClose) {
-      next.fondoCentralApertura = yesterdayClose.fondoCentralCierre || 0;
-      next.bancaApertura = yesterdayClose.bancaCierre || 0;
-      next.efectivoApertura = yesterdayClose.efectivoCierre || 0;
-
-      next.bancaActual = next.bancaApertura;
-      next.efectivoActual = next.efectivoApertura;
-
-      next.bancaCierre = next.bancaActual;
-      next.efectivoCierre = next.efectivoActual;
-      next.fondoCentralCierre = next.fondoCentralApertura;
-    }
-
-    setCashDraft(next);
-    setCashLoaded(true);
-  }, [cashLoaded]);
-
-  useEffect(() => {
-    if (!cashLoaded) return;
-    const t = setTimeout(() => {
-      const todayKey = isoDateKey(new Date());
-      const { draftKey } = makeStorageKeys(todayKey);
-      saveLocal(draftKey, cashDraft);
-    }, 400);
-    return () => clearTimeout(t);
-  }, [cashDraft, cashLoaded]);
-
-  const handleDeleteAllSales = async () => {
-    if (!user) return;
-    setDeleteError(null);
-    setIsDeleting(true);
-    try {
-      await deleteAllSalesForUserClient(user.uid);
-      setSales([]);
-      setIsDialogOpen(false);
-    } catch (error) {
-      console.error(error);
-      setDeleteError('No se pudieron eliminar las ventas. Inténtalo de nuevo.');
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!isDialogOpen) {
-      setConfirmationInput('');
-      setDeleteError(null);
-    }
-  }, [isDialogOpen]);
-
-  const generateSalesReport = async (action: 'download' | 'share') => {
-    const doc = new jsPDF();
-    const date = new Date().toLocaleString();
-
-    if (logoUrl && logoUrl !== 'default') {
-      try {
-        const response = await fetch(logoUrl);
-        const blob = await response.blob();
-        const reader = new FileReader();
-        await new Promise<void>((resolve, reject) => {
-          reader.onload = () => {
-            doc.addImage(reader.result as string, 'PNG', 14, 15, 25, 25);
-            resolve();
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      } catch (e) { console.error("Error al cargar el logo para el PDF:", e); }
-    }
-
-    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.text(businessName || "Reporte de Finanzas", 45, 32);
-    doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.setTextColor(100); doc.text(`Fecha de generación: ${date}`, 45, 38);
-
-    let startY = 55;
-    for (const day of dailyBreakdown) {
-      doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.text(day.date, 14, startY);
-      startY += 8;
-
-      autoTable(doc, {
-        startY,
+    const finalY = (doc as any).lastAutoTable.finalY;
+    doc.setFontSize(18); doc.text("Liquidación Final", 14, finalY + 15);
+    autoTable(doc, { 
+        startY: finalY + 20, theme: 'grid', styles: { fontSize: 14 },
         body: [
-          ['Venta Bruta Total del Día', `$${day.totalSales.toFixed(2)}`],
-          [{ content: 'Tu Ganancia Total del Día', styles: { fontStyle: 'bold' } }, { content: `+$${day.totalCommission.toFixed(2)}`, styles: { fontStyle: 'bold' } }]
+            [{ content: 'Dinero a Liquidar a Casa Grande', styles: { fontStyle: 'bold', halign: 'center' } }],
+            [{ content: formatMoney(amountToSettle), styles: { fontStyle: 'bold', fontSize: 20, halign: 'center', fillColor: [23, 37, 84], textColor: [255, 255, 255] } }],
         ],
-        theme: 'grid', styles: { fontSize: 10 }, headStyles: { fillColor: [230, 230, 230] },
-      });
-      startY = (doc as any).lastAutoTable.finalY + 10;
-
-      const tableHead = [["Sorteo", "Venta Bruta", "Tu Comisión"]];
-      const tableBody = Object.values(day.draws).map(d => [d.name, `$${d.totalSales.toFixed(2)}`, `+$${d.commission.toFixed(2)}`]);
-      autoTable(doc, {
-        startY, head: tableHead, body: tableBody, theme: 'striped',
-        headStyles: { fillColor: [41, 128, 185], textColor: 'white' }, styles: { fontSize: 9 },
-      });
-      startY = (doc as any).lastAutoTable.finalY + 15;
-    }
-
-    const pageCount = (doc as any).internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i); doc.setFontSize(9); doc.setTextColor(150);
-      doc.text(`Página ${i} de ${pageCount}`, doc.internal.pageSize.getWidth() / 2, 287, { align: 'center' });
-    }
-
-    if (action === 'share' && navigator.share) {
-      const blob = doc.output('blob');
-      const file = new File([blob], 'Reporte-Finanzas.pdf', { type: 'application/pdf' });
-      try { await navigator.share({ title: 'Reporte de Finanzas', files: [file] }); }
-      catch (error) { console.error('Error al compartir:', error); doc.save(`${businessName || 'LottoSalesHub'}_Reporte.pdf`); }
-    } else {
-      doc.save(`${businessName || 'LottoSalesHub'}_Reporte.pdf`);
-    }
+    });
+    
+    doc.save(`Reporte-Caja-${docId}.pdf`);
   };
-
-  const cashMetrics = useMemo(() => {
-    const disponibleApertura = (cashDraft.bancaApertura || 0) + (cashDraft.efectivoApertura || 0);
-    const disponibleActual = (cashDraft.bancaActual || 0) + (cashDraft.efectivoActual || 0);
-
-    const esperado =
-      disponibleApertura +
-      (totalToday || 0) +
-      (cashDraft.centralEnviadoParaPagos || 0) -
-      (cashDraft.premiosTotalPagados || 0) +
-      (cashDraft.ajustes || 0);
-
-    const diferencia = disponibleActual - esperado;
-
-    const totalCentralReferencia = (cashDraft.fondoCentralApertura || 0) + (cashDraft.centralEnviadoParaPagos || 0);
-    const tuParteEstimada = disponibleActual - totalCentralReferencia;
-
-    return {
-      disponibleApertura,
-      disponibleActual,
-      esperado,
-      diferencia,
-      totalCentralReferencia,
-      tuParteEstimada,
-    };
-  }, [cashDraft, totalToday]);
-
-  const addPrizeRow = () => {
-    setCashDraft(prev => ({
-      ...prev,
-      premiosPorSorteo: [
-        ...prev.premiosPorSorteo,
-        { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, drawName: '', amount: 0 }
-      ],
-    }));
-  };
-
-  const updatePrizeRow = (id: string, patch: Partial<PrizeRow>) => {
-    setCashDraft(prev => ({
-      ...prev,
-      premiosPorSorteo: prev.premiosPorSorteo.map(r => (r.id === id ? { ...r, ...patch } : r)),
-    }));
-  };
-
-  const removePrizeRow = (id: string) => {
-    setCashDraft(prev => ({
-      ...prev,
-      premiosPorSorteo: prev.premiosPorSorteo.filter(r => r.id !== id),
-    }));
-  };
-
-  useEffect(() => {
-    const sum = cashDraft.premiosPorSorteo.reduce((acc, r) => acc + (Number.isFinite(r.amount) ? r.amount : 0), 0);
-    if (cashDraft.premiosPorSorteo.length > 0) {
-      setCashDraft(prev => ({ ...prev, premiosTotalPagados: sum }));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cashDraft.premiosPorSorteo]);
-
-  const handleSaveClose = () => {
-    const todayKey = isoDateKey(new Date());
-    const { closeKey } = makeStorageKeys(todayKey);
-
-    const toSave: DayCashDraft = {
-      ...cashDraft,
-      bancaCierre: cashDraft.bancaCierre || cashDraft.bancaActual || 0,
-      efectivoCierre: cashDraft.efectivoCierre || cashDraft.efectivoActual || 0,
-      fondoCentralCierre: cashDraft.fondoCentralCierre || cashDraft.fondoCentralApertura || 0,
-    };
-
-    saveLocal(closeKey, toSave);
-    setCashDraft(toSave);
-
-    setCashSavedMsg(`Cierre guardado para ${todayKey}.`);
-    setTimeout(() => setCashSavedMsg(null), 2500);
-  };
-
-  const handleResetCashDraft = () => {
-    const todayKey = isoDateKey(new Date());
-    const { draftKey } = makeStorageKeys(todayKey);
-    saveLocal(draftKey, null);
-    const next = defaultDraft();
-    setCashDraft(next);
-    setCashSavedMsg('Borrador reiniciado.');
-    setTimeout(() => setCashSavedMsg(null), 2500);
-  };
-
-  if (isLoading) {
-    return <div className="min-h-screen bg-gray-900 text-white"><main><FinanceSkeleton /></main></div>;
-  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <main className="container mx-auto p-4 md:p-8">
-        <h1 className="text-3xl font-bold mb-6">Ventas y Caja del Día</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="md:col-span-1 bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle>Tu Comisión</CardTitle>
-              <CardDescription>Establece tu porcentaje de ganancia.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-2">
-                <Input type="number" value={commissionRate} onChange={(e) => setCommissionRate(Number(e.target.value))} className="w-24 text-lg bg-gray-700 border-gray-600 text-white" />
-                <span className="text-lg">%</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-blue-600 text-white">
-            <CardHeader><CardTitle>Ventas de Hoy</CardTitle></CardHeader>
-            <CardContent><p className="text-4xl font-bold">{formatMoney(totalToday)}</p></CardContent>
-          </Card>
-
-          <Card className="bg-green-500 text-white">
-            <CardHeader><CardTitle>Ganancia de Hoy</CardTitle></CardHeader>
-            <CardContent><p className="text-4xl font-bold">{formatMoney(commissionToday)}</p></CardContent>
-          </Card>
+        <div className="flex items-center gap-4 mb-6">
+          <Link href="/" className="text-gray-400 hover:text-white transition-colors">
+            <ArrowUturnUpIcon className="h-7 w-7" />
+          </Link>
+          <h1 className="text-3xl font-bold">Supercomputadora de Contabilidad</h1>
         </div>
 
-        <Card className="mb-8 bg-gray-800 border-gray-700">
-          <CardHeader className="flex-row items-center justify-between">
-            <div>
-              <CardTitle>Análisis Diario de Ventas</CardTitle>
-              <CardDescription>Un desglose de tus ventas y comisiones por día.</CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => generateSalesReport('share')} disabled={sales.length === 0}><ShareIcon className="w-4 h-4 mr-2" /> Compartir</Button>
-              <Button variant="secondary" onClick={() => generateSalesReport('download')} disabled={sales.length === 0}><ArrowDownTrayIcon className="w-4 h-4 mr-2" /> Descargar</Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {dailyBreakdown.length > 0 ? (
-              <Accordion type="single" collapsible className="w-full">
-                {dailyBreakdown.map((day) => (
-                  <AccordionItem value={day.date} key={day.date} className="border-b-gray-700">
-                    <AccordionTrigger className="hover:no-underline">
-                      <div className="flex justify-between items-center w-full pr-4">
-                        <span className="font-bold text-lg">{day.date}</span>
-                        <div className="text-right">
-                          <p className="text-sm text-gray-400">Venta Bruta: {formatMoney(day.totalSales)}</p>
-                          <p className="font-semibold text-green-400">Tu Ganancia: +{formatMoney(day.totalCommission)}</p>
-                        </div>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="border-b-gray-600">
-                            <TableHead>Sorteo</TableHead>
-                            <TableHead className="text-right">Venta Bruta</TableHead>
-                            <TableHead className="text-right">Tu Comisión</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {Object.values(day.draws).map(draw => (
-                            <TableRow key={draw.name} className="border-0">
-                              <TableCell>{draw.name}</TableCell>
-                              <TableCell className="text-right">{formatMoney(draw.totalSales)}</TableCell>
-                              <TableCell className="text-right text-green-400">+{formatMoney(draw.commission)}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            ) : (
-              <p className="text-center py-8 text-gray-500">No hay ventas registradas para analizar.</p>
-            )}
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-blue-600 text-white"><CardHeader><CardTitle>Ventas Totales</CardTitle></CardHeader><CardContent>{isLoading.sales ? <p className="text-2xl">Cargando...</p> : <p className="text-4xl font-bold">{formatMoney(totalSales)}</p>}</CardContent></Card>
+          <Card className="bg-green-500 text-white"><CardHeader><CardTitle>Tu Ganancia (Comisión)</CardTitle></CardHeader><CardContent><p className="text-4xl font-bold">{formatMoney(netProfit)}</p></CardContent></Card>
+          <Card className="bg-red-500 text-white"><CardHeader><CardTitle>Total Premios del Día</CardTitle></CardHeader><CardContent><p className="text-4xl font-bold">{formatMoney(totalPrizes)}</p></CardContent></Card>
+          <Card className={houseNet >= 0 ? "bg-purple-600 text-white" : "bg-orange-600 text-white"}><CardHeader><CardTitle>Neto Casa Grande</CardTitle></CardHeader><CardContent><p className="text-4xl font-bold">{formatMoney(houseNet)}</p></CardContent></Card>
+        </div>
 
-        {/* NUEVO: Caja del día (Pruebas) */}
-        <Card className="mb-8 bg-gray-800 border-gray-700">
-          <CardHeader className="flex-row items-center justify-between">
-            <div>
-              <CardTitle>Caja del Día (Pruebas)</CardTitle>
-              <CardDescription>
-                Control operativo: apertura, fondos de central, premios y arqueo. Se guarda localmente por fecha (modo prueba).
-              </CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={handleSaveClose}>Guardar Cierre</Button>
-              <Button variant="outline" onClick={handleResetCashDraft}>Reiniciar Borrador</Button>
-            </div>
-          </CardHeader>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <fieldset disabled={isClosed || isLoading.closure} className="lg:col-span-2 space-y-6">
+            <Card className="bg-gray-800 border-gray-700 disabled:opacity-60">
+              <CardHeader><CardTitle>Valores del Día</CardTitle><CardDescription>Cifras automáticas y configuraciones manuales.</CardDescription></CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div><label className="text-sm text-gray-400">Ventas Brutas (Automático)</label><Input type="text" value={formatMoney(totalSales)} readOnly className="bg-gray-700/50 border-gray-600 font-bold" /></div>
+                    <div><label className="text-sm text-gray-400">Premios del Día (Automático)</label><Input type="text" value={formatMoney(automaticPrizes)} readOnly className="bg-gray-700/50 border-gray-600 font-bold" /></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label className="text-sm text-gray-400">Nombre del Operador</label><Input value={operatorName} onChange={e => setOperatorName(e.target.value)} className="bg-gray-700 border-gray-600" placeholder="Nombre de quien opera"/></div>
+                    <div><label className="text-sm text-gray-400">Teléfono de Contacto</label><Input value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} className="bg-gray-700 border-gray-600" placeholder="Teléfono del negocio"/></div>
+                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div><label className="text-sm text-gray-400">Fondo Inicial del Día</label><Input type="number" value={initialFunds} onChange={e => setInitialFunds(toNumber(e.target.value))} className="bg-gray-700 border-gray-600" /></div>
+                    <div><label className="text-sm text-gray-400">Tasa de Comisión (%)</label><Input type="number" value={commissionRate} onChange={e => setCommissionRate(toNumber(e.target.value))} className="bg-gray-700 border-gray-600" /></div>
+                    <div><label className="text-sm text-gray-400">Inyecciones de Casa Grande</label><Input type="number" value={houseInjections} onChange={e => setHouseInjections(toNumber(e.target.value))} className="bg-gray-700 border-gray-600" /></div>
+                 </div>
+              </CardContent>
+            </Card>
 
-          <CardContent className="space-y-6">
-            {cashSavedMsg && <div className="text-sm text-green-400">{cashSavedMsg}</div>}
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="bg-gray-900 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-base">Apertura</CardTitle>
-                  <CardDescription>Normalmente viene del cierre anterior.</CardDescription>
+            <Card className="bg-gray-800 border-gray-700 disabled:opacity-60">
+                <CardHeader className="flex-row items-center justify-between">
+                    <div><CardTitle>Otros Premios o Gastos (Manual)</CardTitle><CardDescription>Registra cualquier pago no automático.</CardDescription></div>
+                    <Button variant="outline" size="sm" onClick={addManualPrizeRow}><PlusCircleIcon className="w-4 h-4 mr-2"/>Añadir</Button>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <label className="text-sm text-gray-300">Fondo Central (Apertura)</label>
-                    <Input type="number" value={cashDraft.fondoCentralApertura} onChange={(e) => setCashDraft(prev => ({ ...prev, fondoCentralApertura: toNumberSafe(e.target.value) }))} className="bg-gray-700 border-gray-600 text-white" />
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-300">Banca en Línea (Apertura)</label>
-                    <Input type="number" value={cashDraft.bancaApertura} onChange={(e) => setCashDraft(prev => ({ ...prev, bancaApertura: toNumberSafe(e.target.value) }))} className="bg-gray-700 border-gray-600 text-white" />
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-300">Efectivo (Apertura)</label>
-                    <Input type="number" value={cashDraft.efectivoApertura} onChange={(e) => setCashDraft(prev => ({ ...prev, efectivoApertura: toNumberSafe(e.target.value) }))} className="bg-gray-700 border-gray-600 text-white" />
-                  </div>
-                  <div className="pt-2 text-sm text-gray-300">
-                    <div className="flex justify-between">
-                      <span>Disponible Apertura</span>
-                      <span className="font-semibold">{formatMoney(cashMetrics.disponibleApertura)}</span>
-                    </div>
-                  </div>
+                <CardContent>
+                    <Table>
+                        <TableHeader><TableRow className="border-b-gray-600"><TableHead>Descripción</TableHead><TableHead className="w-[150px]">Monto</TableHead><TableHead className="w-[50px]"></TableHead></TableRow></TableHeader>
+                        <TableBody>
+                            {manualPrizes.map(prize => (
+                                <TableRow key={prize.id} className="border-0">
+                                    <TableCell><Input type="text" value={prize.name} onChange={e => updateManualPrize(prize.id, 'name', e.target.value)} className="bg-gray-700 border-gray-600"/></TableCell>
+                                    <TableCell><Input type="number" value={prize.amount} onChange={e => updateManualPrize(prize.id, 'amount', e.target.value)} className="bg-gray-700 border-gray-600"/></TableCell>
+                                    <TableCell><Button variant="destructive" size="icon" onClick={() => removeManualPrize(prize.id)}><TrashIcon className="w-4 h-4"/></Button></TableCell>
+                                </TableRow>
+                            ))}
+                             {manualPrizes.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-gray-500 py-4">No hay registros manuales.</TableCell></TableRow>}
+                        </TableBody>
+                    </Table>
                 </CardContent>
-              </Card>
+            </Card>
+          </fieldset>
 
-              <Card className="bg-gray-900 border-gray-700">
-                <Card
+          <div className="space-y-6">
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader><CardTitle>Liquidación Final</CardTitle><CardDescription>Este es el resultado neto del día que pertenece a la casa grande.</CardDescription></CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-400 text-sm">Dinero a Liquidar a Casa Grande</p>
+                <p className="text-4xl font-bold text-blue-400 py-2">{formatMoney(amountToSettle)}</p>
+                <p className="text-xs text-gray-500">Este es el monto que deberías tener para entregar, antes de contar tu caja.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader><CardTitle>Acciones</CardTitle></CardHeader>
+              <CardContent className="flex flex-col space-y-3">
+                {isClosed ? (
+                    <div className='p-4 text-center bg-yellow-900/50 rounded-lg border border-yellow-700'>
+                        <LockClosedIcon className='w-6 h-6 mx-auto text-yellow-500 mb-2'/>
+                        <p className='text-sm text-yellow-400'>Caja cerrada. Los datos de hoy están guardados.</p>
+                    </div>
+                ) : (
+                    <Button variant="secondary" onClick={handleSaveClosure} disabled={isLoading.closure}>Guardar y Cerrar Caja</Button>
+                )}
+                <Button variant="outline" onClick={handleResetDay} disabled={isClosed}>Reiniciar Día</Button>
+                <Button onClick={handleGeneratePdf}><ArrowDownTrayIcon className="w-4 h-4 mr-2" /> Generar Reporte PDF</Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

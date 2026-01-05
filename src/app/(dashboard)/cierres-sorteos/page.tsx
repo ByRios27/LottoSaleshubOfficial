@@ -371,7 +371,7 @@ export default function CierresSorteosPage() {
               <CardHeader><CardTitle className="text-gray-900 dark:text-white">Resultados del Cierre</CardTitle></CardHeader>
               <CardContent>
                 {!selectedDraw || !schedule ? <div className="flex items-center justify-center h-96 text-center text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl"><p>Selecciona sorteo y horario.</p></div>
-                  : rows.length === 0 ? <div className="flex items-center justify-center h-96 text-center text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl"><p>Aún no hay resultados. Haz clic en "Generar Cierre".</p></div>
+                  : rows.length === 0 ? <div className="flex items-center justify-center h-96 text-center text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl"><p>Aún no hay resultados. Haz clic en &quot;Generar Cierre&quot;.</p></div>
                   : (
                     <div className="space-y-4">
                       <div><h3 className="text-lg font-bold text-gray-900 dark:text-white">{selectedDraw.name} - {schedule}</h3><p className="text-sm text-gray-600 dark:text-gray-400">{date}</p></div>

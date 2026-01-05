@@ -25,15 +25,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#8B5CF6" />
       </head>
       <body className={inter.className}>
-        <AuthProvider>
-          <BusinessProvider>
+        <BusinessProvider>
+          <AuthProvider>
             <ThemeManager>
               <DrawsProvider>
                 {children}
               </DrawsProvider>
             </ThemeManager>
-          </BusinessProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </BusinessProvider>
       </body>
     </html>
   );

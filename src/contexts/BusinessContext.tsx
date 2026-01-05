@@ -2,149 +2,103 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { themes } from '@/lib/themes';
-import { useAuth } from './AuthContext'; // Importar el hook de autenticación
+import { useAuth } from './AuthContext';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 
 // --- ESTRUCTURAS DE DATOS ---
-export interface Horario {
-  id: string;
-  name: string;
-}
-
-export interface Sorteo {
-  id: string;
-  name: string;
-  digits: number;
-  horarios: Horario[];
+export interface BusinessData {
+  name?: string;
+  logoUrl?: string;
+  theme?: string;
+  // Añade aquí otros campos que necesites
 }
 
 // --- TIPOS DEL CONTEXTO ---
 interface BusinessContextType {
-  businessName: string;
-  businessLogo: string;
-  theme: string;
-  sorteos: Sorteo[];
-  isLoading: boolean;
-  setBusinessName: (name: string) => void;
-  setBusinessLogo: (logo: string) => void;
+  business: BusinessData | null;
+  loading: boolean;
+  setBusiness: (data: BusinessData) => void;
+  theme: string; // Mantener el tema separado por ahora para ThemeManager
   setTheme: (themeName: string) => void;
-  resetBusinessInfo: () => void;
 }
-
-// --- VALORES POR DEFECTO ---
-const DEFAULT_NAME = "LottoSalesHub";
-const DEFAULT_LOGO_ID = 'default';
-const DEFAULT_THEME_NAME = themes[0].name;
-const DEFAULT_SORTEOS: Sorteo[] = [
-  { id: 'loteria_nacional', name: 'Lotería Nacional', digits: 2, horarios: [{ id: 'tarde', name: 'Tarde' }, { id: 'noche', name: 'Noche' }] },
-  { id: 'pale', name: 'Palé', digits: 2, horarios: [{ id: 'unica', name: 'Única' }] },
-  { id: 'quiniela_real', name: 'Quiniela Real', digits: 2, horarios: [{ id: 'mediodia', name: 'Mediodía' }] },
-];
 
 // --- CREACIÓN DEL CONTEXTO ---
 const BusinessContext = createContext<BusinessContextType | undefined>(undefined);
 
 // --- COMPONENTE PROVEEDOR ---
 export function BusinessProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth(); // Obtener el usuario del contexto de autenticación
+  const { user } = useAuth();
   const db = getFirestore(app);
 
-  const [businessName, setBusinessNameState] = useState<string>(DEFAULT_NAME);
-  const [businessLogo, setBusinessLogoState] = useState<string>(DEFAULT_LOGO_ID);
-  const [theme, setThemeState] = useState<string>(DEFAULT_THEME_NAME);
-  const [sorteos, setSorteos] = useState<Sorteo[]>(DEFAULT_SORTEOS);
-  const [isLoading, setIsLoading] = useState(true);
+  const [business, setBusinessState] = useState<BusinessData | null>(null);
+  const [theme, setThemeState] = useState<string>(themes[0].name);
+  const [loading, setLoading] = useState(true);
 
-  // --- GUARDAR DATOS EN FIRESTORE ---
-  const saveDataToFirestore = useCallback(async (data: Partial<BusinessContextType>) => {
-    if (!user) return;
+  const saveDataToFirestore = useCallback(async (userId: string, data: Partial<BusinessData>) => {
     try {
-      const userDocRef = doc(db, 'users', user.uid);
+      const userDocRef = doc(db, 'users', userId, 'business', 'profile');
       await setDoc(userDocRef, data, { merge: true });
     } catch (error) {
       console.error("Error saving data to Firestore:", error);
     }
-  }, [user, db]);
+  }, [db]);
 
-  // --- CARGAR DATOS DESDE FIRESTORE ---
   useEffect(() => {
     const loadData = async () => {
       if (!user) {
-        setIsLoading(false);
+        setLoading(false);
         return;
       }
 
-      setIsLoading(true);
+      setLoading(true);
       try {
-        const userDocRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(userDocRef);
+        const docRef = doc(db, 'users', user.uid, 'business', 'profile');
+        const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          const data = docSnap.data();
-          setBusinessNameState(data.businessName || DEFAULT_NAME);
-          setBusinessLogoState(data.businessLogo || DEFAULT_LOGO_ID);
-          setThemeState(data.theme || DEFAULT_THEME_NAME);
-          // Si tienes sorteos guardados, cárgalos también. Por ahora usamos los por defecto.
-          // setSorteos(data.sorteos || DEFAULT_SORTEOS);
+          const data = docSnap.data() as BusinessData;
+          setBusinessState(data);
+          setThemeState(data.theme || themes[0].name);
         } else {
-          // Si el documento no existe, inicializa con los valores por defecto
-          await saveDataToFirestore({
-            businessName: DEFAULT_NAME,
-            businessLogo: DEFAULT_LOGO_ID,
-            theme: DEFAULT_THEME_NAME,
-            sorteos: DEFAULT_SORTEOS,
-          });
+          // Si no existe, puedes inicializarlo con valores por defecto
+          const defaultBusiness: BusinessData = { 
+            name: 'Mi Negocio',
+            logoUrl: '',
+            theme: themes[0].name 
+          };
+          setBusinessState(defaultBusiness);
+          await saveDataToFirestore(user.uid, defaultBusiness);
         }
       } catch (error) {
         console.error("Error loading data from Firestore: ", error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     loadData();
   }, [user, db, saveDataToFirestore]);
 
-  // --- HANDLERS PARA ACTUALIZAR ESTADO Y FIRESTORE ---
-  const handleSetBusinessName = (name: string) => {
-    setBusinessNameState(name);
-    saveDataToFirestore({ businessName: name });
-  };
-
-  const handleSetBusinessLogo = (logoUrl: string) => {
-    setBusinessLogoState(logoUrl);
-    saveDataToFirestore({ businessLogo: logoUrl });
+  const handleSetBusiness = (data: BusinessData) => {
+    if (!user) return;
+    const updatedBusiness = { ...business, ...data };
+    setBusinessState(updatedBusiness);
+    saveDataToFirestore(user.uid, data); // Solo guarda los datos que cambiaron
   };
 
   const handleSetTheme = (themeName: string) => {
+    if (!user) return;
     setThemeState(themeName);
-    saveDataToFirestore({ theme: themeName });
-  };
-
-  const handleReset = () => {
-    setBusinessNameState(DEFAULT_NAME);
-    setBusinessLogoState(DEFAULT_LOGO_ID);
-    setThemeState(DEFAULT_THEME_NAME);
-    setSorteos(DEFAULT_SORTEOS);
-    saveDataToFirestore({
-      businessName: DEFAULT_NAME,
-      businessLogo: DEFAULT_LOGO_ID,
-      theme: DEFAULT_THEME_NAME,
-      sorteos: DEFAULT_SORTEOS,
-    });
+    saveDataToFirestore(user.uid, { theme: themeName });
   };
 
   const value = {
-    businessName,
-    businessLogo,
-    theme,
-    sorteos,
-    isLoading,
-    setBusinessName: handleSetBusinessName,
-    setBusinessLogo: handleSetBusinessLogo,
+    business,
+    loading,
+    setBusiness: handleSetBusiness,
+    theme, // El ThemeManager lo necesita
     setTheme: handleSetTheme,
-    resetBusinessInfo: handleReset,
   };
 
   return (
