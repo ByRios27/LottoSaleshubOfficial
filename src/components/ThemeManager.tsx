@@ -5,10 +5,10 @@ import { useBusiness } from '@/contexts/BusinessContext';
 import { themes } from '@/lib/themes';
 
 export default function ThemeManager({ children }: { children: React.ReactNode }) {
-  const { theme, isLoading } = useBusiness();
+  const { theme, loading } = useBusiness();
 
   useEffect(() => {
-    if (isLoading) return;
+    if (loading) return;
 
     const selectedTheme = themes.find(t => t.name === theme) || themes[0];
     const themeStyles = selectedTheme.styles;
@@ -30,7 +30,7 @@ export default function ThemeManager({ children }: { children: React.ReactNode }
       document.body.style.backgroundAttachment = '';
       document.body.style.backgroundPosition = '';
     };
-  }, [theme, isLoading]);
+  }, [theme, loading]);
 
   return <>{children}</>;
 }

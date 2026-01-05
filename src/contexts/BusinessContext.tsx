@@ -11,15 +11,18 @@ export interface BusinessData {
   name?: string;
   logoUrl?: string;
   theme?: string;
+  phone?: string;
 }
 
 // --- TIPOS DEL CONTEXTO ---
 interface BusinessContextType {
   business: BusinessData | null;
   loading: boolean;
-  setBusiness: (data: Partial<BusinessData>) => void; // Acepta datos parciales
+  setBusiness: (data: Partial<BusinessData>) => void;
   theme: string;
   setTheme: (themeName: string) => void;
+  businessName?: string;
+  businessLogo?: string;
 }
 
 // --- CREACIÓN DEL CONTEXTO ---
@@ -68,7 +71,8 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
           const defaultBusiness: BusinessData = { 
             name: 'Mi Negocio',
             logoUrl: '',
-            theme: themes[0].name 
+            theme: themes[0].name, 
+            phone: ''
           };
           setBusinessState(defaultBusiness);
           await saveDataToFirestore(user.uid, defaultBusiness);
@@ -76,7 +80,7 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error("Error loading data from Firestore: ", error);
         // En caso de error, establece un estado por defecto para que la app no se rompa
-        setBusinessState({ name: 'Mi Negocio', logoUrl: '', theme: themes[0].name });
+        setBusinessState({ name: 'Mi Negocio', logoUrl: '', theme: themes[0].name, phone: '' });
         setThemeState(themes[0].name);
       } finally {
         setLoading(false);
@@ -104,12 +108,14 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
     saveDataToFirestore(user.uid, { theme: themeName });
   };
 
-  const value = {
+  const value: BusinessContextType = {
     business,
     loading,
     setBusiness: handleSetBusiness,
     theme,
     setTheme: handleSetTheme,
+    businessName: business?.name,
+    businessLogo: business?.logoUrl,
   };
 
   return (

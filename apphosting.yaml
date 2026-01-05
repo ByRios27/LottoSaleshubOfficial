@@ -1,4 +1,3 @@
-
 run:
   build:
     - npm i
@@ -6,20 +5,20 @@ run:
   start: npm run start
 env:
   - variable: FIREBASE_PROJECT_ID
-    value: new-proyect-lotto-hub
+    secret: FIREBASE_PROJECT_ID
   - variable: FIREBASE_CLIENT_EMAIL
-    value: firebase-adminsdk-fbsvc@new-proyect-lotto-hub.iam.gserviceaccount.com
+    secret: FIREBASE_CLIENT_EMAIL
   - variable: FIREBASE_PRIVATE_KEY
     secret: FIREBASE_PRIVATE_KEY
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    value: AIzaSyBa7gpgT0PLhlom_Yb9TB-iubIBISQfpGY
+    secret: NEXT_PUBLIC_FIREBASE_API_KEY
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-    value: new-proyect-lotto-hub.firebaseapp.com
+    secret: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    value: new-proyect-lotto-hub
+    secret: NEXT_PUBLIC_FIREBASE_PROJECT_ID
   - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-    value: new-proyect-lotto-hub.appspot.com
+    secret: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
   - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-    value: "390413033115"
+    secret: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    value: 1:390413033115:web:e530f25d91c350a6ebb03e
+    secret: NEXT_PUBLIC_FIREBASE_APP_ID

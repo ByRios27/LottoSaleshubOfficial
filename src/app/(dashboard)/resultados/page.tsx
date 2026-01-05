@@ -74,7 +74,7 @@ type SavedResult = { id: string; drawId: string; date: string; schedule: string;
 
 // --- REFACTORED COMPONENTS ---
 
-const CreateResultForm = ({ user, draws, onResultSaved }) => {
+const CreateResultForm = ({ user, draws, onResultSaved }: { user: any; draws: any[]; onResultSaved: (result: any) => void; }) => {
     const [date, setDate] = useState("");
     const [draw, setDraw] = useState("");
     const [schedule, setSchedule] = useState("");
@@ -109,7 +109,7 @@ const CreateResultForm = ({ user, draws, onResultSaved }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="bg-gray-700 border-gray-600 text-white"/>
                 <Select value={draw} onValueChange={setDraw}><SelectTrigger className="bg-gray-700 border-gray-600"><SelectValue placeholder="Sorteo" /></SelectTrigger><SelectContent className="bg-gray-700 text-white">{draws.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}</SelectContent></Select>
-                <Select value={schedule} onValueChange={setSchedule} disabled={!selectedDraw}><SelectTrigger className="bg-gray-700 border-gray-600"><SelectValue placeholder="Horario" /></SelectTrigger><SelectContent className="bg-gray-700 text-white">{selectedDraw?.sch.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select>
+                <Select value={schedule} onValueChange={setSchedule} disabled={!selectedDraw}><SelectTrigger className="bg-gray-700 border-gray-600"><SelectValue placeholder="Horario" /></SelectTrigger><SelectContent className="bg-gray-700 text-white">{selectedDraw?.sch.map((s: string) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Input placeholder="1ero" value={first} onChange={e => setFirst(e.target.value)} className="bg-gray-700 border-gray-600"/>
@@ -121,7 +121,7 @@ const CreateResultForm = ({ user, draws, onResultSaved }) => {
     );
 };
 
-const WinnersDisplay = ({ winners, totalPayout, isLoading, markAsPaid, isPayLoading, paidMap, selectedResult }) => {
+const WinnersDisplay = ({ winners, totalPayout, isLoading, markAsPaid, isPayLoading, paidMap, selectedResult }: { winners: Winner[]; totalPayout: number; isLoading: boolean; markAsPaid: (winner: Winner, result: SavedResult) => void; isPayLoading: string | null; paidMap: Record<string, boolean>; selectedResult: SavedResult | null; }) => {
     if (isLoading) return <div className="text-center p-8"><p>Calculando ganadores...</p></div>;
     if (!selectedResult) return <div className="text-center p-8 text-white/60">Selecciona un resultado para ver los ganadores.</div>;
     if (winners.length === 0) return <div className="text-center p-8 text-white/60">No se encontraron ganadores para este resultado.</div>;
@@ -154,7 +154,7 @@ const WinnersDisplay = ({ winners, totalPayout, isLoading, markAsPaid, isPayLoad
     );
 };
 
-const EditResultModal = ({ isOpen, onOpenChange, result, user, draws, onResultUpdated }) => {
+const EditResultModal = ({ isOpen, onOpenChange, result, user, draws, onResultUpdated }: { isOpen: boolean; onOpenChange: (isOpen: boolean) => void; result: SavedResult | null; user: any; draws: any[]; onResultUpdated: (result: any) => void; }) => {
     const [editFirst, setEditFirst] = useState("");
     const [editSecond, setEditSecond] = useState("");
     const [editThird, setEditThird] = useState("");
@@ -247,7 +247,7 @@ export default function ResultsPage() {
         try {
             const q = query(payoutRef, where("drawId", "==", result.drawId), where("date", "==", result.date), where("schedule", "==", result.schedule));
             const snap = await getDocs(q);
-            const newPaidMap = {};
+            const newPaidMap: Record<string, boolean> = {};
             snap.forEach(doc => { newPaidMap[doc.id] = doc.data().paid; });
             setPaidMap(newPaidMap);
         } catch (e) { console.warn("Error loading paid statuses: ", e); }

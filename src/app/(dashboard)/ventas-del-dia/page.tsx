@@ -168,10 +168,10 @@ export default function VentasDelDiaPage() {
         catch (e) { console.error("Error adding logo to PDF:", e); }
     }
     
-    doc.setFontSize(16); doc.setFont(undefined, 'bold');
+    doc.setFontSize(16); doc.setFont('Helvetica', 'bold');
     doc.text(business?.name || 'Reporte de Caja', pageW / 2, 20, { align: 'center' });
 
-    doc.setFontSize(10); doc.setFont(undefined, 'normal');
+    doc.setFontSize(10); doc.setFont('Helvetica', 'normal');
     doc.text(`Operador: ${operatorName || 'N/A'}`, pageW - 14, 16, { align: 'right' });
     doc.text(`Tel: ${phoneNumber || 'N/A'}`, pageW - 14, 22, { align: 'right' });
     doc.text(`Fecha: ${docId}`, pageW - 14, 28, { align: 'right' });

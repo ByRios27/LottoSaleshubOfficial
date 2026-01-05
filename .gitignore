@@ -25,10 +25,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*.local
+.env
 
 # vercel
 .vercel
@@ -37,9 +35,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# logs
-*.log
+# Firebase
+.firebase/
 firebase-debug.log*
 
-# specific ignores
-functions/node_modules
+# IDX
+.idx/
