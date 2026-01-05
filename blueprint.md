@@ -1,4 +1,3 @@
-
 # Blueprint: LottoSalesHub
 
 ## Descripción General
@@ -15,6 +14,25 @@ La aplicación sigue una estética moderna y audaz, con un tema oscuro predomina
 *   **Iconografía:** Se utiliza la librería `heroicons` para proporcionar iconos claros y modernos.
 *   **Interactividad:** Los elementos interactivos tienen efectos de "hover" para proporcionar una retroalimentación visual clara.
 *   **Responsividad:** La aplicación está diseñada para ser totalmente responsiva.
+
+## Historial de Cambios Implementados
+
+### Funcionalidad de Edición de Ventas
+
+*   **Actualización del Contexto (`SalesContext.tsx`):** Se añadió la función `updateSale` para permitir actualizaciones optimistas de las ventas.
+*   **Acciones del Servidor (`sales/actions.ts`):** Se creó la función `updateSaleWithIndex` para persistir los cambios en Firestore.
+*   **Modificación de la Interfaz (`SalesModal.tsx`):** Se añadió la opción "Editar" en el historial de ventas, que rellena el formulario de nueva venta con los datos existentes para su modificación.
+
+### Corrección de Interfaz y Compilación en Cierres de Sorteos
+
+*   **Corrección del Error Visual:** Se solucionó un problema de alineación y color en la imagen exportada de los cierres.
+*   **Solución del Error de Compilación (`TypeError`):** Se corrigió un error que ocurría al construir la aplicación (`npm run build`) debido a una posible llamada a `.getTime()` en un valor nulo.
+
+### Estabilización Adicional en Carga de Resultados
+
+*   **Diagnóstico y Solución de `TypeError`:** Se corrigió un `TypeError` en la página de resultados que ocurría al filtrar por fechas.
+*   **Eliminación de Advertencias de React Hooks:** Se optimizó el uso de `useEffect` y `useCallback` para eliminar advertencias y mejorar el rendimiento.
+*   **Implementación de Ordenación Segura:** Se refactorizó la lógica de ordenación de resultados para manejar de forma segura documentos que pudieran carecer del campo `createdAt`.
 
 ## Plan de Acción Actual
 
@@ -37,10 +55,9 @@ Esta página se convertirá en el centro de control financiero, permitiendo al u
     *   Sumar el `totalCost` de esas ventas para obtener las "Ventas Totales Brutas" de forma automática.
 
 2.  **Fase 2: Integración con Firestore para Datos Contables:**
-    *   Crear una nueva colección en Firestore (ej: `dailyClosures`) para almacenar los datos manuales (fondo inicial, saldos, fondos de terceros, premios manuales).
-    *   Al cargar la página, obtener los datos del día actual desde esta nueva colección.
+    *   Crear una nueva colección en Firestore (ej: `dailyClosures`) para almacenar los datos manuales.
     *   Implementar la función `Guardar Cierre del Día` para escribir o actualizar el documento del día en Firestore.
 
 3.  **Fase 3: Acciones y Reportes:**
-    *   Implementar el botón "Reiniciar Día", que borrará el documento del día en `dailyClosures`.
-    *   Crear la función "Generar Reporte PDF" que utilizará los datos de Firestore para crear un informe completo.
+    *   Implementar el botón "Reiniciar Día".
+    *   Crear la función "Generar Reporte PDF".
