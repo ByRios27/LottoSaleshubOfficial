@@ -8,7 +8,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
-// --- COMPONENTES VISUALES (sin cambios) ---
+// --- COMPONENTES VISUALES (sin cambios estéticos) ---
 
 const LotteryIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
@@ -25,7 +25,7 @@ const LoadingView = () => (
     </div>
 );
 
-const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName: string, businessLogo: string, onLogout: () => void }) => {
+const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName: string, businessLogo?: string | null, onLogout: () => void }) => {
     const menuItems = [
         { name: 'Ventas', href: '/sales', icon: LotteryIcon },
         { name: 'Sorteos', href: '/draws', icon: TicketIcon },
@@ -37,7 +37,7 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
         { name: 'Negocio', href: '/business', icon: BuildingStorefrontIcon },
     ];
 
-    const renderLogo = () => businessLogo && businessLogo !== 'default' ? (
+    const renderLogo = () => businessLogo ? (
         <div className="w-32 h-32 relative rounded-full overflow-hidden shadow-lg"><Image
             src={businessLogo}
             alt={`${businessName} logo`}
@@ -70,19 +70,26 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
     );
 };
 
-// --- COMPONENTE NUEVO Y SEGURO PARA EL DASHBOARD ---
+
+// --- COMPONENTE CORREGIDO PARA OBTENER DATOS --- 
 function UserDashboard() {
     const { logout } = useAuth();
-    const { businessName, businessLogo, isLoading: businessLoading } = useBusiness();
+    const { business, loading: businessLoading } = useBusiness(); // FIX: Get the whole 'business' object
 
     if (businessLoading) {
         return <LoadingView />;
     }
 
-    return <DashboardView businessName={businessName} businessLogo={businessLogo} onLogout={logout} />;
+    // FIX: Pass the correct properties from the 'business' object
+    return <DashboardView 
+        businessName={business?.name || 'Mi Negocio'} 
+        businessLogo={business?.logoUrl} 
+        onLogout={logout} 
+    />;
 }
 
-// --- COMPONENTE PRINCIPAL CON LÓGICA DE AUTENTICACIÓN CORREGIDA ---
+
+// --- COMPONENTE PRINCIPAL CON LÓGICA DE AUTENTICACIÓN (sin cambios) ---
 export default function Home() {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
@@ -97,6 +104,5 @@ export default function Home() {
         return <LoadingView />;
     }
 
-    // Si llegamos aquí, el usuario está autenticado y la carga inicial ha terminado.
     return <UserDashboard />;
 }

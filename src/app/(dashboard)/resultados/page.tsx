@@ -99,6 +99,7 @@ const CreateResultForm = ({ user, draws, onResultSaved }) => {
             const docRef = await addDoc(collection(db, "users", user.uid, "results"), newResult);
             toast.success("Resultado guardado.");
             onResultSaved({ id: docRef.id, ...newResult });
+            // Clear form after saving
             setDate(""); setDraw(""); setSchedule(""); setFirst(""); setSecond(""); setThird("");
         } catch (e) { console.error(e); toast.error("Error al guardar."); } finally { setIsSaving(false); }
     };
@@ -240,6 +241,18 @@ export default function ResultsPage() {
 
   useEffect(() => { loadSavedResults(); }, [loadSavedResults]);
 
+    const loadPaidStatuses = useCallback(async (result: SavedResult) => {
+        if (!user) return;
+        const payoutRef = collection(db, "users", user.uid, "payoutStatus");
+        try {
+            const q = query(payoutRef, where("drawId", "==", result.drawId), where("date", "==", result.date), where("schedule", "==", result.schedule));
+            const snap = await getDocs(q);
+            const newPaidMap = {};
+            snap.forEach(doc => { newPaidMap[doc.id] = doc.data().paid; });
+            setPaidMap(newPaidMap);
+        } catch (e) { console.warn("Error loading paid statuses: ", e); }
+    }, [user]);
+
   const calculateAndSetWinners = useCallback(async (result: SavedResult | null) => {
     if (!user || !result) { setWinners([]); return; }
     const selectedDraw = draws.find(d => d.id === result.drawId);
@@ -285,19 +298,7 @@ export default function ResultsPage() {
         setWinners(Array.from(winnersMap.values()));
         await loadPaidStatuses(result);
     } catch (e) { console.error(e); toast.error("Error al calcular ganadores."); } finally { setIsCalculating(false); }
-  }, [user, draws]);
-
-  const loadPaidStatuses = async (result: SavedResult) => {
-        if (!user) return;
-        const payoutRef = collection(db, "users", user.uid, "payoutStatus");
-        try {
-            const q = query(payoutRef, where("drawId", "==", result.drawId), where("date", "==", result.date), where("schedule", "==", result.schedule));
-            const snap = await getDocs(q);
-            const newPaidMap = {};
-            snap.forEach(doc => { newPaidMap[doc.id] = doc.data().paid; });
-            setPaidMap(newPaidMap);
-        } catch (e) { console.warn("Error loading paid statuses: ", e); }
-    };
+  }, [user, draws, loadPaidStatuses]);
 
   const markAsPaid = async (winner: Winner, result: SavedResult) => {
         if (!user) return;
@@ -311,8 +312,16 @@ export default function ResultsPage() {
         } catch (e) { toast.error("Error al marcar pago."); } finally { setIsPayLoading(null); }
     };
 
-  const handleSelectSavedResult = (result: SavedResult) => { setSelectedResult(result); calculateAndSetWinners(result); };
-  const handleResultSaved = (newResult: SavedResult) => { setSavedResults(prev => [newResult, ...prev]); handleSelectSavedResult(newResult); };
+  const handleSelectSavedResult = (result: SavedResult) => {
+    setSelectedResult(result);
+    calculateAndSetWinners(result);
+  };
+
+  const handleResultSaved = (newResult: SavedResult) => {
+    setSavedResults(prev => [newResult, ...prev]);
+    // No longer automatically select the new result, just add it to the list.
+  };
+
   const handleOpenEditModal = (result: SavedResult) => { setEditingResult(result); setIsEditModalOpen(true); };
 
   const handleResultUpdated = (updatedResult: SavedResult) => {

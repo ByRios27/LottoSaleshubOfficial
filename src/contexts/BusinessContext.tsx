@@ -11,15 +11,14 @@ export interface BusinessData {
   name?: string;
   logoUrl?: string;
   theme?: string;
-  // Añade aquí otros campos que necesites
 }
 
 // --- TIPOS DEL CONTEXTO ---
 interface BusinessContextType {
   business: BusinessData | null;
   loading: boolean;
-  setBusiness: (data: BusinessData) => void;
-  theme: string; // Mantener el tema separado por ahora para ThemeManager
+  setBusiness: (data: Partial<BusinessData>) => void; // Acepta datos parciales
+  theme: string;
   setTheme: (themeName: string) => void;
 }
 
@@ -35,25 +34,29 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<string>(themes[0].name);
   const [loading, setLoading] = useState(true);
 
+  // Función unificada para guardar datos en Firestore en la ruta correcta
   const saveDataToFirestore = useCallback(async (userId: string, data: Partial<BusinessData>) => {
     try {
-      const userDocRef = doc(db, 'users', userId, 'business', 'profile');
-      await setDoc(userDocRef, data, { merge: true });
+      const businessDocRef = doc(db, 'businesses', userId);
+      await setDoc(businessDocRef, data, { merge: true });
     } catch (error) {
       console.error("Error saving data to Firestore:", error);
     }
   }, [db]);
 
+  // Efecto para cargar datos cuando el usuario cambia
   useEffect(() => {
     const loadData = async () => {
-      if (!user) {
+      if (!user?.uid) {
+        setBusinessState(null); // Limpia los datos si no hay usuario
+        setThemeState(themes[0].name);
         setLoading(false);
         return;
       }
 
       setLoading(true);
       try {
-        const docRef = doc(db, 'users', user.uid, 'business', 'profile');
+        const docRef = doc(db, 'businesses', user.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -61,7 +64,7 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
           setBusinessState(data);
           setThemeState(data.theme || themes[0].name);
         } else {
-          // Si no existe, puedes inicializarlo con valores por defecto
+          // Si no existe el documento, crea uno con valores por defecto
           const defaultBusiness: BusinessData = { 
             name: 'Mi Negocio',
             logoUrl: '',
@@ -72,6 +75,9 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         console.error("Error loading data from Firestore: ", error);
+        // En caso de error, establece un estado por defecto para que la app no se rompa
+        setBusinessState({ name: 'Mi Negocio', logoUrl: '', theme: themes[0].name });
+        setThemeState(themes[0].name);
       } finally {
         setLoading(false);
       }
@@ -80,13 +86,18 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
     loadData();
   }, [user, db, saveDataToFirestore]);
 
-  const handleSetBusiness = (data: BusinessData) => {
+  // Función para actualizar parcial o totalmente los datos del negocio
+  const handleSetBusiness = (data: Partial<BusinessData>) => {
     if (!user) return;
-    const updatedBusiness = { ...business, ...data };
-    setBusinessState(updatedBusiness);
-    saveDataToFirestore(user.uid, data); // Solo guarda los datos que cambiaron
+    
+    setBusinessState(prevState => {
+        const updatedState = { ...(prevState || {}), ...data };
+        return updatedState as BusinessData;
+    });
+    saveDataToFirestore(user.uid, data); // Guarda solo los datos que cambiaron
   };
 
+  // Función para actualizar el tema
   const handleSetTheme = (themeName: string) => {
     if (!user) return;
     setThemeState(themeName);
@@ -97,7 +108,7 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
     business,
     loading,
     setBusiness: handleSetBusiness,
-    theme, // El ThemeManager lo necesita
+    theme,
     setTheme: handleSetTheme,
   };
 
