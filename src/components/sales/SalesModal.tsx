@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, Fragment, useState, useEffect } from 'react';
+import { useMemo, Fragment, useState, useEffect, useRef } from 'react';
 import { useForm, useFieldArray, useWatch, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -64,7 +64,6 @@ const parseBulkNumbers = (raw: string, digits: number, invert: boolean): ParseRe
   const s = raw.replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/[–—−]/g, '-');
 
   // Detecta pares NUM-CANT (o CANT-NUM si invert=true)
-  // Permitimos 1..digits para el número y 1..4 para la cantidad
   const re = new RegExp(`\\b(\\d{1,${Math.max(1, digits)}})\\s*-\\s*(\\d{1,4})\\b`, 'g');
   const matches = [...s.matchAll(re)];
 
@@ -78,8 +77,6 @@ const parseBulkNumbers = (raw: string, digits: number, invert: boolean): ParseRe
     const left = m[1];
     const right = m[2];
 
-    // invert=false => left=num, right=cant
-    // invert=true  => left=cant, right=num  (listas tipo 10-70)
     const numRaw = invert ? right : left;
     const qtyRaw = invert ? left : right;
 
@@ -113,7 +110,6 @@ type DuplicatePolicy = 'sum' | 'replace' | 'ignore';
 type ApplyMode = 'add' | 'replaceAll';
 
 const mergeRows = (existing: ParsedItem[], incoming: ParsedItem[], duplicatePolicy: DuplicatePolicy): ParsedItem[] => {
-  // Mantiene orden de inserción: primero existentes, luego nuevos (si no existían)
   const map = new Map<string, number>();
 
   for (const r of existing) {
@@ -151,6 +147,10 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
   const [viewingReceipt, setViewingReceipt] = useState<Sale | null>(null);
   const [sessionSales, setSessionSales] = useState<Sale[]>([]);
   const [editingSale, setEditingSale] = useState<Sale | null>(null);
+
+  // Anti doble-clic / doble-submit
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
   // Bulk add state
   const [bulkText, setBulkText] = useState('');
@@ -208,7 +208,8 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
         clientName: editingSale.clientName || '',
         clientPhone: editingSale.clientPhone || '',
       });
-      // Limpia el bloque bulk al entrar a editar para evitar “aplicar” por error
+
+      // Limpia el bloque bulk al entrar a editar
       setBulkText('');
       setBulkPreview([]);
       setBulkErrors([]);
@@ -225,20 +226,32 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     if (!draw) return;
 
-    if (editingSale && editingSale.id) {
-      try {
-        await updateSale(editingSale.id, {
-          ...values,
-          totalCost,
-        });
-        toast.success('Venta actualizada con éxito');
-        setEditingSale(null);
-        form.reset();
-        setActiveTab('history');
-      } catch {
-        toast.error('Error al actualizar la venta');
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setIsSubmitting(true);
+
+    try {
+      if (editingSale && editingSale.id) {
+        try {
+          await updateSale(editingSale.id, { ...values, totalCost });
+          toast.success('Venta actualizada con éxito');
+
+          setEditingSale(null);
+          form.reset();
+
+          // FIX: limpiar pegado rápido tras actualizar
+          setBulkText('');
+          setBulkPreview([]);
+          setBulkErrors([]);
+          setInvertList(false);
+
+          setActiveTab('history');
+        } catch {
+          toast.error('Error al actualizar la venta');
+        }
+        return;
       }
-    } else {
+
       const newSaleData: Omit<Sale, 'id' | 'timestamp'> = {
         ticketId: generateTicketId(),
         drawId: draw.id.toString(),
@@ -252,9 +265,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
       };
 
       const newlyAddedSale = await addSale(newSaleData);
-      if (newlyAddedSale) {
-        setSessionSales((prev) => [newlyAddedSale, ...prev]);
-      }
+      if (newlyAddedSale) setSessionSales((prev) => [newlyAddedSale, ...prev]);
 
       toast.success('Venta realizada con éxito');
       form.reset();
@@ -263,6 +274,9 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
       setBulkErrors([]);
       setInvertList(false);
       setActiveTab('history');
+    } finally {
+      setIsSubmitting(false);
+      submittingRef.current = false;
     }
   };
 
@@ -280,9 +294,6 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
     toast.success('Venta eliminada correctamente');
   };
 
-  // =========================
-  // BULK: Procesar / Aplicar
-  // =========================
   const handleProcessBulk = () => {
     const res = parseBulkNumbers(bulkText, digits, invertList);
     setBulkPreview(res.items);
@@ -293,15 +304,11 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
       return;
     }
 
-    if (res.errors.length > 0) {
-      toast.warning(`Procesado con advertencias: ${res.errors.length}`);
-    } else {
-      toast.success(`Procesado: ${res.items.length} fila(s) detectadas.`);
-    }
+    if (res.errors.length > 0) toast.warning(`Procesado con advertencias: ${res.errors.length}`);
+    else toast.success(`Procesado: ${res.items.length} fila(s) detectadas.`);
   };
 
   const handleApplyBulk = () => {
-    // Si el usuario no dio a “Procesar”, procesamos automáticamente aquí.
     const res = bulkPreview.length ? { items: bulkPreview, errors: bulkErrors } : parseBulkNumbers(bulkText, digits, invertList);
 
     setBulkPreview(res.items);
@@ -313,29 +320,17 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
     }
 
     const current = (watchedNumbers || [])
-      .map((r) => ({
-        number: (r?.number || '').trim(),
-        quantity: Number(r?.quantity) || 0,
-      }))
+      .map((r) => ({ number: (r?.number || '').trim(), quantity: Number(r?.quantity) || 0 }))
       .filter((r) => r.number);
 
-    let nextRows: ParsedItem[];
+    const nextRows =
+      applyMode === 'replaceAll'
+        ? mergeRows([], res.items, duplicatePolicy)
+        : mergeRows(current, res.items, duplicatePolicy);
 
-    if (applyMode === 'replaceAll') {
-      // Reemplaza toda la lista con lo que venga del pegado
-      nextRows = mergeRows([], res.items, duplicatePolicy);
-    } else {
-      // Agrega a lo existente (aplicando política de duplicados)
-      nextRows = mergeRows(current, res.items, duplicatePolicy);
-    }
-
-    // Si queda vacío por algún motivo, siempre dejamos una fila para el UI
     const safeRows = nextRows.length > 0 ? nextRows : [{ number: '', quantity: 1 }];
 
-    // Actualiza el fieldArray completo
     replace(safeRows);
-
-    // Fuerza validación y marca dirty para que en producción no se “pierda”
     form.trigger('numbers');
 
     toast.success(`Aplicado: ${nextRows.length} fila(s) en la lista.`);
@@ -367,9 +362,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
               <button
                 onClick={() => setActiveTab('sell')}
                 className={`w-full py-2 text-sm font-medium rounded-md transition-colors ${
-                  activeTab === 'sell'
-                    ? 'bg-green-600 text-white shadow'
-                    : 'text-white/70 hover:bg-white/10'
+                  activeTab === 'sell' ? 'bg-green-600 text-white shadow' : 'text-white/70 hover:bg-white/10'
                 }`}
               >
                 {editingSale ? 'Editando Venta' : form.formState.isDirty ? 'Venta en Progreso' : 'Nueva Venta'}
@@ -377,9 +370,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
               <button
                 onClick={() => setActiveTab('history')}
                 className={`w-full py-2 text-sm font-medium rounded-md transition-colors ${
-                  activeTab === 'history'
-                    ? 'bg-green-600 text-white shadow'
-                    : 'text-white/70 hover:bg-white/10'
+                  activeTab === 'history' ? 'bg-green-600 text-white shadow' : 'text-white/70 hover:bg-white/10'
                 }`}
               >
                 Historial ({completedSales.length})
@@ -455,10 +446,8 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                         <div>
                           <p className="text-sm font-semibold text-white/90">Pegado rápido (lista)</p>
                           <p className="text-xs text-white/60">
-                            Pega formatos como:{' '}
-                            <span className="font-mono">26-6, 25-12 24-6</span> (comas/espacios/saltos de línea).{' '}
-                            Activa <span className="font-mono">Invertir</span> para listas tipo{' '}
-                            <span className="font-mono">10-70</span> (cantidad-número).
+                            Pega formatos como: <span className="font-mono">26-6, 25-12 24-6</span> (comas/espacios/saltos de línea). Activa{' '}
+                            <span className="font-mono">Invertir</span> para listas tipo <span className="font-mono">10-70</span> (cantidad-número).
                           </p>
                         </div>
 
@@ -523,14 +512,11 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                         className="mt-3 w-full min-h-[110px] bg-black/20 border border-white/20 rounded-lg p-3 text-white text-sm focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-all"
                       />
 
-                      {/* Preview + errores */}
                       <div className="mt-3 grid sm:grid-cols-2 gap-3">
                         <div className="bg-black/20 border border-white/10 rounded-lg p-3">
                           <div className="flex items-center gap-2 mb-2">
                             <CheckCircle2 className="w-4 h-4 text-green-400" />
-                            <p className="text-xs font-semibold text-white/80">
-                              Preview ({bulkPreview.length})
-                            </p>
+                            <p className="text-xs font-semibold text-white/80">Preview ({bulkPreview.length})</p>
                           </div>
                           {bulkPreview.length === 0 ? (
                             <p className="text-xs text-white/50">Presiona “Procesar” para ver la vista previa.</p>
@@ -552,9 +538,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                         <div className="bg-black/20 border border-white/10 rounded-lg p-3">
                           <div className="flex items-center gap-2 mb-2">
                             <AlertTriangle className="w-4 h-4 text-orange-400" />
-                            <p className="text-xs font-semibold text-white/80">
-                              Advertencias ({bulkErrors.length})
-                            </p>
+                            <p className="text-xs font-semibold text-white/80">Advertencias ({bulkErrors.length})</p>
                           </div>
                           {bulkErrors.length === 0 ? (
                             <p className="text-xs text-white/50">Sin advertencias.</p>
@@ -624,7 +608,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ draw, onClose, businessName, lo
                   </div>
                   <button
                     type="submit"
-                    disabled={!form.formState.isValid}
+                    disabled={!form.formState.isValid || isSubmitting}
                     className="bg-green-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-lg transition-all duration-300 disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-700"
                   >
                     {editingSale ? 'Actualizar Venta' : 'Completar Venta'}
