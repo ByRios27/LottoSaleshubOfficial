@@ -34,6 +34,18 @@ La aplicación sigue una estética moderna y audaz, con un tema oscuro predomina
 *   **Eliminación de Advertencias de React Hooks:** Se optimizó el uso de `useEffect` y `useCallback` para eliminar advertencias y mejorar el rendimiento.
 *   **Implementación de Ordenación Segura:** Se refactorizó la lógica de ordenación de resultados para manejar de forma segura documentos que pudieran carecer del campo `createdAt`.
 
+### Corrección de Permisos de Secretos en App Hosting
+
+*   **Diagnóstico del Problema:** Se identificó que el backend de App Hosting no tenía los permisos necesarios para acceder a los secretos almacenados en Google Secret Manager, lo que causaba un error fatal durante el despliegue.
+*   **Identificación de la Cuenta de Servicio:** Se utilizó la herramienta `apphosting_list_backends` para identificar la cuenta de servicio correcta asociada al backend de App Hosting.
+*   **Concesión de Permisos:** Se otorgó el rol de "Lector de Secretos" (`roles/secretmanager.secretAccessor`) a la cuenta de servicio para todos los secretos requeridos por la aplicación, solucionando así el problema de acceso y permitiendo un despliegue exitoso.
+
+### Corrección de Permisos de Secretos en Cloud Build
+
+*   **Diagnóstico del Problema:** Se identificó que el error de permisos también ocurría durante la fase de *construcción* de la aplicación, ya que el servicio Cloud Build tampoco tenía acceso a los secretos.
+*   **Identificación de la Cuenta de Servicio de Cloud Build:** Se obtuvo el número del proyecto y se construyó el nombre de la cuenta de servicio de Cloud Build (`[NÚMERO_DE_PROYECTO]@cloudbuild.gserviceaccount.com`).
+*   **Concesión de Permisos a Cloud Build:** Se otorgó el rol de "Lector de Secretos" (`roles/secretmanager.secretAccessor`) a la cuenta de servicio de Cloud Build para todos los secretos del proyecto, solucionando definitivamente el problema de acceso a secretos durante el despliegue.
+
 ## Plan de Acción Actual
 
 **Objetivo:** Construir la "Supercomputadora de Contabilidad" v2, integrada con Firestore.
