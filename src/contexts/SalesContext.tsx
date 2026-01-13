@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/lib/firebase';
 import { createSaleWithIndex, updateSaleWithIndex } from '@/app/(dashboard)/sales/actions';
@@ -11,7 +11,7 @@ import {
   query,
   orderBy,
   Timestamp,
-  onSnapshot // Importar onSnapshot
+  onSnapshot
 } from 'firebase/firestore';
 
 // --- Definición de Tipos ---
@@ -35,7 +35,7 @@ export type Sale = {
 type SalesContextType = {
   sales: Sale[];
   addSale: (newSale: Omit<Sale, 'id' | 'timestamp'>) => Promise<Sale | undefined>;
-  updateSale: (id: string, updatedData: Partial<Omit<Sale, 'id' | 'timestamp'>>) => Promise<void>;
+  updateSale: (id: string, updatedData: Partial<Omit<Sale, 'id'>>) => Promise<void>;
   deleteSale: (id: string) => Promise<void>;
   isLoading: boolean;
 };
@@ -74,36 +74,54 @@ export function SalesProvider({ children }: SalesProviderProps) {
     const salesCollectionRef = collection(db, 'users', user.uid, 'sales');
     const q = query(salesCollectionRef, orderBy('timestamp', 'desc'));
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const userSales = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          timestamp: (data.timestamp as Timestamp)?.toDate?.().toISOString() ?? data.timestamp,
-        } as Sale;
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setSales(prevSales => {
+        let newSales = [...prevSales];
+
+        snapshot.docChanges().forEach((change) => {
+          const docData = change.doc.data();
+          const sale = {
+            id: change.doc.id,
+            ...docData,
+            timestamp: (docData.timestamp as Timestamp)?.toDate?.().toISOString() ?? docData.timestamp,
+          } as Sale;
+
+          if (change.type === "added") {
+            // Añadir si no existe, para evitar duplicados en la carga inicial
+            if (!newSales.some(s => s.id === sale.id)) {
+                newSales.push(sale);
+            }
+          }
+          if (change.type === "modified") {
+            const index = newSales.findIndex(s => s.id === sale.id);
+            if (index !== -1) {
+              newSales[index] = sale; // Actualiza el elemento existente
+            }
+          }
+          if (change.type === "removed") {
+            newSales = newSales.filter(s => s.id !== sale.id);
+          }
+        });
+
+        // Re-ordenar por si acaso, especialmente después de añadir
+        newSales.sort((a, b) => new Date(b.timestamp as string).getTime() - new Date(a.timestamp as string).getTime());
+        return newSales;
       });
-      setSales(userSales);
+
       setIsLoading(false);
     }, (error) => {
       console.error("Error listening to sales from Firestore:", error);
       setIsLoading(false);
     });
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [user, isAuthLoading]);
 
   const addSale = async (newSale: Omit<Sale, 'id' | 'timestamp'>): Promise<Sale | undefined> => {
     if (!user) throw new Error('User not authenticated to add sale');
     try {
-      // Llamamos a la server action y esta se encarga de todo.
-      // onSnapshot actualizará la UI automáticamente.
       const { saleId } = await createSaleWithIndex(user.uid, newSale as any);
-      if (!saleId) {
-        throw new Error('Sale creation failed, no ID returned.');
-      }
-      // Devolvemos una representación del sale, aunque la UI ya está actualizada.
+      if (!saleId) throw new Error('Sale creation failed, no ID returned.');
       return { ...newSale, id: saleId, timestamp: new Date().toISOString() } as Sale;
     } catch (error) {
       console.error('Error creating sale with index:', error);
@@ -114,7 +132,7 @@ export function SalesProvider({ children }: SalesProviderProps) {
   const updateSale = async (id: string, updatedData: Partial<Omit<Sale, 'id'>>) => {
     if (!user) throw new Error('User not authenticated to update sale');
     try {
-      // onSnapshot se encargará de actualizar la UI.
+      // La lógica de onSnapshot se encargará de actualizar la UI de forma granular y correcta.
       await updateSaleWithIndex(user.uid, id, updatedData as any);
     } catch (error) {
       console.error('Error updating sale:', error);
@@ -125,10 +143,10 @@ export function SalesProvider({ children }: SalesProviderProps) {
   const deleteSale = async (id: string) => {
     if (!user) throw new Error('User not authenticated to delete sale');
     try {
-      // onSnapshot se encargará de actualizar la UI.
+      // La lógica de onSnapshot se encargará de actualizar la UI.
       const saleDocRef = doc(db, 'users', user.uid, 'sales', id);
       await deleteDoc(saleDocRef);
-    } catch (error) {
+    } catch (error) { 
       console.error('Error deleting sale:', error);
     }
   };
