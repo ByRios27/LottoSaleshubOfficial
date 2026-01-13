@@ -23,6 +23,24 @@ La aplicación sigue un enfoque de diseño moderno y audaz, con un fuerte énfas
 
 ## Plan de Acción Completado (Reciente)
 
+### Correcciones de Rendimiento y UI (Ventas)
+
+**Objetivo:** Solucionar la lentitud en la carga/guardado de ventas, un error de flujo en el modal de edición y un problema de diseño en la vista móvil del historial.
+
+**Pasos Realizados:**
+
+1.  **Optimización de Rendimiento en `ventas-del-dia`:**
+    *   **Diagnóstico:** Se confirmó que la página `/ventas-del-dia` cargaba todos los documentos de ventas y pagos del día mediante `getDocs`, causando una carga lenta y un alto consumo de recursos.
+    *   **Solución:** Se refactorizó el componente para utilizar escuchas en tiempo real (`onSnapshot`). Ahora, los totales de ventas y premios se actualizan de forma instantánea y eficiente, sin necesidad de recargar la página ni de consultar todos los documentos.
+
+2.  **Corrección de Flujo en Modal de Edición:**
+    *   **Diagnóstico:** Al hacer clic en "Editar" una venta, el modal no cambiaba automáticamente a la pestaña de edición, forzando al usuario a hacerlo manualmente.
+    *   **Solución:** Se modificó la función `handleEditSale` en `SalesModal.tsx` para que, además de cargar los datos de la venta, active programáticamente la pestaña de edición, haciendo el flujo de trabajo más intuitivo y rápido.
+
+3.  **Arreglo de Diseño en Vista Móvil:**
+    *   **Diagnóstico:** El historial de ventas dentro del `SalesModal` usaba una cuadrícula (`grid`) que no se adaptaba a pantallas pequeñas, provocando que los elementos se superpusieran.
+    *   **Solución:** Se reemplazó la estructura de la lista del historial por un layout basado en `flexbox`, creando un diseño totalmente responsivo que presenta la información de forma clara y ordenada en todos los dispositivos.
+
 ### Eliminación de la Sección de Finanzas
 
 **Objetivo:** Resolver un grave problema de rendimiento y simplificar la aplicación eliminando una sección redundante.

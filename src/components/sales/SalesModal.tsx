@@ -97,13 +97,15 @@ const SalesModal: React.FC<{ draw: Draw | null; onClose: () => void; businessNam
     return Array.from(new Map(combined.map(s => [s.id || s.ticketId, s])).values()).sort((a, b) => getSaleDate(b.timestamp).getTime() - getSaleDate(a.timestamp).getTime());
   }, [sales, sessionSales, draw]);
 
-  const handleEditSale = (saleToEdit: Sale) => setEditingSale(saleToEdit);
+  const handleEditSale = (saleToEdit: Sale) => {
+    setEditingSale(saleToEdit);
+    setActiveTab('sell'); // <-- FIX: Automatically switch to the sell tab
+  };
 
   useEffect(() => {
     if (editingSale) {
       form.reset({ schedules: editingSale.schedules, numbers: editingSale.numbers, clientName: editingSale.clientName || '', clientPhone: editingSale.clientPhone || '' });
       setBulkText(''); setBulkPreview([]); setBulkErrors([]);
-      setActiveTab('sell');
     }
   }, [editingSale, form]);
 
@@ -112,7 +114,6 @@ const SalesModal: React.FC<{ draw: Draw | null; onClose: () => void; businessNam
     const currentSchedules = form.getValues('schedules');
     const validSchedules = currentSchedules.filter(sch => !closedSchedules.includes(`${draw.id}-${sch}`));
     if (currentSchedules.length !== validSchedules.length) {
-      // FIX: Cast to `any` to satisfy TypeScript's strict check for non-empty array
       form.setValue('schedules', validSchedules as any, { shouldValidate: true });
     }
   }, [closedSchedules, draw, form]);
@@ -261,21 +262,37 @@ const SalesModal: React.FC<{ draw: Draw | null; onClose: () => void; businessNam
               </form>
             )}
             {activeTab === 'history' && (
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-white">Historial de Ventas para {draw.name}</h3>
-                 {isLoading ? <p>Cargando...</p> : completedSales.length > 0 ? (
-                    <div className="divide-y divide-white/10 mt-4">
+              <div className="p-1 sm:p-4">
+                <h3 className="text-lg font-semibold text-white mb-4">Historial para {draw.name}</h3>
+                 {isLoading ? <p className="text-center py-8">Cargando historial...</p> : completedSales.length > 0 ? (
+                    <div className="space-y-3">
                         {completedSales.map(sale => (
-                            <div key={sale.id} className="py-3 grid grid-cols-5 gap-4 text-sm items-center">
-                                <div>{sale.numbers.map(n => n.number).join(', ')}</div>
-                                <div>{sale.schedules.join(', ')}</div>
-                                <div>{sale.clientName || '-'}</div>
-                                <div className="font-mono text-green-400">${sale.totalCost.toFixed(2)}</div>
-                                <div className="flex justify-end"><ActionMenu sale={sale} onVisualize={() => setViewingReceipt(sale)} onShare={() => {}} onEdit={() => handleEditSale(sale)} onDelete={() => sale.id && deleteSale(sale.id)} /></div>
+                            <div key={sale.id} className="bg-black/20 p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                               <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-3">
+                                        <p className="font-mono text-sm text-white truncate"><span className="font-bold">ID:</span> {sale.ticketId}</p>
+                                        <p className="text-xs text-white/60">{getSaleDate(sale.timestamp).toLocaleTimeString()}</p>
+                                    </div>
+                                    <p className="text-xs text-white/70 mt-1 truncate"><span className="font-semibold">Cliente:</span> {sale.clientName || 'N/A'}</p>
+                                </div>
+                                <div className="flex items-center justify-between sm:justify-end gap-4 mt-2 sm:mt-0">
+                                    <div className="text-right">
+                                        <p className="text-sm font-bold text-green-400">${sale.totalCost.toFixed(2)}</p>
+                                        <p className="text-xs text-white/60">{sale.schedules.join(', ')}</p>
+                                    </div>
+                                    <div className="flex-shrink-0">
+                                        <ActionMenu sale={sale} onVisualize={() => setViewingReceipt(sale)} onShare={() => {}} onEdit={() => handleEditSale(sale)} onDelete={() => sale.id && deleteSale(sale.id)} />
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>
-                 ) : <p className="text-white/60 mt-4">No hay ventas registradas.</p>}
+                 ) : (
+                    <div className="text-center py-10 px-4 bg-black/20 rounded-lg">
+                        <TicketIcon className="mx-auto w-12 h-12 text-white/30"/>
+                        <p className="mt-4 text-white/70">No hay ventas registradas para este sorteo.</p>
+                    </div>
+                 )}
               </div>
             )}
           </main>

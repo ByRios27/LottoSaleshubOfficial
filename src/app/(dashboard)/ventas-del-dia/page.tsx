@@ -10,7 +10,7 @@ import { ArrowDownTrayIcon, TrashIcon, PlusCircleIcon, LockClosedIcon, ArrowUtur
 import { useAuth } from '@/contexts/AuthContext';
 import { useBusiness } from '@/contexts/BusinessContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, Timestamp, doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, Timestamp, doc, setDoc } from 'firebase/firestore';
 import type { Sale } from '@/contexts/SalesContext';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -91,51 +91,63 @@ export default function VentasDelDiaPage() {
     if (business?.phone) setPhoneNumber(business.phone);
   }, [user, business]);
 
-  // --- DATOS: OBTENER DE FIRESTORE ---
+  // --- DATOS: OBTENER DE FIRESTORE (OPTIMIZADO CON ONSNAPSHOT) ---
   useEffect(() => {
     if (!user) return;
     const todayDocId = getTodayDocId();
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
 
-    const fetchSalesAndPayouts = async () => {
-        setIsLoading(prev => ({ ...prev, sales: true }));
-        const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
-        const salesRef = collection(db, 'users', user.uid, 'sales');
-        const salesQuery = query(salesRef, where('timestamp', '>=', Timestamp.fromDate(todayStart)));
-        const payoutsRef = collection(db, 'users', user.uid, 'payoutStatus');
-        const payoutsQuery = query(payoutsRef, where('date', '==', todayDocId));
-        
-        try {
-            const [salesSnap, payoutsSnap] = await Promise.all([getDocs(salesQuery), getDocs(payoutsQuery)]);
-            setTotalSales(salesSnap.docs.reduce((acc, doc) => acc + (doc.data() as Sale).totalCost, 0));
-            setAutomaticPrizes(payoutsSnap.docs.reduce((acc, doc) => acc + (doc.data() as Payout).totalWin, 0));
-        } catch (error) { console.error("Error fetching sales/payouts:", error); }
-        finally { setIsLoading(prev => ({ ...prev, sales: false })); }
+    // Listener para ventas
+    const salesRef = collection(db, 'users', user.uid, 'sales');
+    const salesQuery = query(salesRef, where('timestamp', '>=', Timestamp.fromDate(todayStart)));
+    const unsubscribeSales = onSnapshot(salesQuery, (snapshot) => {
+        const salesTotal = snapshot.docs.reduce((acc, doc) => acc + (doc.data() as Sale).totalCost, 0);
+        setTotalSales(salesTotal);
+        setIsLoading(prev => ({ ...prev, sales: false }));
+    }, (error) => {
+        console.error("Error listening to sales:", error);
+        setIsLoading(prev => ({ ...prev, sales: false }));
+    });
+
+    // Listener para premios automáticos
+    const payoutsRef = collection(db, 'users', user.uid, 'payoutStatus');
+    const payoutsQuery = query(payoutsRef, where('date', '==', todayDocId));
+    const unsubscribePayouts = onSnapshot(payoutsQuery, (snapshot) => {
+        const payoutsTotal = snapshot.docs.reduce((acc, doc) => acc + (doc.data() as Payout).totalWin, 0);
+        setAutomaticPrizes(payoutsTotal);
+    }, (error) => {
+        console.error("Error listening to payouts:", error);
+    });
+
+    // Listener para el cierre diario
+    const closureRef = doc(db, 'users', user.uid, 'dailyClosures', todayDocId);
+    const unsubscribeClosure = onSnapshot(closureRef, (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data() as DailyClosure;
+            setCommissionRate(data.commissionRate || 10);
+            setManualPrizes(data.manualPrizes || []);
+            setInitialFunds(data.initialFunds || 0);
+            setHouseInjections(data.houseInjections || 0);
+            setClosureStatus(data.status || 'open');
+            if (data.operatorName) setOperatorName(data.operatorName);
+            if (data.phoneNumber) setPhoneNumber(data.phoneNumber);
+        }
+        setIsLoading(prev => ({ ...prev, closure: false }));
+    }, (error) => {
+        console.error("Error listening to closure:", error);
+        setIsLoading(prev => ({ ...prev, closure: false }));
+    });
+
+    // Cleanup listeners on component unmount
+    return () => {
+        unsubscribeSales();
+        unsubscribePayouts();
+        unsubscribeClosure();
     };
-
-    const fetchClosure = async () => {
-        setIsLoading(prev => ({ ...prev, closure: true }));
-        const closureRef = doc(db, 'users', user.uid, 'dailyClosures', todayDocId);
-        try {
-            const docSnap = await getDoc(closureRef);
-            if (docSnap.exists()) {
-                const data = docSnap.data() as DailyClosure;
-                setCommissionRate(data.commissionRate || 10);
-                setManualPrizes(data.manualPrizes || []);
-                setInitialFunds(data.initialFunds || 0);
-                setHouseInjections(data.houseInjections || 0);
-                setClosureStatus(data.status || 'open');
-                if (data.operatorName) setOperatorName(data.operatorName);
-                if (data.phoneNumber) setPhoneNumber(data.phoneNumber);
-            }
-        } catch (error) { console.error("Error fetching closure:", error); }
-        finally { setIsLoading(prev => ({ ...prev, closure: false })); }
-    };
-
-    fetchSalesAndPayouts();
-    fetchClosure();
   }, [user]);
 
-  // --- DATOS: GUARDAR CIERRE EN FIRESTORE ---
+  // --- DATOS: GUARDAR CIERRE EN FIRESTORE (DEBOUNCED) ---
   useEffect(() => {
     if (!user || isLoading.closure || isClosed) return;
     const handler = setTimeout(() => {
@@ -175,8 +187,7 @@ export default function VentasDelDiaPage() {
               description: "Todos los datos del día han sido eliminados.",
               variant: "default",
           });
-          // Forzar recarga para ver los contadores a cero
-          window.location.reload();
+          // No es necesario recargar, onSnapshot actualizará la UI
       } catch (error) {
           console.error("Error en el reseteo masivo:", error);
           toast({
