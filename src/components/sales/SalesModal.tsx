@@ -733,8 +733,7 @@ const ActionMenu: React.FC<{
                   <Eye className="w-5 h-5 mr-2" />
                   Visualizar
                 </button>
-              )}
-            </Menu.Item>
+              )}</Menu.Item>
 
             <Menu.Item>
               {({ active }) => (

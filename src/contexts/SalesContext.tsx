@@ -8,12 +8,10 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDocs,
   query,
   orderBy,
   Timestamp,
-  updateDoc,
-  serverTimestamp
+  onSnapshot // Importar onSnapshot
 } from 'firebase/firestore';
 
 // --- Definición de Tipos ---
@@ -61,13 +59,22 @@ export function SalesProvider({ children }: SalesProviderProps) {
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchSales = useCallback(async () => {
-    if (!user) return;
+  useEffect(() => {
+    if (isAuthLoading) {
+      setIsLoading(true);
+      return;
+    }
+    if (!user) {
+      setSales([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     const salesCollectionRef = collection(db, 'users', user.uid, 'sales');
     const q = query(salesCollectionRef, orderBy('timestamp', 'desc'));
-    try {
-      const querySnapshot = await getDocs(q);
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const userSales = querySnapshot.docs.map(doc => {
         const data = doc.data();
         return {
@@ -77,100 +84,52 @@ export function SalesProvider({ children }: SalesProviderProps) {
         } as Sale;
       });
       setSales(userSales);
-    } catch (error) {
-      console.error("Error fetching sales from Firestore:", error);
-    } finally {
       setIsLoading(false);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (isAuthLoading) {
-      return;
-    }
-
-    if (user) {
-      fetchSales();
-    } else {
-      setSales([]);
+    }, (error) => {
+      console.error("Error listening to sales from Firestore:", error);
       setIsLoading(false);
-    }
-  }, [user, isAuthLoading, fetchSales]);
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [user, isAuthLoading]);
 
   const addSale = async (newSale: Omit<Sale, 'id' | 'timestamp'>): Promise<Sale | undefined> => {
     if (!user) throw new Error('User not authenticated to add sale');
-    
-    const optimisticSale: Sale = {
-        ...newSale,
-        id: `temp-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-      };
-  
-    setSales(prevSales => [optimisticSale, ...prevSales]);
-
     try {
+      // Llamamos a la server action y esta se encarga de todo.
+      // onSnapshot actualizará la UI automáticamente.
       const { saleId } = await createSaleWithIndex(user.uid, newSale as any);
-      
       if (!saleId) {
         throw new Error('Sale creation failed, no ID returned.');
       }
-      
-      const finalSale: Sale = {
-        ...newSale,
-        id: saleId,
-        timestamp: new Date().toISOString(),
-      };
-
-      setSales(prevSales => 
-        prevSales.map(sale => sale.id === optimisticSale.id ? finalSale : sale)
-      );
-      
-      return finalSale;
-
+      // Devolvemos una representación del sale, aunque la UI ya está actualizada.
+      return { ...newSale, id: saleId, timestamp: new Date().toISOString() } as Sale;
     } catch (error) {
       console.error('Error creating sale with index:', error);
-      setSales(prevSales => prevSales.filter(sale => sale.id !== optimisticSale.id));
       return undefined;
     }
   };
 
   const updateSale = async (id: string, updatedData: Partial<Omit<Sale, 'id'>>) => {
     if (!user) throw new Error('User not authenticated to update sale');
-
-    const saleIndex = sales.findIndex(sale => sale.id === id);
-    if (saleIndex === -1) {
-      console.error("Sale not found for update");
-      return;
-    }
-
-    const originalSales = [...sales];
-    const updatedSale = { ...sales[saleIndex], ...updatedData, timestamp: new Date().toISOString() };
-
-    setSales(prevSales => {
-        const newSales = [...prevSales];
-        newSales[saleIndex] = updatedSale as Sale;
-        return newSales;
-    });
-
     try {
+      // onSnapshot se encargará de actualizar la UI.
       await updateSaleWithIndex(user.uid, id, updatedData as any);
     } catch (error) {
       console.error('Error updating sale:', error);
-      setSales(originalSales);
       throw error;
     }
   };
 
   const deleteSale = async (id: string) => {
     if (!user) throw new Error('User not authenticated to delete sale');
-    const originalSales = [...sales];
-    setSales(prevSales => prevSales.filter(sale => sale.id !== id));
     try {
+      // onSnapshot se encargará de actualizar la UI.
       const saleDocRef = doc(db, 'users', user.uid, 'sales', id);
       await deleteDoc(saleDocRef);
     } catch (error) {
       console.error('Error deleting sale:', error);
-      setSales(originalSales);
     }
   };
 

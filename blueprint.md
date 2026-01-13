@@ -1,12 +1,16 @@
-# Blueprint: LottoSalesHub
+# Blueprint: Lotto Sales Hub
 
 ## Descripción General
 
-LottoSalesHub es una aplicación de punto de venta y gestión de loterías diseñada para funcionar como una "supercomputadora de contabilidad". Su objetivo es proporcionar una visión clara y en tiempo real de cada aspecto financiero del negocio, desde las ventas diarias hasta la gestión de fondos de terceros, utilizando **Firestore como única fuente de verdad**.
+Lotto Sales Hub es una aplicación web progresiva (PWA) diseñada para la gestión y el análisis de ventas de lotería. La aplicación permite a los usuarios realizar un seguimiento de las ventas, los resultados de los sorteos, la contabilidad diaria y el rendimiento de los vendedores. Está construida con Next.js y aprovecha Firebase para la autenticación, la base de datos (Firestore) y el hosting.
+
+## Arquitectura de Datos: Firestore como Única Fuente de Verdad
+
+Para garantizar el máximo rendimiento, escalabilidad y fiabilidad, toda la información de la aplicación (ventas, sorteos, resultados, etc.) se gestiona exclusivamente a través de Firestore. No se utiliza el `localStorage` del navegador para la persistencia de datos críticos. La comunicación con la base de datos se realiza principalmente a través de escuchas en tiempo real (`onSnapshot`) para asegurar una interfaz de usuario siempre sincronizada y una experiencia fluida.
 
 ## Diseño y Estilo
 
-La aplicación sigue una estética moderna y audaz, con un tema oscuro predominante y acentos de color verde vibrante para crear un aspecto energético y premium.
+La aplicación sigue un enfoque de diseño moderno y audaz, con un fuerte énfasis en la experiencia del usuario.
 
 *   **Tipografía:** Se utilizan fuentes expresivas con un fuerte énfasis en la jerarquía visual.
 *   **Color:** La paleta de colores es rica y variada, con una amplia gama de tonos verdes y dorados.
@@ -15,61 +19,17 @@ La aplicación sigue una estética moderna y audaz, con un tema oscuro predomina
 *   **Interactividad:** Los elementos interactivos tienen efectos de "hover" para proporcionar una retroalimentación visual clara.
 *   **Responsividad:** La aplicación está diseñada para ser totalmente responsiva.
 
-## Historial de Cambios Implementados
-
-### Funcionalidad de Edición de Ventas
-
-*   **Actualización del Contexto (`SalesContext.tsx`):** Se añadió la función `updateSale` para permitir actualizaciones optimistas de las ventas.
-*   **Acciones del Servidor (`sales/actions.ts`):** Se creó la función `updateSaleWithIndex` para persistir los cambios en Firestore.
-*   **Modificación de la Interfaz (`SalesModal.tsx`):** Se añadió la opción "Editar" en el historial de ventas, que rellena el formulario de nueva venta con los datos existentes para su modificación.
-
-### Corrección de Interfaz y Compilación en Cierres de Sorteos
-
-*   **Corrección del Error Visual:** Se solucionó un problema de alineación y color en la imagen exportada de los cierres.
-*   **Solución del Error de Compilación (`TypeError`):** Se corrigió un error que ocurría al construir la aplicación (`npm run build`) debido a una posible llamada a `.getTime()` en un valor nulo.
-
-### Estabilización Adicional en Carga de Resultados
-
-*   **Diagnóstico y Solución de `TypeError`:** Se corrigió un `TypeError` en la página de resultados que ocurría al filtrar por fechas.
-*   **Eliminación de Advertencias de React Hooks:** Se optimizó el uso de `useEffect` y `useCallback` para eliminar advertencias y mejorar el rendimiento.
-*   **Implementación de Ordenación Segura:** Se refactorizó la lógica de ordenación de resultados para manejar de forma segura documentos que pudieran carecer del campo `createdAt`.
-
-### Corrección de Permisos de Secretos en App Hosting
-
-*   **Diagnóstico del Problema:** Se identificó que el backend de App Hosting no tenía los permisos necesarios para acceder a los secretos almacenados en Google Secret Manager, lo que causaba un error fatal durante el despliegue.
-*   **Identificación de la Cuenta de Servicio:** Se utilizó la herramienta `apphosting_list_backends` para identificar la cuenta de servicio correcta asociada al backend de App Hosting.
-*   **Concesión de Permisos:** Se otorgó el rol de "Lector de Secretos" (`roles/secretmanager.secretAccessor`) a la cuenta de servicio para todos los secretos requeridos por la aplicación, solucionando así el problema de acceso y permitiendo un despliegue exitoso.
-
-### Corrección de Permisos de Secretos en Cloud Build
-
-*   **Diagnóstico del Problema:** Se identificó que el error de permisos también ocurría durante la fase de *construcción* de la aplicación, ya que el servicio Cloud Build tampoco tenía acceso a los secretos.
-*   **Identificación de la Cuenta de Servicio de Cloud Build:** Se obtuvo el número del proyecto y se construyó el nombre de la cuenta de servicio de Cloud Build (`[NÚMERO_DE_PROYECTO]@cloudbuild.gserviceaccount.com`).
-*   **Concesión de Permisos a Cloud Build:** Se otorgó el rol de "Lector de Secretos" (`roles/secretmanager.secretAccessor`) a la cuenta de servicio de Cloud Build para todos los secretos del proyecto, solucionando definitivamente el problema de acceso a secretos durante el despliegue.
+---
 
 ## Plan de Acción Actual
 
-**Objetivo:** Construir la "Supercomputadora de Contabilidad" v2, integrada con Firestore.
+### Auditoría y Refactorización de la Persistencia de Datos
 
-Esta página se convertirá en el centro de control financiero, permitiendo al usuario:
+**Objetivo:** Asegurar que todos los datos de la aplicación (sorteos, resultados, ganadores) se gestionen de forma centralizada y eficiente en Firestore, eliminando cualquier uso de `localStorage` o métodos de carga de datos ineficientes.
 
-*   Visualizar las **ventas totales** y las **ganancias** del día **(obtenidas automáticamente de Firestore)**.
-*   Registrar y totalizar los **premios pagados**.
-*   Calcular la **ganancia o pérdida** neta en tiempo real.
-*   Registrar los **fondos iniciales** y el estado de la caja (banca y efectivo).
-*   Gestionar el dinero inyectado por "la casa grande" (fondos de terceros).
-*   **Guardar un historial de cierres diarios en Firestore** para futuras consultas.
+**Pasos a Seguir:**
 
-**Fases de Desarrollo:**
-
-1.  **Fase 1: Obtención Automática de Ventas (En progreso):**
-    *   Modificar la página para que consulte la colección `sales` del usuario en Firestore.
-    *   Filtrar las ventas que corresponden al día actual.
-    *   Sumar el `totalCost` de esas ventas para obtener las "Ventas Totales Brutas" de forma automática.
-
-2.  **Fase 2: Integración con Firestore para Datos Contables:**
-    *   Crear una nueva colección en Firestore (ej: `dailyClosures`) para almacenar los datos manuales.
-    *   Implementar la función `Guardar Cierre del Día` para escribir o actualizar el documento del día en Firestore.
-
-3.  **Fase 3: Acciones y Reportes:**
-    *   Implementar el botón "Reiniciar Día".
-    *   Crear la función "Generar Reporte PDF".
+1.  **Auditar `ResultsContext` y `DrawsContext`:** Se revisarán los contextos `src/contexts/ResultsContext.tsx` y `src/contexts/DrawsContext.tsx` para identificar la estrategia actual de carga y almacenamiento de datos.
+2.  **Identificar Puntos de Mejora:** Se buscará cualquier uso de `localStorage` o de la función `getDocs` de Firestore para la carga de datos.
+3.  **Refactorizar a `onSnapshot`:** Todos los contextos que utilicen `getDocs` serán refactorizados para usar `onSnapshot`. Esto garantizará que los datos de resultados y sorteos se carguen de manera eficiente y se actualicen en tiempo real en la interfaz de usuario.
+4.  **Centralizar la Lógica:** Se consolidará toda la lógica de acceso a datos dentro de los contextos de React, asegurando que los componentes de la interfaz permanezcan limpios y se limiten a consumir los datos proporcionados por dichos contextos.

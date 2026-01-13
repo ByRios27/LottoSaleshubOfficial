@@ -157,8 +157,18 @@ export default function FinanzasPage() {
     const date = new Date().toLocaleString();
 
     if (business?.logoUrl && business.logoUrl !== 'default') {
-        try { doc.addImage(business.logoUrl, 'PNG', 14, 15, 25, 25); } 
-        catch (e) { console.error("Error al cargar el logo para el PDF:", e); }
+      try {
+        const response = await fetch(business.logoUrl);
+        const logoArrayBuffer = await response.arrayBuffer();
+        const logoUint8Array = new Uint8Array(logoArrayBuffer);
+        try {
+          doc.addImage(logoUint8Array, 'PNG', 14, 15, 25, 25);
+        } catch (e) {
+          doc.addImage(logoUint8Array, 'JPEG', 14, 15, 25, 25);
+        }
+      } catch (e) {
+        console.error("Error al cargar el logo para el PDF:", e);
+      }
     }
     doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.text(business?.name || "Reporte de Finanzas", 45, 32);
     doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.setTextColor(100); doc.text(`Fecha de generación: ${date}`, 45, 38);

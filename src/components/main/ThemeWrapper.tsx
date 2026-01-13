@@ -20,20 +20,20 @@ export default function ThemeWrapper({ children }: { children: React.ReactNode }
 
   if (loading) {
     return (
-        <body className={`${inter.className} bg-gray-900`}>
+        <div className={`${inter.className} bg-gray-900`}>
             <div className="flex justify-center items-center h-screen">
                 <p className="text-white">Cargando Negocio...</p>
             </div>
-        </body>
+        </div>
     )
   }
 
   return (
-    <body 
+    <div 
         className={`${inter.className} bg-cover bg-center bg-no-repeat min-h-screen`}
         style={backgroundStyle}
     >
       {children}
-    </body>
+    </div>
   );
 }
