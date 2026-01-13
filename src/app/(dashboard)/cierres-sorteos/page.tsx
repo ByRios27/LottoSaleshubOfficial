@@ -344,22 +344,22 @@ export default function CierresSorteosPage() {
               <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtros Principales</label>
-                  <Input type="date" value={date} onChange={(e) => { setDate(e.target.value); resetResults(); }} className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600" />
+                  <Input type="date" value={date} onChange={(e) => { setDate(e.target.value); resetResults(); }} className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white" />
                   <Select value={drawId} onValueChange={(v) => { setDrawId(v); setSchedule(''); resetResults(); }}>
-                    <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"><SelectValue placeholder="Seleccionar sorteo..." /></SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gray-800">{draws.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}</SelectContent>
+                    <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"><SelectValue placeholder="Seleccionar sorteo..." /></SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{draws.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}</SelectContent>
                   </Select>
                   <Select value={schedule} onValueChange={(v) => { setSchedule(v); resetResults(); }} disabled={!selectedDraw}>
-                    <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"><SelectValue placeholder="Seleccionar horario..." /></SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gray-800">{(selectedDraw?.sch || []).map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                    <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"><SelectValue placeholder="Seleccionar horario..." /></SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{(selectedDraw?.sch || []).map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                   </Select>
                   {showPlanillaWarning && <p className="text-xs text-yellow-600 dark:text-yellow-400 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md border border-yellow-200 dark:border-yellow-700">Este sorteo usa <b>{selectedDraw?.cif} cifras</b>. La planilla está optimizada para 2.</p>}
                 </div>
                 <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Opciones de Exportación</label>
                   <div className="space-y-3">
-                    <Input value={operatorName} onChange={handleOperatorNameChange} placeholder="Nombre del Operador (default)" className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600" />
-                    <Input value={operatorPhone} onChange={handleOperatorPhoneChange} placeholder="Teléfono (default)" className="bg-gray-50 dark:bg-gamma-700 border-gray-300 dark:border-gray-600" />
+                    <Input value={operatorName} onChange={handleOperatorNameChange} placeholder="Nombre del Operador (default)" className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white" />
+                    <Input value={operatorPhone} onChange={handleOperatorPhoneChange} placeholder="Teléfono (default)" className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white" />
                   </div>
                 </div>
                 <Button size="lg" className="w-full text-base bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white dark:text-gray-900 font-bold" onClick={loadAndConsolidate} disabled={isLoading}>{isLoading ? 'Generando... ' : 'Generar Cierre'}</Button>
