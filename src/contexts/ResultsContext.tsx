@@ -8,9 +8,8 @@ import {
   ReactNode,
   useCallback,
 } from "react";
-import { useAuth } from "./AuthContext"; // Para la autenticación
-import { useSales } from "./SalesContext"; // Para obtener las ventas
-import { db } from "@/lib/firebase"; // Conexión a Firestore
+import { useAuth } from "./AuthContext";
+import { db } from "@/lib/firebase";
 import {
   collection,
   addDoc,
@@ -34,22 +33,9 @@ export type Result = {
   timestamp: Timestamp;
 };
 
-export type Winner = {
-  ticketId: string;
-  clientName: string;
-  drawName: string;
-  schedule: string;
-  play: { number: string; amount: number };
-  prize: string;
-  timestamp: string;
-};
-
-// El tipo Sale ya viene de SalesContext, no es necesario redefinirlo
-
 // --- Contexto de React ---
 type ResultsContextType = {
   results: Result[];
-  winners: Winner[];
   addResult: (newResultData: Omit<Result, "id" | "timestamp">) => Promise<void>;
   deleteResult: (id: string) => Promise<void>;
   updateResult: (id: string, updatedData: Partial<Omit<Result, "id">>) => Promise<void>;
@@ -66,12 +52,10 @@ export function useResults() {
   return context;
 }
 
-// --- Proveedor del Contexto ---
+// --- Proveedor del Contexto (Optimizado) ---
 export function ResultsProvider({ children }: { children: ReactNode }) {
   const { user, loading: isAuthLoading } = useAuth();
-  const { sales: allSales } = useSales(); // Obtener ventas del SalesContext
   const [results, setResults] = useState<Result[]>([]);
-  const [winners, setWinners] = useState<Winner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Carga y escucha de resultados desde Firestore
@@ -105,55 +89,6 @@ export function ResultsProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe(); // Limpiar la suscripción
   }, [user, isAuthLoading]);
 
-  // Lógica para calcular ganadores
-  const calculateWinners = useCallback(() => {
-    if (allSales.length === 0 || results.length === 0) {
-      setWinners([]);
-      return;
-    }
-
-    const newWinners: Winner[] = [];
-
-    results.forEach((result) => {
-        const winningNums = result.winningNumbers;
-        const prizeMapping: Record<string, string> = {
-            [winningNums["1ro"]]: "1ro",
-            [winningNums["2do"]]: "2do",
-            [winningNums["3ro"]]: "3ro",
-        };
-
-        const relevantSales = allSales.filter(
-            (sale) =>
-            sale.drawId === result.drawId && sale.schedules.includes(result.schedule)
-        );
-
-        relevantSales.forEach((sale) => {
-            sale.numbers.forEach((play) => {
-                const prize = prizeMapping[play.number];
-                if (prize) {
-                    const quantity = Number(play.quantity) || 0;
-
-                    newWinners.push({
-                        ticketId: sale.ticketId,
-                        clientName: sale.clientName || 'Desconocido',
-                        drawName: result.drawName,
-                        schedule: result.schedule,
-                        play: { number: play.number, amount: quantity },
-                        prize,
-                        timestamp: sale.timestamp as string,
-                    });
-                }
-            });
-        });
-    });
-
-    setWinners(newWinners);
-  }, [allSales, results]);
-
-  useEffect(() => {
-    calculateWinners();
-  }, [calculateWinners]);
-
   // --- Funciones CRUD para Firestore ---
   const addResult = async (newResultData: Omit<Result, "id" | "timestamp">) => {
     if (!user) throw new Error("User not authenticated");
@@ -178,7 +113,6 @@ export function ResultsProvider({ children }: { children: ReactNode }) {
 
   const value = {
     results,
-    winners,
     addResult,
     deleteResult,
     updateResult,

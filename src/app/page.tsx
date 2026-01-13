@@ -32,7 +32,6 @@ const DashboardView = ({ businessName, businessLogo, onLogout }: { businessName:
         { name: 'Ventas del Día', href: '/ventas-del-dia', icon: DocumentChartBarIcon },
         { name: 'Resultados', href: '/resultados', icon: TrophyIcon },
         { name: 'Cierres', href: '/cierres-sorteos', icon: ArchiveBoxIcon },
-        { name: 'Finanzas', href: '/finanzas', icon: CurrencyDollarIcon },
         { name: 'Verificación', href: '/verificacion', icon: ShieldCheckIcon },
         { name: 'Negocio', href: '/business', icon: BuildingStorefrontIcon },
     ];

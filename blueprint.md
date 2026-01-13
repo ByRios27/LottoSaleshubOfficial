@@ -2,7 +2,7 @@
 
 ## Descripción General
 
-Lotto Sales Hub es una aplicación web progresiva (PWA) diseñada para la gestión y el análisis de ventas de lotería. La aplicación permite a los usuarios realizar un seguimiento de las ventas, los resultados de los sorteos, la contabilidad diaria y el rendimiento de los vendedores. Está construida con Next.js y aprovecha Firebase para la autenticación, la base de datos (Firestore) y el hosting.
+Lotto Sales Hub es una aplicación web progresiva (PWA) diseñada para la gestión y el análisis de ventas de lotería. La aplicación permite a los usuarios realizar un seguimiento de las ventas, los resultados de los sorteos, y el rendimiento del negocio. Está construida con Next.js y aprovecha Firebase para la autenticación, la base de datos (Firestore) y el hosting.
 
 ## Arquitectura de Datos: Firestore como Única Fuente de Verdad
 
@@ -21,7 +21,21 @@ La aplicación sigue un enfoque de diseño moderno y audaz, con un fuerte énfas
 
 ---
 
-## Plan de Acción Actual
+## Plan de Acción Completado (Reciente)
+
+### Eliminación de la Sección de Finanzas
+
+**Objetivo:** Resolver un grave problema de rendimiento y simplificar la aplicación eliminando una sección redundante.
+
+**Pasos Realizados:**
+
+1.  **Diagnóstico:** Se identificó que la página `/finanzas` cargaba de forma ineficiente todos los documentos de ventas (`getDocs`) en cada visita, causando una alta latencia a medida que crecía el volumen de datos.
+2.  **Decisión Estratégica:** En colaboración con el usuario, se determinó que la página "Ventas del Día" ya cubría las necesidades de análisis financiero, haciendo que la página de "Finanzas" fuera redundante.
+3.  **Eliminación de Archivos:** Se borraron los archivos `src/app/(dashboard)/finanzas/page.tsx` y `src/app/(dashboard)/finanzas/actions.ts`.
+4.  **Limpieza de Navegación:** Se eliminó el enlace a `/finanzas` del menú principal en `src/app/page.tsx`, eliminando por completo el acceso a la sección.
+5.  **Resultado:** El problema de rendimiento ha sido solucionado de raíz, y la base de código es ahora más limpia y fácil de mantener.
+
+## Plan de Acción Anterior
 
 ### Auditoría y Refactorización de la Persistencia de Datos
 
