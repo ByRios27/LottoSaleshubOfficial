@@ -5,13 +5,29 @@ import { adminDb } from '@/lib/firebase/admin';
 import { Sale } from '@/contexts/SalesContext';
 import { firestore } from 'firebase-admin';
 
-// --- Funciones de borrado en lotes ---
+// --- Helper Functions ---
+
+/**
+ * Gets the current date as a string in 'YYYY-MM-DD' format for the Dominican Republic timezone.
+ * @returns {string} The formatted date string.
+ */
+function getDominicanDateString(): string {
+    const date = new Date();
+    const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone: 'America/Santo_Domingo',
+    };
+    // Using a locale like 'sv-SE' provides the desired YYYY-MM-DD format.
+    return new Intl.DateTimeFormat('sv-SE', options).format(date);
+}
+
+// --- Batch Deletion Functions ---
 async function deleteQueryBatch(query: firestore.Query, resolve: (value?: any) => void, reject: (reason?: any) => void) {
     try {
         const snapshot = await query.get();
-
-        const batchSize = snapshot.size;
-        if (batchSize === 0) {
+        if (snapshot.size === 0) {
             resolve();
             return;
         }
@@ -25,7 +41,7 @@ async function deleteQueryBatch(query: firestore.Query, resolve: (value?: any) =
         process.nextTick(() => {
             deleteQueryBatch(query, resolve, reject);
         });
-    } catch(error) {
+    } catch (error) {
         reject(error);
     }
 }
@@ -33,32 +49,27 @@ async function deleteQueryBatch(query: firestore.Query, resolve: (value?: any) =
 async function deleteCollection(collectionPath: string, batchSize: number = 50) {
     const collectionRef = adminDb.collection(collectionPath);
     const query = collectionRef.limit(batchSize);
-
     return new Promise((resolve, reject) => {
         deleteQueryBatch(query, resolve, reject);
     });
 }
 
-// --- Acción principal de reseteo ---
+// --- Main Data Reset Action ---
 export async function resetDailyData(userId: string) {
     try {
         if (!userId) {
             throw new Error("User not authenticated for reset");
         }
-
         console.log(`Iniciando reseteo de datos para el usuario: ${userId}`);
 
-        // 1. Borrar colección de ventas
         const salesPath = `users/${userId}/sales`;
         await deleteCollection(salesPath);
         console.log(`Colección de ventas eliminada para ${userId}`);
 
-        // 2. Borrar colección de resultados
         const resultsPath = `users/${userId}/results`;
         await deleteCollection(resultsPath);
         console.log(`Colección de resultados eliminada para ${userId}`);
 
-        // 3. Borrar entradas del índice de tickets
         const ticketIndexQuery = adminDb.collection('ticketIndex').where('userId', '==', userId);
         await new Promise((resolve, reject) => {
             deleteQueryBatch(ticketIndexQuery, resolve, reject);
@@ -68,24 +79,17 @@ export async function resetDailyData(userId: string) {
         return { success: true, message: "Todos los datos del día han sido eliminados." };
 
     } catch (error: any) {
-        console.error('🔥 Error detallado en reseteo de datos:', {
-            message: error?.message,
-            stack: error?.stack,
-            userId,
-        });
+        console.error('🔥 Error detallado en reseteo de datos:', { message: error?.message, stack: error?.stack, userId });
         throw new Error("Ocurrió un error durante el reseteo de los datos.");
     }
 }
 
-// --- Funciones existentes de ventas ---
+// --- Sale Management Actions ---
 type SaleData = Omit<Sale, 'id' | 'timestamp'> & {
     timestamp: firestore.FieldValue;
 };
 
-export async function createSaleWithIndex(
-    userId: string,
-    newSaleData: SaleData
-) {
+export async function createSaleWithIndex(userId: string, newSaleData: SaleData) {
     try {
         if (!newSaleData || typeof newSaleData !== 'object') {
             throw new Error('Critical error: newSaleData is invalid.');
@@ -93,6 +97,24 @@ export async function createSaleWithIndex(
         if (!userId) {
             throw new Error('User not authenticated');
         }
+
+        // --- BLOCK SALE IF DRAW IS CLOSED ---
+        if (newSaleData.schedules && newSaleData.schedules.length > 0) {
+            const today = getDominicanDateString();
+            const resultsRef = adminDb.collection(`users/${userId}/results`);
+            const resultsQuery = resultsRef
+                .where('drawId', '==', newSaleData.drawId)
+                .where('schedule', 'in', newSaleData.schedules)
+                .where('date', '==', today);
+
+            const existingResultsSnapshot = await resultsQuery.get();
+
+            if (!existingResultsSnapshot.empty) {
+                const closedSchedule = existingResultsSnapshot.docs[0].data().schedule;
+                throw new Error(`El sorteo (${newSaleData.drawName}) para el horario de las ${closedSchedule} ya ha cerrado hoy.`);
+            }
+        }
+        // --- END VALIDATION ---
 
         const saleWithServerTimestamp = {
             ...newSaleData,
@@ -104,29 +126,33 @@ export async function createSaleWithIndex(
 
         const ticketId = String(newSaleData.ticketId).trim().toUpperCase();
         if (!ticketId) {
-             console.error('Venta creada pero no se pudo generar índice por ticketId vacío.', { saleId: newSaleRef.id });
-             return { saleId: newSaleRef.id };
+            console.warn('Venta creada pero no se pudo generar índice por ticketId vacío.', { saleId: newSaleRef.id });
+            return { saleId: newSaleRef.id };
         }
 
         const ticketIndexRef = adminDb.collection('ticketIndex').doc(ticketId);
         await ticketIndexRef.set({
             salePath: newSaleRef.path,
-            userId: userId, 
+            userId: userId,
             createdAt: firestore.FieldValue.serverTimestamp()
         });
 
         return { saleId: newSaleRef.id };
+
     } catch (error: any) {
-        console.error('🔥 Error creando venta con índice:', { error, userId });
-        throw error;
+        if (error.message.includes("ya ha cerrado hoy")) {
+            throw error; // Re-throw validation error to be caught by the client
+        }
+        console.error('🔥 Error creando venta con índice:', {
+            errorMessage: error.message,
+            errorStack: error.stack,
+            userId,
+        });
+        throw new Error('No se pudo crear la venta. Por favor, intente de nuevo.');
     }
 }
 
-export async function updateSaleWithIndex(
-    userId: string,
-    saleId: string,
-    updatedData: Partial<SaleData>
-) {
+export async function updateSaleWithIndex(userId: string, saleId: string, updatedData: Partial<SaleData>) {
     try {
         if (!userId || !saleId || !updatedData) {
             throw new Error('Faltan parámetros para actualizar la venta.');
@@ -143,3 +169,4 @@ export async function updateSaleWithIndex(
         throw error;
     }
 }
+
