@@ -3,27 +3,15 @@
 import {
   createContext,
   useContext,
-  useState,
-  useEffect,
   ReactNode,
-  useCallback,
+  useCallback
 } from "react";
+import { useMasterData } from "./MasterDataContext";
+import { Timestamp } from "firebase/firestore";
+import { addResult as addResultAction, deleteResult as deleteResultAction, updateResult as updateResultAction } from '@/app/(dashboard)/results/actions';
 import { useAuth } from "./AuthContext";
-import { db } from "@/lib/firebase";
-import {
-  collection,
-  addDoc,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  query,
-  orderBy,
-  serverTimestamp,
-  updateDoc,
-  Timestamp,
-} from "firebase/firestore";
 
-// --- Definición de Tipos ---
+// --- Definición de Tipos (sin cambios) ---
 export type Result = {
   id: string;
   drawId: string;
@@ -33,7 +21,7 @@ export type Result = {
   timestamp: Timestamp;
 };
 
-// --- Contexto de React ---
+// --- Contexto de React (Refactorizado) ---
 type ResultsContextType = {
   results: Result[];
   addResult: (newResultData: Omit<Result, "id" | "timestamp">) => Promise<void>;
@@ -52,67 +40,28 @@ export function useResults() {
   return context;
 }
 
-// --- Proveedor del Contexto (Optimizado) ---
+// --- Proveedor del Contexto (Refactorizado) ---
 export function ResultsProvider({ children }: { children: ReactNode }) {
-  const { user, loading: isAuthLoading } = useAuth();
-  const [results, setResults] = useState<Result[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { masterData, isLoading } = useMasterData();
+  const { user } = useAuth();
 
-  // Carga y escucha de resultados desde Firestore
-  useEffect(() => {
-    if (isAuthLoading) {
-      setIsLoading(true);
-      return;
-    }
-    if (!user) {
-      setResults([]);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    const resultsCollectionRef = collection(db, 'users', user.uid, 'results');
-    const q = query(resultsCollectionRef, orderBy("timestamp", "desc"));
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const firestoreResults = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Result, 'id'>),
-      }));
-      setResults(firestoreResults);
-      setIsLoading(false);
-    }, (error) => {
-      console.error("Error listening to results from Firestore:", error);
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe(); // Limpiar la suscripción
-  }, [user, isAuthLoading]);
-
-  // --- Funciones CRUD para Firestore ---
-  const addResult = async (newResultData: Omit<Result, "id" | "timestamp">) => {
+  const addResult = useCallback(async (newResultData: Omit<Result, "id" | "timestamp">) => {
     if (!user) throw new Error("User not authenticated");
-    const resultsCollectionRef = collection(db, 'users', user.uid, 'results');
-    await addDoc(resultsCollectionRef, {
-      ...newResultData,
-      timestamp: serverTimestamp(),
-    });
-  };
+    await addResultAction(user.uid, newResultData);
+  }, [user]);
 
-  const deleteResult = async (id: string) => {
+  const deleteResult = useCallback(async (id: string) => {
     if (!user) throw new Error("User not authenticated");
-    const resultDocRef = doc(db, 'users', user.uid, 'results', id);
-    await deleteDoc(resultDocRef);
-  };
+    await deleteResultAction(user.uid, id);
+  }, [user]);
 
-  const updateResult = async (id: string, updatedData: Partial<Omit<Result, "id">>) => {
+  const updateResult = useCallback(async (id: string, updatedData: Partial<Omit<Result, "id">>) => {
     if (!user) throw new Error("User not authenticated");
-    const resultDocRef = doc(db, 'users', user.uid, 'results', id);
-    await updateDoc(resultDocRef, updatedData);
-  };
+    await updateResultAction(user.uid, id, updatedData);
+  }, [user]);
 
   const value = {
-    results,
+    results: masterData.results,
     addResult,
     deleteResult,
     updateResult,

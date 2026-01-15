@@ -8,22 +8,18 @@ import {
   ReactNode,
   useCallback,
 } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { db } from "@/lib/firebase";
+import { useMasterData } from "./MasterDataContext";
+import { useAuth } from "./AuthContext";
 import {
-  collection,
-  doc,
-  writeBatch,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy,
-  onSnapshot,
+    addDoc, 
+    updateDoc, 
+    deleteDoc, 
+    collection, 
+    doc 
 } from "firebase/firestore";
-import { initialDraws } from "@/lib/placeholder-data";
+import { db } from "@/lib/firebase";
 
-// --- Tipos y Contexto (sin cambios) ---
+// --- Tipos y Contexto ---
 export type Draw = {
   id: string;
   name: string;
@@ -51,54 +47,44 @@ export function useDraws() {
   return context;
 }
 
-// --- Proveedor del Contexto (con onSnapshot) ---
+// --- Proveedor del Contexto (Refactorizado con Caché) ---
 export function DrawsProvider({ children }: { children: ReactNode }) {
-  const { user, loading: isAuthLoading } = useAuth();
-  const [draws, setDraws] = useState<Draw[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { masterData, isLoading: isMasterLoading } = useMasterData();
+  const { user } = useAuth();
+  const [localDraws, setLocalDraws] = useState<Draw[]>([]);
 
+  const DRAWS_CACHE_KEY = user ? `draws_cache_${user.uid}` : null;
+
+  // Efecto para cargar desde caché al inicio
   useEffect(() => {
-    if (isAuthLoading) {
-      setIsLoading(true);
-      return;
-    }
-    if (!user) {
-      setDraws([]);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    const drawsCollectionRef = collection(db, 'users', user.uid, 'draws');
-    const q = query(drawsCollectionRef, orderBy("name", "asc"));
-
-    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-      if (querySnapshot.empty) {
-        // Si no hay sorteos, crear los iniciales
-        console.log("No draws found, seeding initial data...");
-        const batch = writeBatch(db);
-        initialDraws.forEach((draw) => {
-          const newDrawRef = doc(drawsCollectionRef, draw.id);
-          batch.set(newDrawRef, draw);
-        });
-        await batch.commit();
-        // onSnapshot volverá a ejecutarse con los nuevos datos, no es necesario setDraws aquí.
-      } else {
-        const userDraws = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Omit<Draw, 'id'>),
-        }));
-        setDraws(userDraws);
+    if (DRAWS_CACHE_KEY) {
+      try {
+        const cachedDraws = localStorage.getItem(DRAWS_CACHE_KEY);
+        if (cachedDraws) {
+          setLocalDraws(JSON.parse(cachedDraws));
+        }
+      } catch (error) {
+        console.error("Error reading draws from localStorage:", error);
       }
-      setIsLoading(false);
-    }, (error) => {
-      console.error("Error listening to draws from Firestore:", error);
-      setIsLoading(false);
-    });
+    }
+  }, [DRAWS_CACHE_KEY]);
 
-    return () => unsubscribe();
-  }, [user, isAuthLoading]);
+  // Efecto para actualizar el estado y la caché cuando los datos maestros cambian
+  useEffect(() => {
+    // Solo actualizamos si los datos maestros han cambiado y no están vacíos
+    if (masterData.draws.length > 0) {
+      setLocalDraws(masterData.draws);
+      if (DRAWS_CACHE_KEY) {
+        try {
+          localStorage.setItem(DRAWS_CACHE_KEY, JSON.stringify(masterData.draws));
+        } catch (error) {
+          console.error("Error saving draws to localStorage:", error);
+        }
+      }
+    }
+  }, [masterData.draws, DRAWS_CACHE_KEY]);
 
+  // --- Funciones CRUD (apuntan a Firestore directamente, la UI se actualizará vía MasterData) ---
   const addDraw = useCallback(async (newDrawData: Omit<Draw, 'id'>) => {
     if (!user) throw new Error("User not authenticated");
     const drawsCollectionRef = collection(db, 'users', user.uid, 'draws');
@@ -108,7 +94,6 @@ export function DrawsProvider({ children }: { children: ReactNode }) {
   const updateDraw = useCallback(async (updatedDraw: Draw) => {
     if (!user) throw new Error("User not authenticated");
     const drawDocRef = doc(db, 'users', user.uid, 'draws', updatedDraw.id);
-    // Quitamos el 'id' del objeto para no guardarlo en el documento
     const { id, ...dataToUpdate } = updatedDraw;
     await updateDoc(drawDocRef, dataToUpdate);
   }, [user]);
@@ -119,7 +104,14 @@ export function DrawsProvider({ children }: { children: ReactNode }) {
     await deleteDoc(drawDocRef);
   }, [user]);
 
-  const value = { draws, addDraw, updateDraw, deleteDraw, isLoading };
+  const value = {
+    draws: localDraws, // Usamos el estado local cacheado
+    addDraw,
+    updateDraw,
+    deleteDraw,
+    // El `isLoading` ahora es más complejo: es true si la carga maestra está en curso Y no tenemos nada en la caché.
+    isLoading: isMasterLoading && localDraws.length === 0,
+  };
 
   return (
     <DrawsContext.Provider value={value}>{children}</DrawsContext.Provider>

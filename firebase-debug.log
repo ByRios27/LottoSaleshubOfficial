@@ -424,3 +424,145 @@
 [error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
 [debug] [2026-01-15T10:33:47.983Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
 [debug] [2026-01-15T10:33:47.983Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2026-01-15T12:29:54.895Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:54.902Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:54.905Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:54.923Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:54.923Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:54.924Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:54.935Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:54.935Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:54.936Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:54.942Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:54.942Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:54.945Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:54.949Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-01-15T12:29:54.950Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2026-01-15T12:29:54.954Z] Checked if tokens are valid: false, expires at: 1768476826264
+[debug] [2026-01-15T12:29:54.955Z] Checked if tokens are valid: false, expires at: 1768476826264
+[debug] [2026-01-15T12:29:54.960Z] > refreshing access token with scopes: []
+[debug] [2026-01-15T12:29:54.967Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-01-15T12:29:54.967Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-01-15T12:29:54.972Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-01-15T12:29:54.973Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2026-01-15T12:29:54.973Z] Checked if tokens are valid: false, expires at: 1768476826264
+[debug] [2026-01-15T12:29:54.973Z] Checked if tokens are valid: false, expires at: 1768476826264
+[debug] [2026-01-15T12:29:54.973Z] > refreshing access token with scopes: []
+[debug] [2026-01-15T12:29:54.974Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-01-15T12:29:54.974Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-01-15T12:29:55.098Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-01-15T12:29:55.105Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-01-15T12:29:55.141Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo [none]
+[debug] [2026-01-15T12:29:55.153Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-01-15T12:29:55.153Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-01-15T12:29:55.178Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo [none]
+[debug] [2026-01-15T12:29:55.271Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo 200
+[debug] [2026-01-15T12:29:55.272Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo {"name":"projects/new-proyect-lotto-hub/billingInfo","projectId":"new-proyect-lotto-hub","billingAccountName":"billingAccounts/015727-1BBEB8-886438","billingEnabled":true}
+[debug] [2026-01-15T12:29:55.275Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.276Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.276Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-01-15T12:29:55.364Z] Checked if tokens are valid: true, expires at: 1768483794153
+[debug] [2026-01-15T12:29:55.364Z] Checked if tokens are valid: true, expires at: 1768483794153
+[debug] [2026-01-15T12:29:55.364Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/new-proyect-lotto-hub/services/firebaseio.com [none]
+[debug] [2026-01-15T12:29:55.364Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/new-proyect-lotto-hub/services/firebaseio.com x-goog-quota-user=projects/new-proyect-lotto-hub
+[debug] [2026-01-15T12:29:55.500Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo 200
+[debug] [2026-01-15T12:29:55.501Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo {"name":"projects/new-proyect-lotto-hub/billingInfo","projectId":"new-proyect-lotto-hub","billingAccountName":"billingAccounts/015727-1BBEB8-886438","billingEnabled":true}
+[debug] [2026-01-15T12:29:55.505Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.506Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.506Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-01-15T12:29:55.519Z] Checked if tokens are valid: true, expires at: 1768483794153
+[debug] [2026-01-15T12:29:55.519Z] Checked if tokens are valid: true, expires at: 1768483794153
+[debug] [2026-01-15T12:29:55.520Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/new-proyect-lotto-hub/services/firebaseio.com [none]
+[debug] [2026-01-15T12:29:55.520Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/new-proyect-lotto-hub/services/firebaseio.com x-goog-quota-user=projects/new-proyect-lotto-hub
+[debug] [2026-01-15T12:29:55.617Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/new-proyect-lotto-hub/services/firebaseio.com 403
+[debug] [2026-01-15T12:29:55.617Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/new-proyect-lotto-hub/services/firebaseio.com [omitted]
+[debug] [2026-01-15T12:29:55.705Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/new-proyect-lotto-hub/services/firebaseio.com 403
+[debug] [2026-01-15T12:29:55.705Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/new-proyect-lotto-hub/services/firebaseio.com [omitted]
+[debug] [2026-01-15T12:29:55.707Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.708Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.708Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.722Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.724Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.724Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.729Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.729Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.729Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.732Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-01-15T12:29:55.732Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2026-01-15T12:29:55.733Z] Checked if tokens are valid: true, expires at: 1768483794153
+[debug] [2026-01-15T12:29:55.733Z] Checked if tokens are valid: true, expires at: 1768483794153
+[debug] [2026-01-15T12:29:55.738Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo [none]
+[debug] [2026-01-15T12:29:55.803Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo 200
+[debug] [2026-01-15T12:29:55.804Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo {"name":"projects/new-proyect-lotto-hub/billingInfo","projectId":"new-proyect-lotto-hub","billingAccountName":"billingAccounts/015727-1BBEB8-886438","billingEnabled":true}
+[debug] [2026-01-15T12:29:55.807Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.810Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.810Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-01-15T12:29:55.816Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.816Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.816Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.817Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-01-15T12:29:55.818Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2026-01-15T12:29:55.841Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.842Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.843Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.850Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.851Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.851Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.870Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.876Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.876Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.880Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.880Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.881Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.883Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-01-15T12:29:55.883Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2026-01-15T12:29:55.883Z] Checked if tokens are valid: true, expires at: 1768483794153
+[debug] [2026-01-15T12:29:55.883Z] Checked if tokens are valid: true, expires at: 1768483794153
+[debug] [2026-01-15T12:29:55.884Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo [none]
+[debug] [2026-01-15T12:29:55.919Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.919Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.920Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.923Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.923Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.923Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.926Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-01-15T12:29:55.926Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2026-01-15T12:29:55.928Z] Checked if tokens are valid: true, expires at: 1768483794153
+[debug] [2026-01-15T12:29:55.928Z] Checked if tokens are valid: true, expires at: 1768483794153
+[debug] [2026-01-15T12:29:55.928Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo [none]
+[debug] [2026-01-15T12:29:55.950Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo 200
+[debug] [2026-01-15T12:29:55.950Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo {"name":"projects/new-proyect-lotto-hub/billingInfo","projectId":"new-proyect-lotto-hub","billingAccountName":"billingAccounts/015727-1BBEB8-886438","billingEnabled":true}
+[debug] [2026-01-15T12:29:55.951Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.951Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.951Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-01-15T12:29:55.952Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.952Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.953Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.957Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-01-15T12:29:55.957Z] > authorizing via signed-in user (jrios5061@gmail.com)
+[debug] [2026-01-15T12:29:55.978Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo 200
+[debug] [2026-01-15T12:29:55.979Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/new-proyect-lotto-hub/billingInfo {"name":"projects/new-proyect-lotto-hub/billingInfo","projectId":"new-proyect-lotto-hub","billingAccountName":"billingAccounts/015727-1BBEB8-886438","billingEnabled":true}
+[debug] [2026-01-15T12:29:55.979Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.980Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.980Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2026-01-15T12:29:55.987Z] Object "/storage" in "firebase.json" has unknown property: {"additionalProperty":"bucket"}
+[debug] [2026-01-15T12:29:55.987Z] Field "/storage" in "firebase.json" is possibly invalid: must be array
+[debug] [2026-01-15T12:29:55.987Z] Field "/storage" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2026-01-15T12:29:55.995Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-01-15T12:29:55.995Z] > authorizing via signed-in user (jrios5061@gmail.com)
