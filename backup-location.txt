@@ -1,0 +1,8 @@
+Se creó una copia del repositorio en: /workspace/LottoSaleshubOfficial_copy
+
+Nota:
+- Esta copia es local y no está vinculada a GitHub porque el repositorio original no tiene un remote configurado.
+- Para verla en GitHub, debes crear un nuevo repositorio y luego ejecutar:
+  1) cd /workspace/LottoSaleshubOfficial_copy
+  2) git remote add origin <URL_DEL_NUEVO_REPO>
+  3) git push -u origin main (o la rama correspondiente)
