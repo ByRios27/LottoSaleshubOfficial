@@ -1,18 +1,11 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { db } from '@/lib/firebase';
+import { useMasterData } from '@/contexts/MasterDataContext';
 import { createSaleWithIndex, updateSaleWithIndex } from '@/app/(dashboard)/sales/actions';
-import {
-  collection,
-  deleteDoc,
-  doc,
-  query,
-  orderBy,
-  Timestamp,
-  onSnapshot
-} from 'firebase/firestore';
+import { deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 // --- Definición de Tipos ---
 export type Sale = {
@@ -50,109 +43,48 @@ export function useSales() {
   return context;
 }
 
-interface SalesProviderProps {
-  children: ReactNode;
-}
+// --- Proveedor del Contexto (Refactorizado) ---
+export function SalesProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+  const { masterData, isLoading } = useMasterData();
 
-export function SalesProvider({ children }: SalesProviderProps) {
-  const { user, loading: isAuthLoading } = useAuth();
-  const [sales, setSales] = useState<Sale[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (isAuthLoading) {
-      setIsLoading(true);
-      return;
-    }
-    if (!user) {
-      setSales([]);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    const salesCollectionRef = collection(db, 'users', user.uid, 'sales');
-    const q = query(salesCollectionRef, orderBy('timestamp', 'desc'));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setSales(prevSales => {
-        let newSales = [...prevSales];
-
-        snapshot.docChanges().forEach((change) => {
-          const docData = change.doc.data();
-          const sale = {
-            id: change.doc.id,
-            ...docData,
-            timestamp: (docData.timestamp as Timestamp)?.toDate?.().toISOString() ?? docData.timestamp,
-          } as Sale;
-
-          if (change.type === "added") {
-            // Añadir si no existe, para evitar duplicados en la carga inicial
-            if (!newSales.some(s => s.id === sale.id)) {
-                newSales.push(sale);
-            }
-          }
-          if (change.type === "modified") {
-            const index = newSales.findIndex(s => s.id === sale.id);
-            if (index !== -1) {
-              newSales[index] = sale; // Actualiza el elemento existente
-            }
-          }
-          if (change.type === "removed") {
-            newSales = newSales.filter(s => s.id !== sale.id);
-          }
-        });
-
-        // Re-ordenar por si acaso, especialmente después de añadir
-        newSales.sort((a, b) => new Date(b.timestamp as string).getTime() - new Date(a.timestamp as string).getTime());
-        return newSales;
-      });
-
-      setIsLoading(false);
-    }, (error) => {
-      console.error("Error listening to sales from Firestore:", error);
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [user, isAuthLoading]);
-
-  const addSale = async (newSale: Omit<Sale, 'id' | 'timestamp'>): Promise<Sale | undefined> => {
+  const addSale = useCallback(async (newSale: Omit<Sale, 'id' | 'timestamp'>): Promise<Sale | undefined> => {
     if (!user) throw new Error('User not authenticated to add sale');
     try {
       const { saleId } = await createSaleWithIndex(user.uid, newSale as any);
       if (!saleId) throw new Error('Sale creation failed, no ID returned.');
+      // La UI se actualizará automáticamente gracias a MasterDataProvider
       return { ...newSale, id: saleId, timestamp: new Date().toISOString() } as Sale;
     } catch (error) {
       console.error('Error creating sale with index:', error);
       return undefined;
     }
-  };
+  }, [user]);
 
-  const updateSale = async (id: string, updatedData: Partial<Omit<Sale, 'id'>>) => {
+  const updateSale = useCallback(async (id: string, updatedData: Partial<Omit<Sale, 'id'>>) => {
     if (!user) throw new Error('User not authenticated to update sale');
     try {
-      // La lógica de onSnapshot se encargará de actualizar la UI de forma granular y correcta.
+      // La UI se actualizará automáticamente gracias a MasterDataProvider
       await updateSaleWithIndex(user.uid, id, updatedData as any);
     } catch (error) {
       console.error('Error updating sale:', error);
       throw error;
     }
-  };
+  }, [user]);
 
-  const deleteSale = async (id: string) => {
+  const deleteSale = useCallback(async (id: string) => {
     if (!user) throw new Error('User not authenticated to delete sale');
     try {
-      // La lógica de onSnapshot se encargará de actualizar la UI.
+      // La UI se actualizará automáticamente gracias a MasterDataProvider
       const saleDocRef = doc(db, 'users', user.uid, 'sales', id);
       await deleteDoc(saleDocRef);
-    } catch (error) { 
+    } catch (error) {
       console.error('Error deleting sale:', error);
     }
-  };
+  }, [user]);
 
   const value = {
-    sales,
+    sales: masterData.sales,
     addSale,
     updateSale,
     deleteSale,
@@ -160,8 +92,6 @@ export function SalesProvider({ children }: SalesProviderProps) {
   };
 
   return (
-    <SalesContext.Provider value={value}>
-      {children}
-    </SalesContext.Provider>
+    <SalesContext.Provider value={value}>{children}</SalesContext.Provider>
   );
 }

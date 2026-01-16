@@ -70,6 +70,14 @@ export async function resetDailyData(userId: string) {
         await deleteCollection(resultsPath);
         console.log(`Colección de resultados eliminada para ${userId}`);
 
+        const payoutsPath = `users/${userId}/payouts`;
+        await deleteCollection(payoutsPath);
+        console.log(`Colección de pagos (payouts) eliminada para ${userId}`);
+
+        const dailyClosuresPath = `users/${userId}/dailyClosures`;
+        await deleteCollection(dailyClosuresPath);
+        console.log(`Colección de cierres diarios (dailyClosures) eliminada para ${userId}`);
+
         const ticketIndexQuery = adminDb.collection('ticketIndex').where('userId', '==', userId);
         await new Promise((resolve, reject) => {
             deleteQueryBatch(ticketIndexQuery, resolve, reject);

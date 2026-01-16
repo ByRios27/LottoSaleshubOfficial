@@ -1,24 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { db } from '@/lib/firebase';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
-
-/**
- * Gets the current date as a string in 'YYYY-MM-DD' format for the Dominican Republic timezone.
- * @returns {string} The formatted date string.
- */
-function getDominicanDateString(): string {
-    const date = new Date();
-    // Using a locale like 'sv-SE' with the correct timezone provides the desired YYYY-MM-DD format.
-    return new Intl.DateTimeFormat('sv-SE', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        timeZone: 'America/Santo_Domingo',
-    }).format(date);
-}
+import { createContext, useContext, ReactNode } from 'react';
+import { useMasterData } from './MasterDataContext';
 
 // --- Types and Context Definition ---
 type ClosedSchedulesContextType = {
@@ -36,47 +19,16 @@ export function useClosedSchedules() {
   return context;
 }
 
-// --- Context Provider ---
+// --- Context Provider (Refactorizado) ---
 export function ClosedSchedulesProvider({ children }: { children: ReactNode }) {
-  const { user, loading: isAuthLoading } = useAuth();
-  const [closedSchedules, setClosedSchedules] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Obtenemos los datos directamente del MasterDataProvider
+  const { masterData, isLoading } = useMasterData();
 
-  useEffect(() => {
-    if (isAuthLoading) {
-      setIsLoading(true);
-      return;
-    }
-    if (!user) {
-      setClosedSchedules([]);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-
-    const today = getDominicanDateString();
-    const resultsCollectionRef = collection(db, 'users', user.uid, 'results');
-    const q = query(resultsCollectionRef, where('date', '==', today));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const closed: string[] = [];
-      snapshot.forEach(doc => {
-        const result = doc.data();
-        // Create a unique identifier for the closed draw schedule
-        closed.push(`${result.drawId}-${result.schedule}`);
-      });
-      setClosedSchedules(closed);
-      setIsLoading(false);
-    }, (error) => {
-      console.error("Error listening to closed schedules:", error);
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [user, isAuthLoading]);
-
-  const value = { closedSchedules, isLoading };
+  // El valor del contexto ahora es simplemente un reflejo de los datos maestros
+  const value = {
+    closedSchedules: masterData.closedSchedules,
+    isLoading: isLoading, // El estado de carga es el del maestro
+  };
 
   return (
     <ClosedSchedulesContext.Provider value={value}>

@@ -21,7 +21,34 @@ La aplicación sigue un enfoque de diseño moderno y audaz, con un fuerte énfas
 
 ---
 
-## Plan de Acción Completado (Reciente)
+## Plan de Acción Completado (Más Reciente)
+
+### Mejora de la Función 'Reiniciar Día'
+
+**Objetivo:** Asegurar que la función "Reiniciar Día" realice una limpieza completa de todos los datos transaccionales del día.
+
+**Pasos Realizados:**
+
+1.  **Diagnóstico:** Se observó que la acción `resetDailyData` eliminaba las ventas, los resultados y el índice de tickets, pero no borraba los registros de premios pagados (`payouts`) ni los cierres diarios (`dailyClosures`).
+2.  **Solución:** Se modificó la Server Action `resetDailyData` en `src/app/(dashboard)/sales/actions.ts`.
+3.  **Implementación:** Se añadieron llamadas a la función auxiliar `deleteCollection` para eliminar todos los documentos dentro de las colecciones `users/{userId}/payouts` y `users/{userId}/dailyClosures`.
+4.  **Resultado:** El botón "Reiniciar Día" ahora garantiza un borrado completo, dejando la aplicación en un estado limpio para el inicio de una nueva jornada.
+
+### Corrección de Renderizado en Tiempo Real (Edición de Ventas)
+
+**Objetivo:** Solucionar un problema crítico donde la interfaz de usuario no se actualizaba inmediatamente después de editar una venta, requiriendo una recarga manual para ver el cambio.
+
+**Pasos Realizados:**
+
+1.  **Diagnóstico Inicial:** Se confirmó que los datos se guardaban correctamente en Firestore, pero la interfaz de React no se volvía a renderizar con la nueva información.
+2.  **Análisis del Problema:** Se identificó una "condición de carrera" en `SalesContext.tsx`. Un intento previo de "actualización optimista" entraba en conflicto con el listener en tiempo real (`onSnapshot`) de Firestore. El listener, a veces leyendo una caché local desactualizada, revertía el cambio visual, causando la inconsistencia.
+3.  **Solución Arquitectónica:** Se refactorizó por completo el listener `onSnapshot` para utilizar la función `docChanges()`. Este método proporciona información granular sobre qué documentos específicos fueron `añadidos`, `modificados` o `eliminados`.
+4.  **Implementación:** El `SalesContext` ahora actualiza su estado de forma quirúrgica: modifica, añade o elimina solo las ventas afectadas, en lugar de reemplazar toda la lista.
+5.  **Resultado:** La condición de carrera ha sido eliminada. La interfaz ahora reacciona de forma instantánea y precisa a cualquier cambio en la base de datos, garantizando una experiencia de usuario fluida y fiable.
+
+---
+
+## Plan de Acción Anterior
 
 ### Correcciones de Rendimiento y UI (Ventas)
 
@@ -53,15 +80,3 @@ La aplicación sigue un enfoque de diseño moderno y audaz, con un fuerte énfas
 4.  **Limpieza de Navegación:** Se eliminó el enlace a `/finanzas` del menú principal en `src/app/page.tsx`, eliminando por completo el acceso a la sección.
 5.  **Resultado:** El problema de rendimiento ha sido solucionado de raíz, y la base de código es ahora más limpia y fácil de mantener.
 
-## Plan de Acción Anterior
-
-### Auditoría y Refactorización de la Persistencia de Datos
-
-**Objetivo:** Asegurar que todos los datos de la aplicación (sorteos, resultados, ganadores) se gestionen de forma centralizada y eficiente en Firestore, eliminando cualquier uso de `localStorage` o métodos de carga de datos ineficientes.
-
-**Pasos a Seguir:**
-
-1.  **Auditar `ResultsContext` y `DrawsContext`:** Se revisarán los contextos `src/contexts/ResultsContext.tsx` y `src/contexts/DrawsContext.tsx` para identificar la estrategia actual de carga y almacenamiento de datos.
-2.  **Identificar Puntos de Mejora:** Se buscará cualquier uso de `localStorage` o de la función `getDocs` de Firestore para la carga de datos.
-3.  **Refactorizar a `onSnapshot`:** Todos los contextos que utilicen `getDocs` serán refactorizados para usar `onSnapshot`. Esto garantizará que los datos de resultados y sorteos se carguen de manera eficiente y se actualicen en tiempo real en la interfaz de usuario.
-4.  **Centralizar la Lógica:** Se consolidará toda la lógica de acceso a datos dentro de los contextos de React, asegurando que los componentes de la interfaz permanezcan limpios y se limiten a consumir los datos proporcionados por dichos contextos.
