@@ -3,10 +3,12 @@
     "rules": "firestore.rules",
     "database": "(default)"
   },
-  "storage": {
-    "rules": "storage.rules",
-    "bucket": "new-proyect-lotto-hub.firebasestorage.app"
-  },
+  "storage": [
+    {
+      "rules": "storage.rules",
+      "bucket": "new-proyect-lotto-hub.firebasestorage.app"
+    }
+  ],
   "apphosting": {
     "backendId": "newhublotto-54341291",
     "rootDir": "./",

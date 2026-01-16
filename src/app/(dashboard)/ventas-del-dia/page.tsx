@@ -109,7 +109,7 @@ export default function VentasDelDiaPage() {
     const payoutsRef = collection(db, 'users', user.uid, 'payoutStatus');
     const payoutsQuery = query(payoutsRef, where('date', '==', todayDocId));
     const unsubscribePayouts = onSnapshot(payoutsQuery, (snapshot) => {
-        const payoutsTotal = snapshot.docs.reduce((acc, doc) => acc + (doc.data() as Payout).totalWin, 0);
+        const payoutsTotal = snapshot.docs.reduce((acc, doc) => acc + (doc.data() as { totalWin: number }).totalWin, 0);
         setAutomaticPrizes(payoutsTotal);
     }, (error) => {
         console.error("Error listening to payouts:", error);
@@ -281,7 +281,8 @@ export default function VentasDelDiaPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <Card className="bg-blue-600 text-white"><CardHeader><CardTitle>Ventas Totales</CardTitle></CardHeader><CardContent>{isLoading.sales ? <p className="text-2xl">Cargando...</p> : <p className="text-4xl font-bold">{formatMoney(totalSales)}</p>}</CardContent></Card>
             <Card className="bg-green-500 text-white"><CardHeader><CardTitle>Tu Ganancia (Comisión)</CardTitle></CardHeader><CardContent><p className="text-4xl font-bold">{formatMoney(netProfit)}</p></CardContent></Card>
-            <Card className="bg-red-500 text-white"><CardHeader><CardTitle>Total Premios del Día</CardTitle></CardHeader><CardContent><p className="text-4xl font-bold">{formatMoney(totalPrizes)}</p></CardContent></Card>
+            <Card className="bg-red-500 text-white
+            "><CardHeader><CardTitle>Total Premios del Día</CardTitle></CardHeader><CardContent><p className="text-4xl font-bold">{formatMoney(totalPrizes)}</p></CardContent></Card>
             <Card className={houseNet >= 0 ? "bg-purple-600 text-white" : "bg-orange-600 text-white"}><CardHeader><CardTitle>Neto Casa Grande</CardTitle></CardHeader><CardContent><p className="text-4xl font-bold">{formatMoney(houseNet)}</p></CardContent></Card>
           </div>
 
