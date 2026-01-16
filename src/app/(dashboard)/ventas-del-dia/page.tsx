@@ -58,11 +58,6 @@ type DailyClosure = {
     phoneNumber?: string;
 };
 
-type Payout = { 
-    totalWin: number;
-    date: string; 
-};
-
 // --- COMPONENT ---
 export default function VentasDelDiaPage() {
   const { user } = useAuth();
@@ -280,7 +275,7 @@ export default function VentasDelDiaPage() {
             <Link href="/" className="text-gray-400 hover:text-white transition-colors">
               <ArrowUturnUpIcon className="h-7 w-7" />
             </Link>
-            <h1 className="text-3xl font-bold">Supercomputadora de Contabilidad</h1>
+            <h1 className="text-3xl font-bold">Estadísticas</h1>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
