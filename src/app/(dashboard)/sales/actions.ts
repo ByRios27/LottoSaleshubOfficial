@@ -19,25 +19,26 @@ function getDominicanDateString(): string {
         day: '2-digit',
         timeZone: 'America/Santo_Domingo',
     };
-    // Using a locale like 'sv-SE' provides the desired YYYY-MM-DD format.
     return new Intl.DateTimeFormat('sv-SE', options).format(date);
 }
 
 // --- Batch Deletion Functions ---
+
+/**
+ * Recursively deletes documents from a query in batches.
+ */
 async function deleteQueryBatch(query: firestore.Query, resolve: (value?: any) => void, reject: (reason?: any) => void) {
     try {
-        const snapshot = await query.get();
+        const snapshot = await query.limit(100).get(); // Increased batch size for speed
         if (snapshot.size === 0) {
             resolve();
             return;
         }
-
         const batch = adminDb.batch();
         snapshot.docs.forEach((doc) => {
             batch.delete(doc.ref);
         });
         await batch.commit();
-
         process.nextTick(() => {
             deleteQueryBatch(query, resolve, reject);
         });
@@ -46,43 +47,66 @@ async function deleteQueryBatch(query: firestore.Query, resolve: (value?: any) =
     }
 }
 
-async function deleteCollection(collectionPath: string, batchSize: number = 50) {
-    const collectionRef = adminDb.collection(collectionPath);
-    const query = collectionRef.limit(batchSize);
+/**
+ * Deletes an entire collection or a query result.
+ */
+async function deleteCollection(collectionOrQuery: string | firestore.Query, batchSize: number = 100) {
+    const query = typeof collectionOrQuery === 'string' 
+        ? adminDb.collection(collectionOrQuery).limit(batchSize) 
+        : collectionOrQuery;
+    
     return new Promise((resolve, reject) => {
         deleteQueryBatch(query, resolve, reject);
     });
 }
 
 // --- Main Data Reset Action ---
+
 export async function resetDailyData(userId: string) {
     try {
         if (!userId) {
             throw new Error("User not authenticated for reset");
         }
-        console.log(`Iniciando reseteo de datos para el usuario: ${userId}`);
+        console.log(`ADVERTENCIA: Iniciando borrado COMPLETO de datos para el usuario: ${userId}`);
 
-        const salesPath = `users/${userId}/sales`;
-        await deleteCollection(salesPath);
-        console.log(`Colección de ventas eliminada para ${userId}`);
+        // Define paths for collections to be entirely deleted
+        const collectionsToDelete = [
+            `users/${userId}/sales`,
+            `users/${userId}/results`,
+            `users/${userId}/winners`,
+            `users/${userId}/payoutStatus`,
+            `users/${userId}/dailyClosures`
+        ];
 
-        const resultsPath = `users/${userId}/results`;
-        await deleteCollection(resultsPath);
-        console.log(`Colección de resultados eliminada para ${userId}`);
-
+        // Define the query for user-specific documents in the root ticketIndex collection
         const ticketIndexQuery = adminDb.collection('ticketIndex').where('userId', '==', userId);
-        await new Promise((resolve, reject) => {
-            deleteQueryBatch(ticketIndexQuery, resolve, reject);
-        });
-        console.log(`Entradas de ticketIndex eliminadas para ${userId}`);
 
-        return { success: true, message: "Todos los datos del día han sido eliminados." };
+        // Create a list of deletion promises
+        const deletionPromises = collectionsToDelete.map(path => 
+            deleteCollection(path).then(() => console.log(`Colección ${path} eliminada.`))
+        );
+
+        // Add the promise for deleting ticketIndex entries
+        deletionPromises.push(
+            deleteCollection(ticketIndexQuery).then(() => console.log(`Entradas de ticketIndex eliminadas para ${userId}.`))
+        );
+
+        // Execute all deletions in parallel
+        await Promise.all(deletionPromises);
+
+        console.log(`Reseteo completo de datos finalizado para el usuario: ${userId}`);
+        return { success: true, message: "Todas las colecciones de datos han sido eliminadas." };
 
     } catch (error: any) {
-        console.error('🔥 Error detallado en reseteo de datos:', { message: error?.message, stack: error?.stack, userId });
-        throw new Error("Ocurrió un error durante el reseteo de los datos.");
+        console.error('🔥 Error detallado en reseteo de datos masivo:', { 
+            message: error?.message, 
+            stack: error?.stack, 
+            userId 
+        });
+        throw new Error("Ocurrió un error catastrófico durante el reseteo de los datos.");
     }
 }
+
 
 // --- Sale Management Actions ---
 type SaleData = Omit<Sale, 'id' | 'timestamp'> & {
@@ -169,4 +193,3 @@ export async function updateSaleWithIndex(userId: string, saleId: string, update
         throw error;
     }
 }
-
