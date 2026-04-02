@@ -20,10 +20,11 @@ import {
   query,
   orderBy,
   onSnapshot,
+  getDocs,
 } from "firebase/firestore";
 import { initialDraws } from "@/lib/placeholder-data";
 
-// --- Tipos y Contexto (sin cambios) ---
+// --- Tipos y Contexto ---
 export type Draw = {
   id: string;
   name: string;
@@ -38,6 +39,7 @@ type DrawsContextType = {
   addDraw: (newDraw: Omit<Draw, 'id'>) => Promise<void>;
   updateDraw: (updatedDraw: Draw) => Promise<void>;
   deleteDraw: (id: string) => Promise<void>;
+  resetDraws: () => Promise<void>; // <--- REINCORPORADO
   isLoading: boolean;
 };
 
@@ -51,7 +53,7 @@ export function useDraws() {
   return context;
 }
 
-// --- Proveedor del Contexto (con onSnapshot) ---
+// --- Proveedor del Contexto ---
 export function DrawsProvider({ children }: { children: ReactNode }) {
   const { user, loading: isAuthLoading } = useAuth();
   const [draws, setDraws] = useState<Draw[]>([]);
@@ -74,7 +76,6 @@ export function DrawsProvider({ children }: { children: ReactNode }) {
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       if (querySnapshot.empty) {
-        // Si no hay sorteos, crear los iniciales
         console.log("No draws found, seeding initial data...");
         const batch = writeBatch(db);
         initialDraws.forEach((draw) => {
@@ -82,7 +83,6 @@ export function DrawsProvider({ children }: { children: ReactNode }) {
           batch.set(newDrawRef, draw);
         });
         await batch.commit();
-        // onSnapshot volverá a ejecutarse con los nuevos datos, no es necesario setDraws aquí.
       } else {
         const userDraws = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -108,7 +108,6 @@ export function DrawsProvider({ children }: { children: ReactNode }) {
   const updateDraw = useCallback(async (updatedDraw: Draw) => {
     if (!user) throw new Error("User not authenticated");
     const drawDocRef = doc(db, 'users', user.uid, 'draws', updatedDraw.id);
-    // Quitamos el 'id' del objeto para no guardarlo en el documento
     const { id, ...dataToUpdate } = updatedDraw;
     await updateDoc(drawDocRef, dataToUpdate);
   }, [user]);
@@ -119,7 +118,29 @@ export function DrawsProvider({ children }: { children: ReactNode }) {
     await deleteDoc(drawDocRef);
   }, [user]);
 
-  const value = { draws, addDraw, updateDraw, deleteDraw, isLoading };
+  // <--- FUNCIÓN REINCORPORADA ---
+  const resetDraws = useCallback(async () => {
+    if (!user) throw new Error("User not authenticated");
+    setIsLoading(true);
+    const drawsCollectionRef = collection(db, 'users', user.uid, 'draws');
+    try {
+      const batch = writeBatch(db);
+      const currentDrawsSnapshot = await getDocs(query(drawsCollectionRef));
+      currentDrawsSnapshot.forEach(doc => batch.delete(doc.ref));
+      initialDraws.forEach(draw => {
+        const newDrawRef = doc(drawsCollectionRef, draw.id);
+        batch.set(newDrawRef, draw);
+      });
+      await batch.commit();
+    } catch (error) {
+      console.error("Error resetting draws:", error);
+      throw error;
+    } finally {
+      // El listener de onSnapshot se encargará de actualizar el estado y el isLoading.
+    }
+  }, [user]);
+
+  const value = { draws, addDraw, updateDraw, deleteDraw, resetDraws, isLoading };
 
   return (
     <DrawsContext.Provider value={value}>{children}</DrawsContext.Provider>
