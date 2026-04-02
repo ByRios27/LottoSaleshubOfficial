@@ -32,8 +32,11 @@ const buildWatermarkData = (sale: Sale) => {
   const nums = (sale.numbers || [])
     .map(n => `${String(n.number).padStart(2, '0')}x${n.quantity}`)
     .join(' ');
+  const pales = (sale.pales || [])
+    .map(p => `${p.number}x${p.quantity.toFixed(2)}`)
+    .join(' ');
   const macroBase = `${id} • TOTAL ${total} • ORIGINAL`;
-  const microBase = `${id} • ${total} • ${nums} • ${id} • ORIGINAL • `;
+  const microBase = `${id} • ${total} • ${nums} ${pales} • ${id} • ORIGINAL • `;
   return { macroBase, microBase, id, total, nums };
 };
 
@@ -299,7 +302,7 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
 
   const { macroBase, microBase, id, total, nums } = buildWatermarkData(sale);
   const seed = simpleSeedFromString(`${id}|${total}|${nums}`);
-  const numbersCount = (sale.numbers || []).length;
+  const numbersCount = (sale.numbers || []).length + (sale.pales || []).length;
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 z-[60]">
@@ -410,6 +413,33 @@ const Receipt: React.FC<ReceiptProps> = ({ sale, drawName, onClose, businessName
                 ))}
               </div>
             </div>
+
+            {sale.pales && sale.pales.length > 0 && (
+                <div className="text-xs font-mono relative rounded-sm overflow-hidden mt-2">
+                    <div className="relative px-1 py-1">
+                        <div className="flex justify-between font-sans font-semibold text-black border-b border-gray-300 pb-1 mb-2">
+                            <span>Pale</span><span>Cantidad</span><span>Monto</span>
+                        </div>
+                        {sale.pales.map((p, index) => (
+                            <div
+                                key={index}
+                                className="flex justify-between items-center"
+                                style={{
+                                    borderBottom: index === sale.pales.length - 1
+                                        ? 'none'
+                                        : '1px dashed rgba(0,0,0,0.28)',
+                                    paddingBottom: '2px',
+                                    marginBottom: '2px',
+                                }}
+                            >
+                                <span style={secureNumberStyle}>{p.number}</span>
+                                <span className="text-gray-900">x{p.quantity.toFixed(2)}</span>
+                                <span className="text-gray-900">${p.quantity.toFixed(2)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="mt-4 pt-2 border-t border-dashed border-gray-300">
               <div className="flex justify-end items-baseline text-lg font-bold font-mono">

@@ -24,6 +24,7 @@ export type Sale = {
   drawLogo?: string;
   schedules: string[];
   numbers: { number: string; quantity: number }[];
+  pales?: { number: string; quantity: number }[];
   sellerId: string;
   clientName?: string;
   clientPhone?: string;

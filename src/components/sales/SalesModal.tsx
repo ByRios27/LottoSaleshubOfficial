@@ -20,6 +20,10 @@ const formSchema = z.object({
   numbers: z.array(z.object({ number: z.string().min(1, 'El número es requerido.'), quantity: z.coerce.number().int().min(1, 'Mínimo 1') })).nonempty('Añade al menos un número.'),
   clientName: z.string().optional(),
   clientPhone: z.string().optional(),
+  pales: z.array(z.object({
+    number: z.string().length(4, 'El número del pale debe tener 4 dígitos.'),
+    quantity: z.coerce.number().min(0.10, 'Mínimo 0.10').max(5, 'Máximo 5'),
+  })).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -83,14 +87,21 @@ const SalesModal: React.FC<{ draw: Draw | null; onClose: () => void; businessNam
   const [applyMode, setApplyMode] = useState<ApplyMode>('add');
   const [invertList, setInvertList] = useState(false);
 
-  const form = useForm<FormValues>({ resolver: zodResolver(formSchema), mode: 'all', defaultValues: { schedules: [], numbers: [{ number: '', quantity: 1 }], clientName: '', clientPhone: '' } });
+  const form = useForm<FormValues>({ resolver: zodResolver(formSchema), mode: 'all', defaultValues: { schedules: [], numbers: [{ number: '', quantity: 1 }], pales: [], clientName: '', clientPhone: '' } });
   const { fields, append, remove, replace } = useFieldArray({ control: form.control, name: 'numbers' });
+  const { fields: paleFields, append: appendPale, remove: removePale } = useFieldArray({ control: form.control, name: 'pales' });
   
   const schedules = useMemo(() => draw?.sch || [], [draw]);
   const costPerFraction = draw?.cost || 0.2;
   const watchedNumbers = useWatch({ control: form.control, name: 'numbers' });
+  const watchedPales = useWatch({ control: form.control, name: 'pales' });
   const watchedSchedules = useWatch({ control: form.control, name: 'schedules' });
-  const totalCost = useMemo(() => (watchedNumbers || []).reduce((acc, curr) => acc + (Number(curr?.quantity) || 0), 0) * (watchedSchedules?.length || 0) * costPerFraction, [watchedNumbers, watchedSchedules, costPerFraction]);
+
+  const totalCost = useMemo(() => {
+    const numbersCost = (watchedNumbers || []).reduce((acc, curr) => acc + (Number(curr?.quantity) || 0), 0) * (watchedSchedules?.length || 0) * costPerFraction;
+    const palesCost = (watchedPales || []).reduce((acc, curr) => acc + (Number(curr?.quantity) || 0), 0) * (watchedSchedules?.length || 0);
+    return numbersCost + palesCost;
+  }, [watchedNumbers, watchedPales, watchedSchedules, costPerFraction]);
 
   const completedSales = useMemo(() => {
     const combined = [...sales.filter(s => s.drawId === draw?.id.toString()), ...sessionSales];
@@ -99,12 +110,18 @@ const SalesModal: React.FC<{ draw: Draw | null; onClose: () => void; businessNam
 
   const handleEditSale = (saleToEdit: Sale) => {
     setEditingSale(saleToEdit);
-    setActiveTab('sell'); // <-- FIX: Automatically switch to the sell tab
+    setActiveTab('sell');
   };
 
   useEffect(() => {
     if (editingSale) {
-      form.reset({ schedules: editingSale.schedules, numbers: editingSale.numbers, clientName: editingSale.clientName || '', clientPhone: editingSale.clientPhone || '' });
+      form.reset({ 
+        schedules: editingSale.schedules, 
+        numbers: editingSale.numbers, 
+        pales: editingSale.pales || [],
+        clientName: editingSale.clientName || '', 
+        clientPhone: editingSale.clientPhone || '' 
+      });
       setBulkText(''); setBulkPreview([]); setBulkErrors([]);
     }
   }, [editingSale, form]);
@@ -250,6 +267,22 @@ const SalesModal: React.FC<{ draw: Draw | null; onClose: () => void; businessNam
                     {form.formState.errors.numbers && <p className="text-red-500 text-xs mt-2">{form.formState.errors.numbers.root?.message}</p>}
                     <button type="button" onClick={() => append({ number: '', quantity: 1 })} className="mt-4 flex items-center gap-2 text-green-400 hover:text-green-300 text-sm"><PlusCircle className="w-5 h-5" />Añadir Número</button>
                   </div>
+
+                  <div>
+                    <h4 className="font-medium text-white/90 mb-3">Añadir Pales</h4>
+                    <div className="space-y-3">
+                      {paleFields.map((field, index) => (
+                        <div key={field.id} className="flex items-center gap-3">
+                          <input placeholder="Número" {...form.register(`pales.${index}.number`)} maxLength={4} className={`w-full bg-black/20 border rounded-lg p-1.5 px-3 text-white ${form.formState.errors.pales?.[index]?.number ? 'border-red-500' : 'border-white/20'}`} />
+                          <input type="number" step="0.10" min="0.10" max="5" placeholder="Cantidad" {...form.register(`pales.${index}.quantity`)} className="w-36 bg-black/20 border-white/20 border rounded-lg py-1.5 px-3 text-white" />
+                          <button type="button" onClick={() => removePale(index)} className="p-2 text-red-500/70 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                        </div>
+                      ))}
+                    </div>
+                    {form.formState.errors.pales && <p className="text-red-500 text-xs mt-2">{form.formState.errors.pales.root?.message}</p>}
+                    <button type="button" onClick={() => appendPale({ number: '', quantity: 0.10 })} className="mt-4 flex items-center gap-2 text-green-400 hover:text-green-300 text-sm"><PlusCircle className="w-5 h-5" />Añadir Pale</button>
+                  </div>
+
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-white/10 flex justify-between items-center">
