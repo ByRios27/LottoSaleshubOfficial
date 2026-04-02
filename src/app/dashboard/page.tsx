@@ -5,7 +5,7 @@ import { ArchiveBoxIcon, ChartBarIcon, TicketIcon, BuildingStorefrontIcon, Arrow
 import Link from 'next/link';
 import { useBusiness } from '@/contexts/BusinessContext';
 import Image from "next/image";
-import React from 'react';
+import React, { useEffect } from 'react'; // <--- IMPORTACIÓN CORREGIDA
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
